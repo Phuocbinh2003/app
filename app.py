@@ -3,30 +3,35 @@ import numpy as np
 import cv2
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
-import streamlit.components.v1 as components
+import io
 
 class GrabCutApp:
     def __init__(self):
         self.img = None
+        self.img2 = None
         self.mask = None
         self.output = None
         self.rect = (0, 0, 1, 1)
         self.drawing = False
+        self.rectangle = False
+        self.rect_over = False
         self.rect_or_mask = 100
-        self.value = (255, 255, 255)  # Màu mặc định là trắng
+        self.value = {'color': (255, 255, 255), 'val': 1}  # Màu mặc định là trắng
+        self.thickness = 3
 
     def run(self):
         if self.img is None:
             st.error("Ảnh chưa được tải lên!")
             return
-        
+
         self.img2 = self.img.copy()
         self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
+        self.output = np.zeros(self.img.shape, np.uint8)
 
         # Hiển thị canvas để vẽ lên ảnh
         canvas_result = st_canvas(
             fill_color="rgba(255, 0, 0, 0.3)",
-            stroke_width=3,
+            stroke_width=self.thickness,
             stroke_color="#FFFFFF",
             background_image=Image.fromarray(self.img),
             update_streamlit=True,
@@ -59,16 +64,27 @@ class GrabCutApp:
                             cv2.line(self.mask, (x1, y1),
                                      (x2, y2), cv2.GC_FGD, 3)
 
-        # Xử lý các sự kiện phím
+        # Xử lý các sự kiện phím từ URL query
         key = st.experimental_get_query_params().get("key", [None])[0]
         if key:
             if key == 'n':
                 self.run_grabcut()
             elif key == 'r':
                 self.reset_mask()
+            elif key == '0':
+                self.value = {'color': (0, 0, 0), 'val': 0}
+            elif key == '1':
+                self.value = {'color': (255, 255, 255), 'val': 1}
+            elif key == '2':
+                self.value = {'color': (0, 0, 255), 'val': 2}
+            elif key == '3':
+                self.value = {'color': (0, 255, 0), 'val': 3}
 
         if st.button("Chạy GrabCut để phân đoạn", type="primary"):
             self.run_grabcut()
+
+        if st.button("Reset", type="primary"):
+            self.reset_mask()
 
         # Hiển thị ảnh kết quả
         if self.output is not None:
@@ -82,17 +98,18 @@ class GrabCutApp:
         bgd_model = np.zeros((1, 65), np.float64)
         fgd_model = np.zeros((1, 65), np.float64)
 
-        # Sử dụng mask đã được đánh dấu thay vì chỉ sử dụng hình chữ nhật
-        cv2.grabCut(self.img2, self.mask, None,
-                    bgd_model, fgd_model, 10, cv2.GC_INIT_WITH_MASK)
+        if self.rect_or_mask == 0:         # grabcut với hình chữ nhật
+            cv2.grabCut(self.img2, self.mask, self.rect, bgd_model, fgd_model, 1, cv2.GC_INIT_WITH_RECT)
+            self.rect_or_mask = 1
+        elif self.rect_or_mask == 1:       # grabcut với mask
+            cv2.grabCut(self.img2, self.mask, self.rect, bgd_model, fgd_model, 1, cv2.GC_INIT_WITH_MASK)
 
-        # Tạo ảnh kết quả
-        mask2 = np.where((self.mask == cv2.GC_FGD) | (
-            self.mask == cv2.GC_PR_FGD), 1, 0).astype('uint8')
-        self.output = self.img * mask2[:, :, np.newaxis]
+        mask2 = np.where((self.mask == 1) | (self.mask == 3), 255, 0).astype('uint8')
+        self.output = cv2.bitwise_and(self.img2, self.img2, mask=mask2)
 
     def reset_mask(self):
         self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
+        self.output = np.zeros(self.img.shape, np.uint8)
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide", page_title="Deploy GrabCut")
@@ -107,7 +124,16 @@ if __name__ == "__main__":
         image = np.array(image)
 
         # Hiển thị HTML để xử lý sự kiện phím
-        components.html(open('index.html').read(), height=0)
+        st.markdown("""
+            <script>
+            document.addEventListener("keydown", function(event) {
+                const key = event.key;
+                if (['0', '1', '2', '3', 'n', 'r'].includes(key)) {
+                    window.parent.postMessage({ key: key }, '*');
+                }
+            });
+            </script>
+            """, unsafe_allow_html=True)
 
         app = GrabCutApp()
         app.img = image.copy()
