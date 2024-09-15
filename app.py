@@ -27,6 +27,9 @@ class GrabCutApp:
         self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
         self.output = np.zeros(self.img.shape, np.uint8)
 
+        # Get image dimensions
+        height, width, _ = self.img.shape
+
         # Display canvas to draw on the image
         canvas_result = st_canvas(
             fill_color="rgba(255, 0, 0, 0.3)",
@@ -34,8 +37,8 @@ class GrabCutApp:
             stroke_color="#FFFFFF",
             background_image=Image.fromarray(self.img),
             update_streamlit=True,
-            height=self.img.shape[0],
-            width=self.img.shape[1],
+            height=height,
+            width=width,
             drawing_mode="freedraw",
             key="canvas",
         )
@@ -79,6 +82,7 @@ class GrabCutApp:
                 mask_overlay[:, :, :3] = self.output
                 result_img = cv2.addWeighted(result_img, 0.7, mask_overlay, 0.3, 0)
 
+            # Ensure the image fits within the canvas dimensions
             st.image(result_img, caption='Segmented Image', use_column_width=True)
 
     def run_grabcut(self):
