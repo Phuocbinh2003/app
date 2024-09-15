@@ -63,22 +63,23 @@ class GrabCutApp:
                                      (x2, y2), cv2.GC_FGD, 3)
 
         # Buttons to interact with the app
-        col1, col2 = st.columns([0.5, 0.5])
-        with col1:
-            if st.button("Run GrabCut"):
-                self.run_grabcut()
+        if st.button("Run GrabCut"):
+            self.run_grabcut()
 
-        with col2:
-            if st.button("Reset"):
-                self.reset_mask()
+        if st.button("Reset"):
+            self.reset_mask()
 
-        # Display both images side by side
-        if self.img is not None and self.output is not None:
-            col1, col2 = st.columns([0.5, 0.5])
-            with col1:
-                st.image(self.img, caption='Input Image', use_column_width=True)
-            with col2:
-                st.image(self.output, caption='Segmented Image', use_column_width=True)
+        # Display both images overlaid
+        if self.img is not None:
+            # Create a canvas for displaying the result
+            result_img = np.copy(self.img)
+            if self.output is not None:
+                # Overlay the segmented output on the input image
+                mask_overlay = np.zeros(self.img.shape, dtype=np.uint8)
+                mask_overlay[:, :, :3] = self.output
+                result_img = cv2.addWeighted(result_img, 0.7, mask_overlay, 0.3, 0)
+
+            st.image(result_img, caption='Segmented Image', use_column_width=True)
 
     def run_grabcut(self):
         bgd_model = np.zeros((1, 65), np.float64)
