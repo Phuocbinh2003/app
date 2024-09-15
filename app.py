@@ -17,7 +17,7 @@ st.markdown("""
     
     * Vẽ hình chữ nhật trước (vẽ bằng click phải)
     * Sử dụng phím (chọn phím sau đó vẽ bằng click trái):
-
+    
         * Phím '0' - Để chọn các vùng có sure background
         * Phím '1' - Để chọn các vùng có sure foreground
         * Phím '2' - Để chọn các vùng probable background
