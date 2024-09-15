@@ -54,10 +54,9 @@ class GrabCutProcessor:
             cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
             cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
-        elif event == cv2.EVENT_MOUSEMOVE:
-            if self.drawing:
-                cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
-                cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
+        elif event == cv2.EVENT_MOUSEMOVE and self.drawing:
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
         elif event == cv2.EVENT_LBUTTONUP:
             if self.drawing:
@@ -69,13 +68,13 @@ class GrabCutProcessor:
         bgdmodel = np.zeros((1, 65), np.float64)
         fgdmodel = np.zeros((1, 65), np.float64)
 
-        if self.rect_or_mask == 0:
+        if self.rect_or_mask == 0:         # grabcut with rectangle
             cv2.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_RECT)
             self.rect_or_mask = 1
-        elif self.rect_or_mask == 1:
-            cv2.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_MASK)
+        elif self.rect_or_mask == 1:       # grabcut with mask
+            cv2.grabCut(self.img2, self.mask, None, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_MASK)
 
-        mask2 = np.where((self.mask == 1) + (self.mask == 3), 255, 0).astype('uint8')
+        mask2 = np.where((self.mask == 1) | (self.mask == 3), 255, 0).astype('uint8')
         self.output = cv2.bitwise_and(self.img2, self.img2, mask=mask2)
 
     def reset(self):
