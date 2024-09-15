@@ -23,22 +23,28 @@ class GrabCutApp:
             st.error("No image uploaded!")
             return
 
-        self.img2 = self.img.copy()
-        self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
-        self.output = np.zeros(self.img.shape, np.uint8)
-
-        # Get image dimensions
+        # Get image dimensions and scale
         height, width, _ = self.img.shape
+        max_dim = 800  # Max dimension for canvas
+        scale = min(max_dim / width, max_dim / height)
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+
+        # Resize image to fit within the canvas
+        img_resized = cv2.resize(self.img, (new_width, new_height), interpolation=cv2.INTER_AREA)
+        self.img2 = img_resized.copy()
+        self.mask = np.zeros(img_resized.shape[:2], dtype=np.uint8)
+        self.output = np.zeros(img_resized.shape, np.uint8)
 
         # Display canvas to draw on the image
         canvas_result = st_canvas(
             fill_color="rgba(255, 0, 0, 0.3)",
             stroke_width=self.thickness,
             stroke_color="#FFFFFF",
-            background_image=Image.fromarray(self.img),
+            background_image=Image.fromarray(img_resized),
             update_streamlit=True,
-            height=height,
-            width=width,
+            height=new_height,
+            width=new_width,
             drawing_mode="freedraw",
             key="canvas",
         )
