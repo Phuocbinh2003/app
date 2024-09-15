@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
-import cv2
 from PIL import Image
+import cv2
 from grabcut_processor import GrabCutProcessor
 import io
 
@@ -14,7 +14,7 @@ st.divider()
 
 st.markdown("""
     ## Hướng dẫn cách dùng
-
+    
     * Vẽ hình chữ nhật trước (vẽ bằng click phải)
     * Sử dụng phím (chọn phím sau đó vẽ bằng click trái):
 
@@ -36,21 +36,20 @@ if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
     image = np.array(image)
-    
+
     # Khởi tạo GrabCutProcessor
     grabcut_processor = GrabCutProcessor(image)
-    
-    # Tạo ảnh để hiển thị trước
-    image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-    # Hiển thị ảnh đầu vào và ảnh kết quả phân đoạn
+    # Phần xử lý ảnh
+    st.write("### Kết quả")
     col1, col2 = st.columns([0.5, 0.5])
+
     with col1:
-        st.image(image_pil, caption='Ảnh đầu vào', use_column_width=True)
-        
+        st.image(image, caption='Ảnh đầu vào', use_column_width=True)
+
     with col2:
         st.image(grabcut_processor.get_output_image(), caption='Ảnh được phân đoạn', use_column_width=True)
-    
+
     # Nút tải ảnh
     output_image_pil = Image.fromarray(cv2.cvtColor(grabcut_processor.get_output_image(), cv2.COLOR_BGR2RGB))
     buf = io.BytesIO()
@@ -63,13 +62,3 @@ if uploaded_file is not None:
         file_name="segmented_image.png",
         mime="image/png"
     )
-
-    # Phần để xử lý tương tác với ảnh và canvas
-    st.write("### Vẽ và Phân đoạn")
-    st.markdown("**Hướng dẫn**: Sử dụng các công cụ trên canvas để vẽ vùng phân đoạn.")
-    # Streamlit Draw Canvas Widget
-    st_canvas = st.experimental_get_query_params().get("key", [None])[0]
-    
-    if st_canvas:
-        # If you have a canvas widget integrated for interaction
-        st.write("Bạn có thể vẽ trên canvas để chỉnh sửa phân đoạn.")
