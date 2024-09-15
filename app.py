@@ -5,6 +5,16 @@ import cv2
 from grabcut_processor import GrabCutProcessor
 import io
 
+import streamlit.components.v1 as components
+
+# Đọc nội dung HTML từ tệp
+with open('index.html', 'r') as file:
+    html_code = file.read()
+
+# Hiển thị HTML trong ứng dụng Streamlit
+components.html(html_code, height=800)
+
+
 # Cấu hình trang Streamlit
 st.set_page_config(layout="wide", page_title="Deploy GrabCut")
 
