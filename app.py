@@ -16,6 +16,10 @@ class GrabCutApp:
         self.value = (255, 255, 255)  # Màu mặc định là trắng
 
     def run(self):
+        if self.img is None:
+            st.error("Ảnh chưa được tải lên!")
+            return
+        
         self.img2 = self.img.copy()
         self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
 
