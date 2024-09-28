@@ -15,7 +15,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     
     # Chỉ định kích thước mới cho ảnh
-    new_width = 500  # Thay đổi kích thước theo nhu cầu
+    new_width = 400  # Thay đổi kích thước theo nhu cầu
     image.thumbnail((new_width, new_width))  # Giữ tỷ lệ khung hình
 
     # Hiển thị ảnh đã thu nhỏ
@@ -28,7 +28,7 @@ if uploaded_file is not None:
     # Placeholder để hiển thị vị trí chuột
     mouse_pos_placeholder = st.empty()
 
-    # CSS và JavaScript để theo dõi vị trí chuột
+    # CSS và JavaScript để chặn sự kiện chuột
     st.markdown(f"""
         <style>
         .overlay {{
@@ -37,21 +37,18 @@ if uploaded_file is not None:
             left: 0;
             width: {new_width}px; /* Chiều rộng của overlay bằng chiều rộng ảnh */
             height: {height}px; /* Chiều cao của overlay bằng chiều cao ảnh */
-            background-color: rgba(0, 0, 0, 0);  /* Màu trong suốt */
-            pointer-events: all;  /* Đảm bảo nhận tất cả sự kiện chuột cho lớp phủ */
-            z-index: 100;  /* Đảm bảo overlay nằm trên ảnh */
+            background-color: rgba(255, 255, 255, 0); /* Màu trong suốt */
+            pointer-events: none; /* Tắt tất cả sự kiện chuột */
+            z-index: 100; /* Đảm bảo overlay nằm trên ảnh */
         }}
         </style>
         <script>
-        const img = document.querySelector("img[alt='Ảnh đầu vào']");
-        
-        // Theo dõi vị trí chuột
-        img.addEventListener('mousemove', function(event) {{
-            const rect = img.getBoundingClientRect();
-            const x = Math.round(event.clientX - rect.left); // Tọa độ X trong ảnh
-            const y = Math.round(event.clientY - rect.top); // Tọa độ Y trong ảnh
+        const overlay = document.querySelector(".overlay");
+        overlay.addEventListener('mousemove', function(event) {{
+            const x = Math.round(event.offsetX); // Tọa độ X trong ảnh
+            const y = Math.round(event.offsetY); // Tọa độ Y trong ảnh
             
-            // Gửi vị trí chuột về Streamlit
+            // Cập nhật vị trí chuột
             window.parent.postMessage({{x: x, y: y}}, "*");
         }});
         </script>
