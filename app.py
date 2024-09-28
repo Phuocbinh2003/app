@@ -132,4 +132,6 @@ if uploaded_file is not None:
             grabcut_processor.rect = (x, y, width, height)
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
-            st.image(output_image, caption="Output Image", use_column_width=True)
+            # Convert output image to PIL format for display
+            output_pil_image = Image.fromarray(output_image)
+            st.image(output_pil_image, caption="Output Image", use_column_width=True)
