@@ -26,7 +26,7 @@ if uploaded_file is not None:
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#FF0000")
 
     # Transparent fill for rectangles
-    fill_color = "rgba(0, 0, 0, 0.0)"  # Transparent fill
+    
 
     # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
