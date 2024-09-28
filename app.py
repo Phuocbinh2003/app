@@ -75,6 +75,8 @@ if uploaded_file is not None:
                     const endY = event.offsetY;
                     const width = Math.abs(startX - endX);
                     const height = Math.abs(startY - endY);
+
+                    // Clear the canvas and redraw the image
                     ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
                     ctx.drawImage(img, 0, 0);  // Redraw the image
                     ctx.rect(startX, startY, width, height);
