@@ -19,7 +19,7 @@ if uploaded_file is not None:
     image.thumbnail((new_width, new_width))  # Giữ tỷ lệ khung hình
 
     # Hiển thị ảnh đã thu nhỏ
-    st.image(image, caption='Ảnh đầu vào', use_column_width=False, output_format='auto')  # Không sử dụng chiều rộng cột
+    st.image(image, caption='Ảnh đầu vào', use_column_width=False)  # Không sử dụng chiều rộng cột
 
     # Hiển thị kích thước ảnh
     width, height = image.size
@@ -37,8 +37,9 @@ if uploaded_file is not None:
             left: 0;
             width: {new_width}px; /* Chiều rộng của overlay bằng chiều rộng ảnh */
             height: {height}px; /* Chiều cao của overlay bằng chiều cao ảnh */
-            background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
-            pointer-events: none;  /* Cho phép nhận sự kiện chuột cho lớp phủ */
+            background-color: rgba(255, 255, 255, 0);  /* Màu trong suốt */
+            pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên overlay */
+            z-index: 100;  /* Đảm bảo overlay nằm trên ảnh */
         }}
         </style>
         <script>
