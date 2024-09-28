@@ -25,15 +25,12 @@ if uploaded_file is not None:
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#FF0000")
 
-    # Transparent fill for rectangles
-    
-
     # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
-        fill_color=fill_color,               # Transparent fill
+        fill_color="rgba(0, 0, 0, 0)",        # Transparent fill
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
-        background_image=Image.fromarray(image_np),  # Đặt ảnh nền là ảnh đã tải lên
+        background_image=image,              # Đặt ảnh nền là ảnh đã tải lên
         update_streamlit=True,
         drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
         height=height,                       # Set chiều cao của canvas bằng ảnh
