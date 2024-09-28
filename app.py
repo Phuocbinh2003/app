@@ -1,6 +1,5 @@
 import streamlit as st
 from PIL import Image
-import io
 
 # Cấu hình ứng dụng Streamlit
 st.set_page_config(layout="wide", page_title="Theo Dõi Vị Trí Chuột")
@@ -25,14 +24,14 @@ if uploaded_file is not None:
 
     # JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
     st.markdown("""
+        <style>
+        img {
+            pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên ảnh */
+        }
+        </style>
         <script>
         const img = document.querySelector("img[alt='Ảnh đầu vào']");
         
-        // Ngăn chặn sự kiện nhấp chuột
-        img.addEventListener('mousedown', function(event) {
-            event.preventDefault();
-        });
-
         // Theo dõi vị trí chuột
         img.addEventListener('mousemove', function(event) {
             const rect = img.getBoundingClientRect();
@@ -49,15 +48,15 @@ if uploaded_file is not None:
     if 'mouse_position' not in st.session_state:
         st.session_state.mouse_position = {'x': 0, 'y': 0}
 
+    # Cập nhật vị trí chuột
+    def update_mouse_position():
+        mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {st.session_state.mouse_position['x']}, Y: {st.session_state.mouse_position['y']})")
+
     # Lắng nghe các tin nhắn từ JavaScript
     def on_message(msg):
         if 'x' in msg and 'y' in msg:
             st.session_state.mouse_position = {'x': msg['x'], 'y': msg['y']}
             update_mouse_position()
-
-    # Cập nhật vị trí chuột
-    def update_mouse_position():
-        mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {st.session_state.mouse_position['x']}, Y: {st.session_state.mouse_position['y']})")
 
     # Đăng ký lắng nghe tin nhắn
     st.session_state.on_message = on_message
