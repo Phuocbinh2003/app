@@ -1,10 +1,11 @@
 import streamlit as st
 from PIL import Image
+from streamlit_drawable_canvas import st_canvas
 
 # Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Tải Ảnh và Theo Dõi Vị Trí Chuột")
+st.set_page_config(layout="wide", page_title="Tải Ảnh và Vẽ Trên Ảnh")
 
-st.title("Tải Ảnh Lên và Theo Dõi Vị Trí Chuột")
+st.title("Tải Ảnh Lên và Vẽ Trên Ảnh")
 
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
@@ -19,84 +20,26 @@ if uploaded_file is not None:
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
 
-    # Placeholder để hiển thị vị trí chuột
-    mouse_pos_placeholder = st.empty()
+    # Thiết lập canvas để vẽ lên ảnh
+    drawing_mode = st.sidebar.selectbox("Chọn chế độ vẽ:", ("Vẽ tự do", "Vẽ hình chữ nhật"))
+    stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
+    stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#000000")
 
-    # CSS và JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
-    st.markdown("""
-        <style>
-        .overlay {
-            position: absolute; /* Sử dụng absolute để phủ lên ảnh */
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
-            pointer-events: none;  /* Không nhận sự kiện chuột */
-            z-index: 100;  /* Đảm bảo overlay nằm trên tất cả */
-        }
-        img {
-            pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên ảnh */
-        }
-        </style>
-        <script>
-        const img = document.querySelector("img[alt='Ảnh đầu vào']");
-        let isDrawing = false;
-        let startX, startY;
+    # Canvas setup
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 165, 0, 0.3)",  # Màu tô
+        stroke_width=stroke_width,            # Độ rộng nét vẽ
+        stroke_color=stroke_color,            # Màu vẽ
+        background_image=image,               # Ảnh nền
+        update_streamlit=True,
+        drawing_mode="freedraw" if drawing_mode == "Vẽ tự do" else "rect",
+        height=height,
+        width=width,
+        key="canvas",
+    )
 
-        // Theo dõi vị trí chuột
-        img.addEventListener('mousemove', function(event) {
-            const rect = img.getBoundingClientRect();
-            const x = Math.round(event.clientX - rect.left); // Tọa độ X trong ảnh
-            const y = Math.round(event.clientY - rect.top); // Tọa độ Y trong ảnh
-            
-            // Gửi vị trí chuột về Streamlit
-            window.parent.postMessage({x: x, y: y}, "*");
-        });
-
-        // Bắt đầu vẽ khi nhấn chuột trái
-        img.addEventListener('mousedown', function(event) {
-            if (event.button === 0) { // Chỉ xử lý nút trái
-                isDrawing = true;
-                startX = event.clientX;
-                startY = event.clientY;
-            }
-        });
-
-        // Kết thúc vẽ khi nhả chuột
-        img.addEventListener('mouseup', function() {
-            if (isDrawing) {
-                isDrawing = false;
-                // Gửi tọa độ để vẽ hình chữ nhật
-                const width = event.clientX - startX;
-                const height = event.clientY - startY;
-                window.parent.postMessage({startX: startX, startY: startY, width: width, height: height}, "*");
-            }
-        });
-        </script>
-        <div class="overlay"></div>
-    """, unsafe_allow_html=True)
-
-    # Cập nhật vị trí chuột từ tin nhắn
-    if 'mouse_position' not in st.session_state:
-        st.session_state.mouse_position = {'x': 0, 'y': 0}
-
-    # Cập nhật vị trí chuột
-    def update_mouse_position():
-        mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {st.session_state.mouse_position['x']}, Y: {st.session_state.mouse_position['y']})")
-
-    # Lắng nghe các tin nhắn từ JavaScript
-    def on_message(msg):
-        if 'x' in msg and 'y' in msg:
-            st.session_state.mouse_position = {'x': msg['x'], 'y': msg['y']}
-            update_mouse_position()
-        if 'startX' in msg and 'startY' in msg and 'width' in msg and 'height' in msg:
-            st.write(f"Vẽ hình chữ nhật từ ({msg['startX']}, {msg['startY']}) với kích thước {msg['width']} x {msg['height']}")
-
-    # Đăng ký lắng nghe tin nhắn
-    st.session_state.on_message = on_message
-
-    # Gọi hàm cập nhật vị trí chuột
-    update_mouse_position()
+    # Kiểm tra kết quả canvas
+    if canvas_result.image_data is not None:
+        st.image(canvas_result.image_data, caption="Ảnh sau khi vẽ", use_column_width=True)
 else:
     st.write("Vui lòng tải lên một bức ảnh.")
