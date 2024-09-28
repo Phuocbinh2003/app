@@ -76,6 +76,8 @@ if uploaded_file is not None:
                     const endY = event.offsetY;
                     const width = Math.abs(startX - endX);
                     const height = Math.abs(startY - endY);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas trước khi vẽ lại
+                    ctx.drawImage(img, 0, 0); // Vẽ lại hình ảnh
                     ctx.rect(startX, startY, width, height);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
@@ -104,11 +106,10 @@ if uploaded_file is not None:
         <script>
         window.addEventListener('message', function(event) {
             const rect = JSON.parse(event.data);
-            if (rect) {
+            if (rect) {{
                 // Gửi dữ liệu hình chữ nhật về Streamlit
-                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-                document.body.innerText = JSON.stringify(data);
-            }
+                document.body.innerText = JSON.stringify(rect);
+            }}
         });
         </script>
         """,
@@ -118,12 +119,13 @@ if uploaded_file is not None:
     # Button to apply GrabCut
     if st.button("Áp dụng GrabCut"):
         # Get rectangle coordinates
-        rect_data = rect_coords.empty()
+        rect_data = st.session_state.get('rect', None)
         if rect_data is not None:
-            x = int(rect_data["x"])
-            y = int(rect_data["y"])
-            width = int(rect_data["width"])
-            height = int(rect_data["height"])
+            rect = json.loads(rect_data)
+            x = int(rect['x'])
+            y = int(rect['y'])
+            width = int(rect['width'])
+            height = int(rect['height'])
             grabcut_processor.rect = (x, y, width, height)
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
@@ -139,5 +141,5 @@ if uploaded_file is not None:
        - Vẽ vùng foreground (nền chính) bằng chuột trái.
        - Vẽ vùng background (nền phụ) bằng cách vẽ với màu khác.
        - Vẽ hình chữ nhật để chọn vùng cắt.
-    5. Nhấn nút **Đặt lại** để khôi phục hình ảnh gốc và bắt đầu lại.
+       - Nhấn nút **Đặt lại** để khôi phục hình ảnh gốc và bắt đầu lại.
     """)
