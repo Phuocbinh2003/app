@@ -1,7 +1,9 @@
+import numpy as np
 import streamlit as st
 from PIL import Image
 from io import BytesIO
 import base64
+from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
 
 # Function to encode image to base64
 def convert_image_to_base64(image):
@@ -9,23 +11,22 @@ def convert_image_to_base64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
-# Configure the Streamlit app
-st.set_page_config(layout="wide", page_title="Draw Rectangles on Image")
+# Streamlit app
+st.title("GrabCut Background Removal with Rectangle Drawing")
 
-st.title("Upload Image and Draw Rectangles on It")
-
-# Sidebar to upload the image
-st.sidebar.write("## Upload Image")
+# Sidebar for image upload
 uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     # Read the image
     image = Image.open(uploaded_file)
-    
-    # Convert the image to base64 for embedding in HTML
-    image_base64 = convert_image_to_base64(image)
+    image_np = np.array(image)
+
+    # Initialize the GrabCut processor
+    grabcut_processor = GrabCutProcessor(image_np)
 
     # HTML and CSS for the drawing canvas
+    image_base64 = convert_image_to_base64(image)
     drawing_html = f"""
     <!DOCTYPE html>
     <html>
@@ -60,39 +61,37 @@ if uploaded_file is not None:
             let startX, startY;
 
             canvas.addEventListener('mousedown', (event) => {{
-                drawing = true;
-                startX = event.offsetX;
-                startY = event.offsetY;
+                if (event.button === 2) {{ // Right mouse button
+                    drawing = true;
+                    startX = event.offsetX;
+                    startY = event.offsetY;
+                }}
             }});
 
-            canvas.addEventListener('mouseup', () => {{
-                drawing = false;
-                ctx.beginPath();
-            }});
-
-            canvas.addEventListener('mousemove', (event) => {{
-                if (!drawing) return;
-                const mouseX = event.offsetX;
-                const mouseY = event.offsetY;
-
-                // Clear the canvas and redraw the image
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-
-                // Draw the rectangle
-                ctx.beginPath();
-                ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
-                ctx.strokeStyle = 'red';
-                ctx.lineWidth = 5;
-                ctx.stroke();
+            canvas.addEventListener('mouseup', (event) => {{
+                if (drawing) {{
+                    drawing = false;
+                    const endX = event.offsetX;
+                    const endY = event.offsetY;
+                    const width = Math.abs(startX - endX);
+                    const height = Math.abs(startY - endY);
+                    ctx.rect(startX, startY, width, height);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Send rectangle coordinates to Python (handle this part with Streamlit)
+                }}
             }});
         </script>
     </body>
     </html>
     """
 
-    # Render the HTML in Streamlit
-    st.components.v1.html(drawing_html, height=image.height)
+    # Display the canvas
+    st.components.v1.html(drawing_html, height=image.height + 100)
 
-else:
-    st.write("Please upload an image.")
+    # Button to apply GrabCut
+    if st.button("Apply GrabCut"):
+        grabcut_processor.apply_grabcut()
+        output_image = grabcut_processor.get_output_image()
+        st.image(output_image, caption="Output Image", use_column_width=True)
