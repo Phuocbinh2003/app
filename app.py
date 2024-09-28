@@ -62,7 +62,7 @@ if uploaded_file is not None:
             let startX, startY;
 
             canvas.addEventListener('mousedown', (event) => {{
-                if (event.button === 2) {{ // Right mouse button
+                if (event.button === 0) {{ // Left mouse button to start drawing
                     drawing = true;
                     startX = event.offsetX;
                     startY = event.offsetY;
@@ -76,15 +76,13 @@ if uploaded_file is not None:
                     const endY = event.offsetY;
                     const width = Math.abs(startX - endX);
                     const height = Math.abs(startY - endY);
-                    ctx.rect(startX, startY, width, height);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
-                    ctx.stroke();
+                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
 
                     // Send rectangle coordinates to Python
                     const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
-                    const jsonString = JSON.stringify(rect);
-                    window.parent.postMessage(jsonString, '*');
+                    window.parent.postMessage(JSON.stringify(rect), '*');
                 }}
             }});
         </script>
@@ -95,37 +93,43 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
-    # Placeholder to store rectangle coordinates
-    rect_coords = st.empty()
-
-    # JavaScript to receive the rectangle coordinates
-    st.markdown(
-        """
-        <script>
-        window.addEventListener('message', function(event) {
-            const rect = JSON.parse(event.data);
-            if (rect) {
-                // Send rectangle data to Streamlit
-                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-                document.body.innerText = JSON.stringify(data);
-            }
-        });
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
-
     # Button to apply GrabCut
     if st.button("Apply GrabCut"):
-        # Get rectangle coordinates
-        rect_data = rect_coords.empty()
-        if rect_data is not None:
-            x = int(rect_data["x"])
-            y = int(rect_data["y"])
-            width = int(rect_data["width"])
-            height = int(rect_data["height"])
+        # Placeholder to receive rectangle coordinates
+        rect_data = st.empty()
+        rect_data.write("Waiting for rectangle coordinates...")
+
+        # JavaScript to receive the rectangle coordinates
+        st.markdown(
+            """
+            <script>
+            window.addEventListener('message', function(event) {
+                const rect = JSON.parse(event.data);
+                if (rect) {
+                    // Send rectangle data to Streamlit
+                    const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.value = JSON.stringify(data);
+                    document.body.appendChild(input);
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Get rectangle coordinates from the hidden input
+        rect_input = st.text_input("Rectangle Coordinates (hidden)", "")
+        if rect_input:
+            rect_data.write("Rectangle coordinates received.")
+            rect_json = json.loads(rect_input)
+            x = int(rect_json["x"])
+            y = int(rect_json["y"])
+            width = int(rect_json["width"])
+            height = int(rect_json["height"])
             grabcut_processor.rect = (x, y, width, height)
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
             st.image(output_image, caption="Output Image", use_column_width=True)
-
