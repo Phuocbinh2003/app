@@ -3,51 +3,51 @@ from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
 
-# Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Vẽ Trực Tiếp Trên Ảnh")
+# Configure the Streamlit app
+st.set_page_config(layout="wide", page_title="Draw on Image")
 
-st.title("Tải Ảnh Lên và Vẽ Trực Tiếp Trên Ảnh")
+st.title("Upload Image and Draw on It")
 
-# Sidebar để tải ảnh
+# Sidebar to upload the image
 st.sidebar.write("## Upload Image")
-uploaded_file = st.sidebar.file_uploader("Chọn ảnh để tải lên", type=["jpg", "jpeg", "png"])
+uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Đọc ảnh và chuyển thành numpy array để sử dụng làm nền cho canvas
+    # Read the image
     image = Image.open(uploaded_file)
-    image_np = np.array(image)  # Convert to NumPy array for canvas background
+    image_np = np.array(image)  # Convert the image to a NumPy array
 
-    # Lấy kích thước ảnh gốc
+    # Get the dimensions of the original image
     original_width, original_height = image.size
 
-    # Xác định kích thước canvas theo tỷ lệ màn hình
-    max_canvas_width = st.sidebar.slider("Chọn kích thước canvas tối đa (px):", 300, 1200, original_width)
+    # Set the maximum canvas size based on the uploaded image
+    max_canvas_width = st.sidebar.slider("Max Canvas Width (px):", 300, 1200, original_width)
     ratio = max_canvas_width / original_width
     new_height = int(original_height * ratio)
 
-    # Hiển thị ảnh đầu vào
-    st.image(image, caption="Ảnh đầu vào", use_column_width=False, width=max_canvas_width)
+    # Display the uploaded image
+    st.image(image, caption="Input Image", use_column_width=False, width=max_canvas_width)
 
-    # Sidebar: Thiết lập cho nét vẽ hình chữ nhật
-    stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
-    stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#FF0000")
+    # Set up drawing parameters
+    stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
+    stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
 
-    # Tạo canvas với kích thước dựa trên ảnh
+    # Create the canvas with the image as the background
     canvas_result = st_canvas(
-        fill_color="rgba(0, 0, 0, 0)",        # Transparent fill
-        stroke_width=stroke_width,            # Độ rộng nét vẽ
-        stroke_color=stroke_color,            # Màu vẽ
-        background_image=Image.fromarray(image_np),  # Đặt ảnh nền là ảnh đã tải lên
+        fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
+        stroke_width=stroke_width,      # Stroke width
+        stroke_color=stroke_color,      # Stroke color
+        background_image=Image.fromarray(image_np),  # Background image
         update_streamlit=True,
-        drawing_mode="rect",                  # Chỉ cho phép vẽ hình chữ nhật
-        height=new_height,                    # Set chiều cao của canvas
-        width=max_canvas_width,               # Set chiều rộng của canvas
+        drawing_mode="rect",            # Allow drawing rectangles
+        height=new_height,              # Height of the canvas
+        width=max_canvas_width,         # Width of the canvas
         key="canvas",
     )
 
-    # Hiển thị kết quả canvas sau khi vẽ
+    # Show the resulting canvas image if drawn
     if canvas_result.image_data is not None:
-        st.image(canvas_result.image_data, caption="Ảnh sau khi vẽ", use_column_width=False, width=max_canvas_width)
+        st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=False, width=max_canvas_width)
 
 else:
-    st.write("Vui lòng tải lên một bức ảnh.")
+    st.write("Please upload an image.")
