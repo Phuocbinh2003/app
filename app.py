@@ -1,9 +1,15 @@
 import streamlit as st
 
-# Function to update mouse position
-def mouse_position():
-    st.session_state.mouse_x = st.session_state.get('mouse_x', 0)
-    st.session_state.mouse_y = st.session_state.get('mouse_y', 0)
+# Initialize session state for mouse coordinates
+if 'mouse_x' not in st.session_state:
+    st.session_state.mouse_x = 0
+if 'mouse_y' not in st.session_state:
+    st.session_state.mouse_y = 0
+
+# Function to update mouse position using Streamlit's session state
+def update_mouse_position(x, y):
+    st.session_state.mouse_x = x
+    st.session_state.mouse_y = y
 
 # Create a placeholder for mouse position display
 mouse_pos_placeholder = st.empty()
@@ -13,7 +19,11 @@ mouse_tracking_code = """
 <script>
     document.addEventListener('mousemove', function(event) {
         // Send mouse coordinates to Streamlit
-        window.parent.streamlit.setMousePosition(event.clientX, event.clientY);
+        const x = event.clientX;
+        const y = event.clientY;
+
+        // Use Streamlit's method to update mouse position
+        window.parent.streamlit.setMousePosition(x, y);
     });
 </script>
 """
@@ -21,13 +31,11 @@ mouse_tracking_code = """
 # Add the JavaScript to the app
 st.markdown(mouse_tracking_code, unsafe_allow_html=True)
 
-# Create the function to update mouse position in Streamlit
-st.session_state.mouse_x = 0
-st.session_state.mouse_y = 0
-
-# Run the function to update mouse position
-if 'mouse_x' in st.session_state and 'mouse_y' in st.session_state:
-    mouse_position()
-
 # Display the current mouse position
-mouse_pos_placeholder.write(f"Vị trí chuột: (X: {st.session_state.mouse_x}, Y: {st.session_state.mouse_y})")
+while True:
+    # Update the mouse position in the Streamlit session state
+    if 'mouse_x' in st.session_state and 'mouse_y' in st.session_state:
+        mouse_pos_placeholder.write(f"Vị trí chuột: (X: {st.session_state.mouse_x}, Y: {st.session_state.mouse_y})")
+
+    # Allow Streamlit to rerun
+    st.experimental_rerun()
