@@ -36,14 +36,14 @@ if uploaded_file is not None:
     """, unsafe_allow_html=True)
 
     # Input ẩn để lưu trạng thái chuột có vào ảnh hay không
-    mouse_in_image = st.text_input("Mouse in Image:", key="mouse_in_image", value="False")
-    
-    # Nút submit ẩn để cập nhật trạng thái mỗi khi có sự thay đổi từ JavaScript
-    st.text_input("Submit Button:", key="submit-button", type="hidden")
+    mouse_in_image = st.text_input("Mouse in Image:", key="mouse_in_image", value="False", label_visibility="hidden")
+
+    # Nút submit giả để trigger cập nhật trạng thái
+    if st.button("Cập nhật trạng thái", key="submit-button", label_visibility="hidden"):
+        pass
 
     # Kiểm tra xem chuột đã vào ảnh hay chưa
     if mouse_in_image == "True":
         st.write("Đã vào bức ảnh")
     else:
         st.write("Chưa vào bức ảnh")
-
