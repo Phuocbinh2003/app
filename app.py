@@ -29,9 +29,13 @@ if uploaded_file is not None:
         stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
         stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
 
-        # Ensure stroke_color is in the correct format (string)
-        if isinstance(stroke_color, str):
-            # Create the canvas with the uploaded image as the background
+        # Debugging: Print values of variables
+        st.write("Stroke Width:", stroke_width)
+        st.write("Stroke Color:", stroke_color)
+        st.write("Background Image Shape:", image_np.shape)
+
+        # Create the canvas with the uploaded image as the background
+        try:
             canvas_result = st_canvas(
                 fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
                 stroke_width=stroke_width,      # Stroke width
@@ -61,8 +65,8 @@ if uploaded_file is not None:
             if canvas_result.image_data is not None:
                 st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=True)
 
-        else:
-            st.error("Stroke color is not valid. Please select a color.")
+        except Exception as e:
+            st.error(f"Error while creating canvas: {e}")
 
     else:
         st.error("Uploaded image does not have the expected format (RGBA). Please upload a valid image.")
