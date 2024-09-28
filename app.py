@@ -17,7 +17,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGBA")
     image_np = np.array(image)  # Convert the image to a NumPy array
 
-    # Check if the image has an alpha channel
+    # Ensure the image is in the expected format
     if image_np.ndim == 3 and image_np.shape[2] == 4:
         # Get the dimensions of the original image
         original_height, original_width, _ = image_np.shape
@@ -33,8 +33,8 @@ if uploaded_file is not None:
         canvas_result = st_canvas(
             fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
             stroke_width=stroke_width,      # Stroke width
-            stroke_color=stroke_color,      # Stroke color
-            background_image=image_np,      # Use uploaded image as background
+            stroke_color=stroke_color,      # Stroke color (directly using the color)
+            background_image=image,         # Use uploaded image as background (PIL Image)
             update_streamlit=True,
             drawing_mode="freedraw",        # Allow free drawing
             height=original_height,         # Height of the canvas
