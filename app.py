@@ -21,7 +21,7 @@ if uploaded_file is not None:
     original_width, original_height = image.size
 
     # Display the uploaded image
-    st.image(image, caption="Input Image", use_column_width=False)
+    st.image(image, caption="Input Image", use_column_width=True)
 
     # Set up drawing parameters
     stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
@@ -42,7 +42,7 @@ if uploaded_file is not None:
 
     # Show the resulting canvas image if drawn
     if canvas_result.image_data is not None:
-        st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=False)
+        st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=True)
 
 else:
     st.write("Please upload an image.")
