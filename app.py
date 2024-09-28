@@ -1,7 +1,6 @@
 import streamlit as st
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
-import numpy as np
 
 # Cấu hình ứng dụng Streamlit
 st.set_page_config(layout="wide", page_title="Tải Ảnh và Vẽ Trên Ảnh")
@@ -16,13 +15,6 @@ if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
     
-    # Convert the image to RGBA format to ensure it's compatible
-    if image.mode != "RGBA":
-        image = image.convert("RGBA")
-    
-    # Chuyển đổi ảnh thành mảng numpy để sử dụng trong canvas
-    image_np = np.array(image)
-
     # Hiển thị kích thước ảnh
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
@@ -40,7 +32,7 @@ if uploaded_file is not None:
         fill_color=fill_color,               # Màu tô trong suốt
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
-        background_image=image_np,           # Ảnh nền để vẽ lên
+        background_image=image,              # Ảnh nền để vẽ lên
         update_streamlit=True,
         drawing_mode="freedraw" if drawing_mode == "Vẽ tự do" else "rect",
         height=height,
