@@ -19,19 +19,22 @@ if uploaded_file is not None:
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
 
-    # Canvas setup - chỉ cho phép vẽ hình chữ nhật
+    # Thiết lập nét vẽ hình chữ nhật
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#000000")
 
-    # Transparency setting for fill (make it transparent)
-    fill_color = "rgba(255, 165, 0, 0.0)"  # Fully transparent
+    # Transparency for fill color (fully transparent)
+    fill_color = "rgba(0, 0, 0, 0.0)"  # Transparent fill (alpha = 0.0)
 
-    # Vẽ canvas với ảnh nền và chế độ vẽ hình chữ nhật
+    # Hiển thị ảnh trước khi vẽ
+    st.image(image, caption="Ảnh đầu vào", use_column_width=True)
+
+    # Thiết lập canvas với ảnh nền trong suốt
     canvas_result = st_canvas(
         fill_color=fill_color,               # Màu tô trong suốt
         stroke_width=stroke_width,           # Độ rộng nét vẽ
-        stroke_color=stroke_color,           # Màu vẽ
-        background_image=image,              # Ảnh nền
+        stroke_color=stroke_color,           # Màu nét vẽ
+        background_image=image,              # Ảnh nền được hiển thị
         update_streamlit=True,
         drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
         height=height,
