@@ -3,9 +3,9 @@ from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
 # Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Tải Ảnh và Vẽ Trên Ảnh")
+st.set_page_config(layout="wide", page_title="Tải Ảnh và Vẽ Hình Chữ Nhật")
 
-st.title("Tải Ảnh Lên và Vẽ Trên Ảnh")
+st.title("Tải Ảnh Lên và Vẽ Hình Chữ Nhật")
 
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
@@ -19,22 +19,21 @@ if uploaded_file is not None:
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
 
-    # Thiết lập canvas để vẽ lên ảnh
-    drawing_mode = st.sidebar.selectbox("Chọn chế độ vẽ:", ("Vẽ tự do", "Vẽ hình chữ nhật"))
+    # Canvas setup - chỉ cho phép vẽ hình chữ nhật
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#000000")
 
-    # Transparency setting for drawing (set alpha value for transparency)
-    fill_color = "rgba(255, 165, 0, 0.0)"  # Fully transparent (alpha = 0.0)
+    # Transparency setting for fill (make it transparent)
+    fill_color = "rgba(255, 165, 0, 0.0)"  # Fully transparent
 
-    # Canvas setup
+    # Vẽ canvas với ảnh nền và chế độ vẽ hình chữ nhật
     canvas_result = st_canvas(
         fill_color=fill_color,               # Màu tô trong suốt
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
-        background_image=image,              # Ảnh nền để vẽ lên
+        background_image=image,              # Ảnh nền
         update_streamlit=True,
-        drawing_mode="freedraw" if drawing_mode == "Vẽ tự do" else "rect",
+        drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
         height=height,
         width=width,
         key="canvas",
