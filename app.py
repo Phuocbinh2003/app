@@ -36,10 +36,23 @@ if uploaded_file is not None:
             stroke_color=stroke_color,      # Stroke color
             background_image=image_np,      # Use uploaded image as background
             update_streamlit=True,
-            drawing_mode="rect",            # Allow drawing rectangles
+            drawing_mode="freedraw",        # Allow free drawing
             height=original_height,         # Height of the canvas
             width=original_width,           # Width of the canvas
             key="canvas",
+            display_toolbar=False            # Hide toolbar for cleaner UI
+        )
+
+        # Custom CSS to change cursor style
+        st.markdown(
+            """
+            <style>
+            .stCanvas {
+                cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJklEQVR42mJ8//8/A5cD3gB2igO3AAAAAElFTkSuQmCC') 8 8, auto;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
         )
 
         # Show the resulting canvas image if drawn
