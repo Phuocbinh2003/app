@@ -17,6 +17,9 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     image_np = np.array(image)  # Convert to NumPy array for canvas background
 
+    # Hiển thị ảnh ban đầu
+    st.image(image, caption="Ảnh đầu vào", use_column_width=True)
+
     # Lấy kích thước ảnh
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
@@ -27,10 +30,10 @@ if uploaded_file is not None:
 
     # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
-     
+        fill_color="rgba(0, 0, 0, 0)",        # Transparent fill
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
-        background_image=image,              # Đặt ảnh nền là ảnh đã tải lên
+        background_image=Image.fromarray(image_np),  # Đặt ảnh nền là ảnh đã tải lên
         update_streamlit=True,
         drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
         height=height,                       # Set chiều cao của canvas bằng ảnh
