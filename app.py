@@ -29,35 +29,40 @@ if uploaded_file is not None:
         stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
         stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
 
-        # Create the canvas with the uploaded image as the background
-        canvas_result = st_canvas(
-            fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
-            stroke_width=stroke_width,      # Stroke width
-            stroke_color=stroke_color,      # Stroke color
-            background_image=image_np,      # Use uploaded image as background
-            update_streamlit=True,
-            drawing_mode="freedraw",        # Allow free drawing
-            height=original_height,         # Height of the canvas
-            width=original_width,           # Width of the canvas
-            key="canvas",
-            display_toolbar=False            # Hide toolbar for cleaner UI
-        )
+        # Ensure stroke_color is in the correct format (string)
+        if isinstance(stroke_color, str):
+            # Create the canvas with the uploaded image as the background
+            canvas_result = st_canvas(
+                fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
+                stroke_width=stroke_width,      # Stroke width
+                stroke_color=stroke_color,      # Stroke color
+                background_image=image_np,      # Use uploaded image as background
+                update_streamlit=True,
+                drawing_mode="freedraw",        # Allow free drawing
+                height=original_height,         # Height of the canvas
+                width=original_width,           # Width of the canvas
+                key="canvas",
+                display_toolbar=False            # Hide toolbar for cleaner UI
+            )
 
-        # Custom CSS to change cursor style
-        st.markdown(
-            """
-            <style>
-            .stCanvas {
-                cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJklEQVR42mJ8//8/A5cD3gB2igO3AAAAAElFTkSuQmCC') 8 8, auto;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+            # Custom CSS to change cursor style
+            st.markdown(
+                """
+                <style>
+                .stCanvas {
+                    cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJklEQVR42mJ8//8/A5cD3gB2igO3AAAAAElFTkSuQmCC') 8 8, auto;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
 
-        # Show the resulting canvas image if drawn
-        if canvas_result.image_data is not None:
-            st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=True)
+            # Show the resulting canvas image if drawn
+            if canvas_result.image_data is not None:
+                st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=True)
+
+        else:
+            st.error("Stroke color is not valid. Please select a color.")
 
     else:
         st.error("Uploaded image does not have the expected format (RGBA). Please upload a valid image.")
