@@ -26,14 +26,14 @@ if uploaded_file is not None:
     st.markdown("""
         <style>
         .overlay {
-            position: absolute;
+            position: fixed; /* Sử dụng fixed để phủ lên toàn bộ trang */
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
             pointer-events: all;  /* Cho phép nhận sự kiện chuột */
-            z-index: 10;  /* Đảm bảo overlay nằm trên tất cả */
+            z-index: 100;  /* Đảm bảo overlay nằm trên tất cả */
         }
         img {
             pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên ảnh */
