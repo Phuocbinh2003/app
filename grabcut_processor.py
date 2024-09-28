@@ -1,135 +1,82 @@
 import numpy as np
-import streamlit as st
-from PIL import Image
-from io import BytesIO
-import base64
-import json
-from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
+import cv2
 
-# Function to encode image to base64
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
+class GrabCutProcessor:
+    BLUE = [255, 0, 0]        # Color for rectangle
+    RED = [0, 0, 255]         # Color for background prediction
+    GREEN = [0, 255, 0]       # Color for foreground prediction
+    BLACK = [0, 0, 0]         # Color for sure background
+    WHITE = [255, 255, 255]   # Color for sure foreground
 
-# Streamlit app
-st.title("GrabCut Background Removal with Rectangle Drawing")
+    DRAW_BG = {'color': BLACK, 'val': 0}
+    DRAW_FG = {'color': WHITE, 'val': 1}
+    DRAW_PR_BG = {'color': RED, 'val': 2}
+    DRAW_PR_FG = {'color': GREEN, 'val': 3}
 
-# Sidebar for image upload
-uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
+    def __init__(self, image):
+        self.img = image.copy()
+        self.img2 = image.copy()
+        self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
+        self.output = np.zeros(self.img.shape, np.uint8)
+        self.rect = (0, 0, 1, 1)
+        self.drawing = False
+        self.rectangle = False
+        self.rect_over = False
+        self.rect_or_mask = 100
+        self.value = self.DRAW_FG
+        self.thickness = 3
 
-if uploaded_file is not None:
-    # Read the image
-    image = Image.open(uploaded_file)
-    image_np = np.array(image)
+    def onmouse(self, event, x, y, flags):
+        if event == cv2.EVENT_RBUTTONDOWN:
+            self.rectangle = True
+            self.ix, self.iy = x, y
 
-    # Initialize the GrabCut processor
-    grabcut_processor = GrabCutProcessor(image_np)
+        elif event == cv2.EVENT_MOUSEMOVE:
+            if self.rectangle:
+                self.img = self.img2.copy()
+                cv2.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
+                self.rect = (min(self.ix, x), min(self.iy, y),
+                             abs(self.ix - x), abs(self.iy - y))
 
-    # HTML and CSS for the drawing canvas
-    image_base64 = convert_image_to_base64(image)
-    drawing_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background-color: #f0f0f0;
-            }}
-            canvas {{
-                border: 1px solid black;
-                cursor: crosshair;
-            }}
-        </style>
-    </head>
-    <body>
-        <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
-        <script>
-            const canvas = document.getElementById('drawingCanvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.src = 'data:image/png;base64,{image_base64}';
+        elif event == cv2.EVENT_RBUTTONUP:
+            self.rectangle = False
+            self.rect_over = True
+            cv2.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
+            self.rect = (min(self.ix, x), min(self.iy, y),
+                         abs(self.ix - x), abs(self.iy - y))
 
-            img.onload = function() {{
-                ctx.drawImage(img, 0, 0);
-            }};
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.drawing = True
 
-            let drawing = false;
-            let startX, startY;
+        elif event == cv2.EVENT_MOUSEMOVE and self.drawing:
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
-            canvas.addEventListener('mousedown', (event) => {{
-                if (event.button === 0) {{ // Left mouse button to start drawing
-                    drawing = true;
-                    startX = event.offsetX;
-                    startY = event.offsetY;
-                }}
-            }});
+        elif event == cv2.EVENT_LBUTTONUP:
+            self.drawing = False
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
-            canvas.addEventListener('mouseup', (event) => {{
-                if (drawing) {{
-                    drawing = false;
-                    const endX = event.offsetX;
-                    const endY = event.offsetY;
-                    const width = Math.abs(startX - endX);
-                    const height = Math.abs(startY - endY);
-                    ctx.strokeStyle = 'blue';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
+    def apply_grabcut(self):
+        bgdmodel = np.zeros((1, 65), np.float64)
+        fgdmodel = np.zeros((1, 65), np.float64)
 
-                    // Send rectangle coordinates to Python
-                    const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
-                    window.parent.postMessage(JSON.stringify(rect), '*');
-                }}
-            }});
-        </script>
-    </body>
-    </html>
-    """
+        if self.rect_over:  # GrabCut with rectangle
+            cv2.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_RECT)
 
-    # Display the canvas
-    st.components.v1.html(drawing_html, height=image.height + 100)
+        mask2 = np.where((self.mask == 1) | (self.mask == 3), 255, 0).astype('uint8')
+        self.output = cv2.bitwise_and(self.img2, self.img2, mask=mask2)
 
-    # Button to apply GrabCut
-    if st.button("Apply GrabCut"):
-        # Placeholder to receive rectangle coordinates
-        rect_data = st.empty()
-        rect_data.write("Waiting for rectangle coordinates...")
+    def reset(self):
+        self.rect = (0, 0, 1, 1)
+        self.drawing = False
+        self.rectangle = False
+        self.rect_or_mask = 100
+        self.rect_over = False
+        self.value = self.DRAW_FG
+        self.img = self.img2.copy()
+        self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
+        self.output = np.zeros(self.img.shape, np.uint8)
 
-        # JavaScript to receive the rectangle coordinates
-        st.markdown(
-            """
-            <script>
-            window.addEventListener('message', function(event) {
-                const rect = JSON.parse(event.data);
-                if (rect) {
-                    // Send rectangle data to Streamlit
-                    const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.value = JSON.stringify(data);
-                    document.body.appendChild(input);
-                    input.dispatchEvent(new Event('change'));
-                }
-            });
-            </script>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # Get rectangle coordinates from the hidden input
-        rect_input = st.text_input("Rectangle Coordinates (hidden)", "")
-        if rect_input:
-            rect_data.write("Rectangle coordinates received.")
-            rect_json = json.loads(rect_input)
-            x = int(rect_json["x"])
-            y = int(rect_json["y"])
-            width = int(rect_json["width"])
-            height = int(rect_json["height"])
-            grabcut_processor.rect = (x, y, width, height)
-            grabcut_processor.apply_grabcut()
-            output_image = grabcut_processor.get_output_image()
-            st.image(output_image, caption="Output Image", use_column_width=True)
+    def get_output_image(self):
+        return self.output
