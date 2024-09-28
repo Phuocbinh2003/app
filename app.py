@@ -143,3 +143,4 @@ if uploaded_file is not None:
     # Display rectangle coordinates (hidden)
     st.markdown("### Tọa độ hình chữ nhật (ẩn)")
     st.write(rect_coords)
+
