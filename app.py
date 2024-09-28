@@ -16,12 +16,16 @@ if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
     
+    # Convert the image to RGBA format to ensure it's compatible
+    if image.mode != "RGBA":
+        image = image.convert("RGBA")
+    
+    # Chuyển đổi ảnh thành mảng numpy để sử dụng trong canvas
+    image_np = np.array(image)
+
     # Hiển thị kích thước ảnh
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
-
-    # Chuyển đổi ảnh thành mảng numpy để sử dụng trong canvas
-    image_np = np.array(image)
 
     # Thiết lập canvas để vẽ lên ảnh
     drawing_mode = st.sidebar.selectbox("Chọn chế độ vẽ:", ("Vẽ tự do", "Vẽ hình chữ nhật"))
