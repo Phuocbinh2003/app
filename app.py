@@ -16,7 +16,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     image = np.array(image)
 
-    # Hiển thị ảnh với lớp CSS cho con trỏ
+    # Hiển thị ảnh
     st.image(image, caption='Ảnh đầu vào', use_column_width=True)
 
     # JavaScript để theo dõi sự kiện chuột di chuyển vào và ra khỏi ảnh
@@ -24,25 +24,33 @@ if uploaded_file is not None:
         <script>
         const img = document.querySelector('img');
         img.addEventListener('mouseenter', function() {
-            document.querySelector('input[name="mouse_in_image"]').value = 'True';
-            document.querySelector('input[name="submit-button"]').click();
+            document.dispatchEvent(new CustomEvent('mouseInImage', {detail: true}));
         });
 
         img.addEventListener('mouseleave', function() {
-            document.querySelector('input[name="mouse_in_image"]').value = 'False';
-            document.querySelector('input[name="submit-button"]').click();
+            document.dispatchEvent(new CustomEvent('mouseInImage', {detail: false}));
         });
         </script>
     """, unsafe_allow_html=True)
 
-    # Input ẩn để lưu trạng thái chuột có vào ảnh hay không
-    mouse_in_image = st.text_input("Mouse in Image:", key="mouse_in_image", value="False", label_visibility="hidden")
+    # Theo dõi sự kiện từ JavaScript
+    st.markdown("""
+        <script>
+        document.addEventListener('mouseInImage', function(e) {
+            const input = window.parent.document.querySelector('input[data-testid="mouse_in_image"]');
+            input.value = e.detail;
+            input.dispatchEvent(new Event('input', {bubbles: true}));
+        });
+        </script>
+    """, unsafe_allow_html=True)
 
-    # Nút submit giả để trigger cập nhật trạng thái
-    if st.button("Cập nhật trạng thái", key="submit-button", label_visibility="hidden"):
-        pass
+    # Khởi tạo trạng thái nếu chưa có
+    if "mouse_in_image" not in st.session_state:
+        st.session_state["mouse_in_image"] = False
 
-    # Kiểm tra xem chuột đã vào ảnh hay chưa
+    # Hiển thị trạng thái chuột có trong ảnh hay không
+    mouse_in_image = st.text_input("Mouse in Image:", value=str(st.session_state["mouse_in_image"]), key="mouse_in_image")
+
     if mouse_in_image == "True":
         st.write("Đã vào bức ảnh")
     else:
