@@ -2,9 +2,9 @@ import streamlit as st
 from PIL import Image
 
 # Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Tải Ảnh và Theo Dõi Vị Trí Chuột")
+st.set_page_config(layout="wide", page_title="Tải Ảnh và Vẽ Bounding Box")
 
-st.title("Tải Ảnh Lên và Theo Dõi Vị Trí Chuột")
+st.title("Tải Ảnh Lên và Vẽ Bounding Box")
 
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
@@ -22,7 +22,10 @@ if uploaded_file is not None:
     # Placeholder để hiển thị vị trí chuột
     mouse_pos_placeholder = st.empty()
 
-    # CSS và JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
+    # Thông tin về bounding box
+    st.session_state.bounding_boxes = []
+
+    # CSS và JavaScript để theo dõi vị trí chuột, vẽ bounding box và ngăn chặn sự kiện nhấp chuột
     st.markdown(f"""
         <style>
         .overlay {{
@@ -45,7 +48,10 @@ if uploaded_file is not None:
         </style>
         <script>
         const img = document.querySelector("img[alt='Ảnh đầu vào']");
-        
+        let isDrawing = false;
+        let startX = 0;
+        let startY = 0;
+
         // Ngăn chặn kéo ảnh mặc định
         img.addEventListener('dragstart', function(event) {{
             event.preventDefault();
@@ -59,7 +65,51 @@ if uploaded_file is not None:
             
             // Gửi vị trí chuột về Streamlit
             window.parent.postMessage({{x: x, y: y}}, "*");
+
+            // Nếu đang vẽ, cập nhật bounding box
+            if (isDrawing) {{
+                drawBox(startX, startY, x, y);
+            }}
         }});
+
+        // Bắt đầu vẽ khi nhấn chuột trái
+        img.addEventListener('mousedown', function(event) {{
+            if (event.button === 0) {{ // Kiểm tra nếu chuột trái được nhấn
+                isDrawing = true;
+                const rect = img.getBoundingClientRect();
+                startX = Math.round(event.clientX - rect.left); // Vị trí bắt đầu X
+                startY = Math.round(event.clientY - rect.top); // Vị trí bắt đầu Y
+            }}
+        }});
+
+        // Kết thúc vẽ khi nhả chuột
+        img.addEventListener('mouseup', function(event) {{
+            if (isDrawing) {{
+                isDrawing = false;
+                const rect = img.getBoundingClientRect();
+                const endX = Math.round(event.clientX - rect.left);
+                const endY = Math.round(event.clientY - rect.top);
+                
+                // Ghi nhận bounding box
+                window.parent.postMessage({{
+                    action: 'saveBox',
+                    box: {{ startX: startX, startY: startY, endX: endX, endY: endY }}
+                }}, "*");
+            }}
+        }});
+
+        function drawBox(startX, startY, endX, endY) {{
+            const overlay = document.querySelector('.overlay');
+            overlay.innerHTML = ''; // Xóa bounding box cũ
+            const box = document.createElement('div');
+            box.style.position = 'absolute';
+            box.style.border = '2px solid red';
+            box.style.left = Math.min(startX, endX) + 'px';
+            box.style.top = Math.min(startY, endY) + 'px';
+            box.style.width = Math.abs(endX - startX) + 'px';
+            box.style.height = Math.abs(endY - startY) + 'px';
+            overlay.appendChild(box);
+        }
         </script>
         <div class="overlay"></div>
     """, unsafe_allow_html=True)
@@ -77,11 +127,18 @@ if uploaded_file is not None:
         if 'x' in msg and 'y' in msg:
             st.session_state.mouse_position = {'x': msg['x'], 'y': msg['y']}
             update_mouse_position()
+        if 'action' in msg and msg['action'] == 'saveBox':
+            st.session_state.bounding_boxes.append(msg['box'])  # Lưu bounding box
 
     # Đăng ký lắng nghe tin nhắn
     st.session_state.on_message = on_message
 
     # Gọi hàm cập nhật vị trí chuột
     update_mouse_position()
+
+    # Hiển thị bounding boxes
+    if st.session_state.bounding_boxes:
+        for box in st.session_state.bounding_boxes:
+            st.markdown(f"Bounding Box: Từ ({box['startX']}, {box['startY']}) đến ({box['endX']}, {box['endY']})")
 else:
     st.write("Vui lòng tải lên một bức ảnh.")
