@@ -17,18 +17,17 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     image_np = np.array(image)  # Convert to NumPy array for canvas background
 
-    # Hiển thị ảnh ban đầu
-    st.image(image, caption="Ảnh đầu vào", use_column_width=True)
-
     # Lấy kích thước ảnh
     width, height = image.size
-    st.write(f"Kích thước ảnh: {width} x {height}")
+
+    # Hiển thị ảnh đầu vào
+    st.image(image, caption="Ảnh đầu vào", use_column_width=False)
 
     # Sidebar: Thiết lập cho nét vẽ hình chữ nhật
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#FF0000")
 
-    # Vẽ canvas với kích thước ảnh đã tải lên
+    # Tạo canvas với kích thước của ảnh
     canvas_result = st_canvas(
         fill_color="rgba(0, 0, 0, 0)",        # Transparent fill
         stroke_width=stroke_width,           # Độ rộng nét vẽ
@@ -36,14 +35,14 @@ if uploaded_file is not None:
         background_image=Image.fromarray(image_np),  # Đặt ảnh nền là ảnh đã tải lên
         update_streamlit=True,
         drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
-        height=height,                       # Set chiều cao của canvas bằng ảnh
-        width=width,                         # Set chiều rộng của canvas bằng ảnh
+        height=height,                       # Set chiều cao của canvas bằng chiều cao ảnh
+        width=width,                         # Set chiều rộng của canvas bằng chiều rộng ảnh
         key="canvas",
     )
 
     # Hiển thị kết quả canvas sau khi vẽ
     if canvas_result.image_data is not None:
-        st.image(canvas_result.image_data, caption="Ảnh sau khi vẽ", use_column_width=True)
+        st.image(canvas_result.image_data, caption="Ảnh sau khi vẽ", use_column_width=False)
 
 else:
     st.write("Vui lòng tải lên một bức ảnh.")
