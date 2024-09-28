@@ -31,20 +31,28 @@ st.markdown("""
         const y = Math.round(event.clientY - rect.top); // Tọa độ Y trong ảnh
         
         // Gửi vị trí chuột về Streamlit
-        const data = {x: x, y: y};
-        window.parent.streamlit.setMousePosition(data);
+        window.parent.postMessage({x: x, y: y}, "*");
     });
     </script>
 """, unsafe_allow_html=True)
 
-# Hiển thị vị trí chuột
+# Cập nhật vị trí chuột từ tin nhắn
+def update_mouse_position():
+    if 'mouse_position' in st.session_state:
+        mouse_pos = st.session_state.mouse_position
+        mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {mouse_pos['x']}, Y: {mouse_pos['y']})")
+
+# Lắng nghe các tin nhắn từ JavaScript
+def on_message(msg):
+    if 'x' in msg and 'y' in msg:
+        st.session_state.mouse_position = {'x': msg['x'], 'y': msg['y']}
+        update_mouse_position()
+
+# Đăng ký lắng nghe tin nhắn
+st.session_state.on_message = on_message
+
 if 'mouse_position' not in st.session_state:
     st.session_state.mouse_position = {'x': 0, 'y': 0}
 
-# Cập nhật vị trí chuột khi có sự kiện
-def update_mouse_position(data):
-    st.session_state.mouse_position = data
-    mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {st.session_state.mouse_position['x']}, Y: {st.session_state.mouse_position['y']})")
-
 # Gọi hàm cập nhật vị trí chuột
-update_mouse_position(st.session_state.mouse_position)
+update_mouse_position()
