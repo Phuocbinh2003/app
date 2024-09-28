@@ -29,34 +29,34 @@ if uploaded_file is not None:
     mouse_pos_placeholder = st.empty()
 
     # CSS và JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
-    st.markdown("""
+    st.markdown(f"""
         <style>
-        .overlay {
-            position: fixed; /* Sử dụng fixed để phủ lên toàn bộ trang */
+        .overlay {{
+            position: absolute; /* Sử dụng absolute để phủ lên ảnh */
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: {new_width}px; /* Chiều rộng của overlay bằng chiều rộng ảnh */
+            height: {height}px; /* Chiều cao của overlay bằng chiều cao ảnh */
             background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
             pointer-events: all;  /* Cho phép nhận sự kiện chuột */
-            z-index: 100;  /* Đảm bảo overlay nằm trên tất cả */
-        }
-        img {
+            z-index: 100;  /* Đảm bảo overlay nằm trên ảnh */
+        }}
+        img {{
             pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên ảnh */
-        }
+        }}
         </style>
         <script>
         const img = document.querySelector("img[alt='Ảnh đầu vào']");
         
         // Theo dõi vị trí chuột
-        img.addEventListener('mousemove', function(event) {
+        img.addEventListener('mousemove', function(event) {{
             const rect = img.getBoundingClientRect();
             const x = Math.round(event.clientX - rect.left); // Tọa độ X trong ảnh
             const y = Math.round(event.clientY - rect.top); // Tọa độ Y trong ảnh
             
             // Gửi vị trí chuột về Streamlit
-            window.parent.postMessage({x: x, y: y}, "*");
-        });
+            window.parent.postMessage({{x: x, y: y}}, "*");
+        }});
         </script>
         <div class="overlay"></div>
     """, unsafe_allow_html=True)
