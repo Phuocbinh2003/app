@@ -3,8 +3,7 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import base64
-import json
-from grabcut_processor import GrabCutProcessor  # Import GrabCutProcessor
+from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
 
 # Function to encode image to base64
 def convert_image_to_base64(image):
@@ -13,7 +12,7 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Streamlit app
-st.title("Xóa nền bằng GrabCut với các công cụ vẽ")
+st.title("GrabCut Background Removal with Rectangle Drawing")
 
 # Sidebar for image upload
 uploaded_file = st.sidebar.file_uploader("Chọn một hình ảnh để tải lên", type=["jpg", "jpeg", "png"])
@@ -62,7 +61,7 @@ if uploaded_file is not None:
             let startX, startY;
 
             canvas.addEventListener('mousedown', (event) => {{
-                if (event.button === 2) {{ // Chuột phải
+                if (event.button === 0) {{ // Left mouse button
                     drawing = true;
                     startX = event.offsetX;
                     startY = event.offsetY;
@@ -76,14 +75,12 @@ if uploaded_file is not None:
                     const endY = event.offsetY;
                     const width = Math.abs(startX - endX);
                     const height = Math.abs(startY - endY);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas trước khi vẽ lại
-                    ctx.drawImage(img, 0, 0); // Vẽ lại hình ảnh
                     ctx.rect(startX, startY, width, height);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
-                    // Gửi tọa độ hình chữ nhật đến Python
+                    // Send rectangle coordinates to Python
                     const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
                     const jsonString = JSON.stringify(rect);
                     window.parent.postMessage(jsonString, '*');
@@ -106,40 +103,48 @@ if uploaded_file is not None:
         <script>
         window.addEventListener('message', function(event) {
             const rect = JSON.parse(event.data);
-            if (rect) {{
-                // Gửi dữ liệu hình chữ nhật về Streamlit
-                document.body.innerText = JSON.stringify(rect);
-            }}
+            if (rect) {
+                // Send rectangle data to Streamlit
+                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+                document.body.innerText = JSON.stringify(data);
+            }
         });
         </script>
         """,
         unsafe_allow_html=True
     )
 
+    # Dropdown to select drawing type
+    drawing_type = st.selectbox("Chọn loại miền:", ["foreground", "background", "probable foreground", "probable background"])
+    grabcut_processor.set_drawing_color(drawing_type)
+
     # Button to apply GrabCut
     if st.button("Áp dụng GrabCut"):
         # Get rectangle coordinates
-        rect_data = st.session_state.get('rect', None)
+        rect_data = rect_coords.empty()
         if rect_data is not None:
-            rect = json.loads(rect_data)
-            x = int(rect['x'])
-            y = int(rect['y'])
-            width = int(rect['width'])
-            height = int(rect['height'])
+            x = int(rect_data["x"])
+            y = int(rect_data["y"])
+            width = int(rect_data["width"])
+            height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
-            st.image(output_image, caption="Hình ảnh sau khi cắt nền", use_column_width=True)
+            st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
-    # Instructions
-    st.sidebar.markdown("""
+    # Instructions in Vietnamese
+    st.markdown("""
     ## Hướng dẫn sử dụng
-    1. Tải lên một hình ảnh bằng cách sử dụng mục tải lên bên trái.
-    2. Sử dụng chuột phải để vẽ một hình chữ nhật xung quanh vùng bạn muốn giữ lại.
-    3. Nhấn nút **Áp dụng GrabCut** để cắt nền hình ảnh.
-    4. Bạn có thể sử dụng các công cụ khác như:
-       - Vẽ vùng foreground (nền chính) bằng chuột trái.
-       - Vẽ vùng background (nền phụ) bằng cách vẽ với màu khác.
-       - Vẽ hình chữ nhật để chọn vùng cắt.
-       - Nhấn nút **Đặt lại** để khôi phục hình ảnh gốc và bắt đầu lại.
+    1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
+    2. Sử dụng chuột trái để vẽ các vùng khác nhau:
+        - **Foreground**: Chọn "foreground" từ danh sách và vẽ vùng đối tượng.
+        - **Background**: Chọn "background" từ danh sách và vẽ vùng nền.
+        - **Probable Foreground**: Chọn "probable foreground" để vẽ các vùng có khả năng là đối tượng.
+        - **Probable Background**: Chọn "probable background" để vẽ các vùng có khả năng là nền.
+    3. Kéo và thả chuột phải để vẽ một hình chữ nhật bao quanh đối tượng.
+    4. Nhấn nút "Áp dụng GrabCut" để cắt nền.
     """)
+
+    # Display rectangle coordinates (hidden)
+    st.markdown("### Tọa độ hình chữ nhật (ẩn)")
+    st.write(rect_coords)
