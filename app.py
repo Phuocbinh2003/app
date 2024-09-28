@@ -28,16 +28,19 @@ if uploaded_file is not None:
     # Fill color with full transparency for rectangles
     fill_color = "rgba(0, 0, 0, 0.0)"  # Transparent fill
 
-    # Vẽ canvas trực tiếp trên ảnh đã tải lên
+    # Hiển thị ảnh trước khi vẽ
+    st.image(image, caption="Ảnh đầu vào", use_column_width=True)
+
+    # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
         fill_color=fill_color,               # Transparent fill
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
-        background_image=Image.fromarray(image_np),  # Ảnh nền là ảnh đã tải lên
+        background_image=Image.fromarray(image_np),  # Đặt ảnh nền là ảnh đã tải lên
         update_streamlit=True,
-        drawing_mode="rect",                 # Chế độ vẽ hình chữ nhật
-        height=height,
-        width=width,
+        drawing_mode="rect",                 # Chỉ cho phép vẽ hình chữ nhật
+        height=height,                       # Set chiều cao của canvas bằng ảnh
+        width=width,                         # Set chiều rộng của canvas bằng ảnh
         key="canvas",
     )
 
