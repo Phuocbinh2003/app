@@ -46,12 +46,15 @@ if uploaded_file is not None:
             display_toolbar=False            # Hide toolbar for cleaner UI
         )
 
-        # Custom CSS to change cursor style
+        # Custom CSS to adjust canvas styling and cursor
         st.markdown(
             """
             <style>
             .stCanvas {
                 cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJklEQVR42mJ8//8/A5cD3gB2igO3AAAAAElFTkSuQmCC') 8 8, auto;
+                border: 2px solid #CCCCCC; /* Add a border to the canvas */
+                margin: 10px; /* Add margin to prevent overflow */
+                background: rgba(255, 255, 255, 0.5); /* Optional: set a background color */
             }
             </style>
             """,
