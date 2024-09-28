@@ -13,7 +13,13 @@ uploaded_file = st.sidebar.file_uploader("Chọn ảnh để tải lên", type=[
 if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
-    st.image(image, caption='Ảnh đầu vào', use_column_width=True)
+    
+    # Chỉ định kích thước mới cho ảnh
+    new_width = 400  # Thay đổi kích thước theo nhu cầu
+    image.thumbnail((new_width, new_width))  # Giữ tỷ lệ khung hình
+
+    # Hiển thị ảnh đã thu nhỏ
+    st.image(image, caption='Ảnh đầu vào', use_column_width=False)  # Không sử dụng chiều rộng cột
 
     # Hiển thị kích thước ảnh
     width, height = image.size
