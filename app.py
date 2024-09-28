@@ -20,34 +20,29 @@ if uploaded_file is not None:
     # Get the dimensions of the original image
     original_width, original_height = image.size
 
-    # Set the maximum canvas size based on the uploaded image
-    max_canvas_width = st.sidebar.slider("Max Canvas Width (px):", 300, 1200, original_width)
-    ratio = max_canvas_width / original_width
-    new_height = int(original_height * ratio)
-
     # Display the uploaded image
-    st.image(image, caption="Input Image", use_column_width=False, width=max_canvas_width)
+    st.image(image, caption="Input Image", use_column_width=False)
 
     # Set up drawing parameters
     stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
 
-    # Create the canvas with the image as the background
+    # Create the canvas with the uploaded image as the background
     canvas_result = st_canvas(
         fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
         stroke_width=stroke_width,      # Stroke width
         stroke_color=stroke_color,      # Stroke color
-        background_image=Image.fromarray(image_np),  # Background image
+        background_image=image_np,      # Use uploaded image as background
         update_streamlit=True,
         drawing_mode="rect",            # Allow drawing rectangles
-        height=new_height,              # Height of the canvas
-        width=max_canvas_width,         # Width of the canvas
+        height=original_height,         # Height of the canvas
+        width=original_width,           # Width of the canvas
         key="canvas",
     )
 
     # Show the resulting canvas image if drawn
     if canvas_result.image_data is not None:
-        st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=False, width=max_canvas_width)
+        st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=False)
 
 else:
     st.write("Please upload an image.")
