@@ -23,16 +23,19 @@ if uploaded_file is not None:
     drawing_mode = st.sidebar.selectbox("Chọn chế độ vẽ:", ("Vẽ tự do", "Vẽ hình chữ nhật"))
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#000000")
-
-    # Convert PIL image to numpy array (required by st_canvas for background)
+    
+    # Transparency setting for drawing (set alpha value for transparency)
+    fill_color = "rgba(255, 165, 0, 0.0)"  # Fully transparent (alpha = 0.0)
+    
+    # Convert PIL image to RGBA format
     image_np = image.convert("RGBA")
     
     # Canvas setup
     canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Màu tô (nếu vẽ hình chữ nhật)
-        stroke_width=stroke_width,            # Độ rộng nét vẽ
-        stroke_color=stroke_color,            # Màu vẽ
-        background_image=image_np,            # Ảnh nền để vẽ lên
+        fill_color=fill_color,               # Màu tô trong suốt
+        stroke_width=stroke_width,           # Độ rộng nét vẽ
+        stroke_color=stroke_color,           # Màu vẽ
+        background_image=image_np,           # Ảnh nền để vẽ lên
         update_streamlit=True,
         drawing_mode="freedraw" if drawing_mode == "Vẽ tự do" else "rect",
         height=height,
@@ -46,4 +49,3 @@ if uploaded_file is not None:
 
 else:
     st.write("Vui lòng tải lên một bức ảnh.")
-
