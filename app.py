@@ -50,7 +50,8 @@ if uploaded_file is not None:
         st.image(grabcut_processor.get_output_image(), caption='Ảnh được phân đoạn', use_column_width=True)
 
     # Hiển thị vị trí chuột
-    mouse_position = st.empty()  # Tạo không gian hiển thị vị trí chuột
+    mouse_x = st.number_input("Vị trí X:", min_value=0, value=0)
+    mouse_y = st.number_input("Vị trí Y:", min_value=0, value=0)
 
     # Nút tải ảnh
     output_image_pil = Image.fromarray(cv2.cvtColor(grabcut_processor.get_output_image(), cv2.COLOR_BGR2RGB))
@@ -65,32 +66,6 @@ if uploaded_file is not None:
         mime="image/png"
     )
 
-    # JavaScript để theo dõi vị trí chuột
-    st.markdown(
-        """
-        <script>
-        const img = document.querySelector('img');
-        img.addEventListener('mousemove', function(event) {
-            const rect = img.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            const mousePosition = `(${Math.round(x)}, ${Math.round(y)})`;
-            window.parent.postMessage({ type: 'mouse_position', position: mousePosition }, '*');
-        });
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+    # Hiển thị vị trí chuột
+    st.write(f"Vị trí chuột: ({mouse_x}, {mouse_y})")
 
-    # Xử lý thông điệp từ JavaScript
-    if 'position' in st.session_state:
-        pos = st.session_state.position
-        mouse_position.text(f"Vị trí chuột: {pos}")
-    else:
-        mouse_position.text("Vị trí chuột: (0, 0)")
-
-# Lắng nghe các thông điệp từ JavaScript
-st.session_state.mouse_position = st.empty()  # Tạo không gian hiển thị cho vị trí chuột
-if st.button('Cập nhật vị trí chuột'):
-    pos = st.session_state.position if 'position' in st.session_state else "(0, 0)"
-    st.session_state.mouse_position.text(f"Vị trí chuột: {pos}")
