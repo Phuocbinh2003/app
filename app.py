@@ -1,27 +1,46 @@
 import streamlit as st
-from PIL import Image, ImageDraw
 
-# Configure the Streamlit app
-st.set_page_config(layout="wide", page_title="Draw on Image with PIL")
+# Embed HTML and JavaScript for drawing
+drawing_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
 
-st.title("Upload Image and Draw on It")
+        canvas.addEventListener('mousedown', () => {
+            drawing = true;
+        });
 
-# Sidebar to upload the image
-st.sidebar.write("## Upload Image")
-uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            ctx.beginPath();
+        });
 
-if uploaded_file is not None:
-    # Read the image
-    image = Image.open(uploaded_file)
+        canvas.addEventListener('mousemove', (event) => {
+            if (!drawing) return;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'red';
+            ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+        });
+    </script>
+</body>
+</html>
+"""
 
-    # Create a drawing context
-    draw = ImageDraw.Draw(image)
-    
-    # Draw a rectangle (example)
-    draw.rectangle([(50, 50), (200, 200)], outline="blue", width=5)
-
-    # Display the image
-    st.image(image, caption="Image with Drawings", use_column_width=True)
-
-else:
-    st.write("Please upload an image.")
+# Render the HTML in Streamlit
+st.components.v1.html(drawing_html, height=500)
