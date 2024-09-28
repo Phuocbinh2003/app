@@ -41,6 +41,10 @@ if uploaded_file is not None:
         }}
         img {{
             pointer-events: none; /* Ngăn chặn mọi sự kiện chuột trên ảnh */
+            user-select: none; /* Ngăn chặn việc chọn văn bản */
+            -webkit-user-drag: none; /* Ngăn chặn kéo ảnh trên Safari */
+            -moz-user-select: none; /* Ngăn chặn kéo ảnh trên Firefox */
+            -ms-user-select: none; /* Ngăn chặn kéo ảnh trên IE */
         }}
         </style>
         <script>
