@@ -15,6 +15,7 @@ st.divider()
 st.markdown("""
     ## Hướng dẫn cách dùng
     
+    * Chọn vùng hình chữ nhật sử dụng thanh trượt để chỉ định tọa độ.
     * Chọn chế độ vẽ bằng các phím sau:
         * Phím '0' - Để chọn các vùng có sure background
         * Phím '1' - Để chọn các vùng có sure foreground
@@ -37,6 +38,16 @@ if uploaded_file is not None:
 
     # Khởi tạo GrabCutProcessor
     grabcut_processor = GrabCutProcessor(image)
+
+    # Chọn tọa độ cho vùng hình chữ nhật
+    st.sidebar.write("## Chọn tọa độ vùng hình chữ nhật")
+    x1 = st.sidebar.slider("X1", 0, image.shape[1], 0)
+    y1 = st.sidebar.slider("Y1", 0, image.shape[0], 0)
+    x2 = st.sidebar.slider("X2", 0, image.shape[1], image.shape[1])
+    y2 = st.sidebar.slider("Y2", 0, image.shape[0], image.shape[0])
+
+    # Thiết lập vùng hình chữ nhật trong GrabCutProcessor
+    grabcut_processor.rect = (x1, y1, x2 - x1, y2 - y1)
 
     # Tùy chọn để chọn chế độ vẽ
     st.sidebar.write("## Chọn chế độ vẽ")
