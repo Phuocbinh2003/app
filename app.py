@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
+from io import BytesIO  # Import BytesIO
 import base64
-import numpy as np
 
 # Function to encode image to base64
 def convert_image_to_base64(image):
