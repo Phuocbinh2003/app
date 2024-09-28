@@ -7,15 +7,6 @@ st.set_page_config(layout="wide", page_title="Mouse Position Tracking")
 
 st.write("# Theo dõi vị trí chuột trên hình ảnh")
 
-# CSS để thay đổi con trỏ khi di chuột vào hình ảnh
-st.markdown("""
-    <style>
-    .crosshair-cursor {
-        cursor: crosshair;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
 uploaded_file = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
@@ -34,16 +25,21 @@ if uploaded_file is not None:
         const img = document.querySelector('img');
         img.addEventListener('mouseenter', function() {
             document.querySelector('input[name="mouse_in_image"]').value = 'True';
+            document.querySelector('input[name="submit-button"]').click();
         });
 
         img.addEventListener('mouseleave', function() {
             document.querySelector('input[name="mouse_in_image"]').value = 'False';
+            document.querySelector('input[name="submit-button"]').click();
         });
         </script>
     """, unsafe_allow_html=True)
 
     # Input ẩn để lưu trạng thái chuột có vào ảnh hay không
     mouse_in_image = st.text_input("Mouse in Image:", key="mouse_in_image", value="False")
+    
+    # Nút submit ẩn để cập nhật trạng thái mỗi khi có sự thay đổi từ JavaScript
+    st.text_input("Submit Button:", key="submit-button", type="hidden")
 
     # Kiểm tra xem chuột đã vào ảnh hay chưa
     if mouse_in_image == "True":
