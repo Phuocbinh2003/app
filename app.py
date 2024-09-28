@@ -21,10 +21,17 @@ st.write(f"Kích thước ảnh: {width} x {height}")
 # Placeholder để hiển thị vị trí chuột
 mouse_pos_placeholder = st.empty()
 
-# JavaScript để theo dõi vị trí chuột
+# JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
 st.markdown("""
     <script>
     const img = document.querySelector("img[alt='Ảnh đầu vào']");
+    
+    // Ngăn chặn sự kiện nhấp chuột
+    img.addEventListener('mousedown', function(event) {
+        event.preventDefault();
+    });
+
+    // Theo dõi vị trí chuột
     img.addEventListener('mousemove', function(event) {
         const rect = img.getBoundingClientRect();
         const x = Math.round(event.clientX - rect.left); // Tọa độ X trong ảnh
@@ -37,10 +44,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Cập nhật vị trí chuột từ tin nhắn
-def update_mouse_position():
-    if 'mouse_position' in st.session_state:
-        mouse_pos = st.session_state.mouse_position
-        mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {mouse_pos['x']}, Y: {mouse_pos['y']})")
+if 'mouse_position' not in st.session_state:
+    st.session_state.mouse_position = {'x': 0, 'y': 0}
 
 # Lắng nghe các tin nhắn từ JavaScript
 def on_message(msg):
@@ -48,11 +53,12 @@ def on_message(msg):
         st.session_state.mouse_position = {'x': msg['x'], 'y': msg['y']}
         update_mouse_position()
 
+# Cập nhật vị trí chuột
+def update_mouse_position():
+    mouse_pos_placeholder.write(f"Vị trí chuột trong ảnh: (X: {st.session_state.mouse_position['x']}, Y: {st.session_state.mouse_position['y']})")
+
 # Đăng ký lắng nghe tin nhắn
 st.session_state.on_message = on_message
-
-if 'mouse_position' not in st.session_state:
-    st.session_state.mouse_position = {'x': 0, 'y': 0}
 
 # Gọi hàm cập nhật vị trí chuột
 update_mouse_position()
