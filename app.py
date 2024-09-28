@@ -17,7 +17,6 @@ st.markdown("""
 
     * Vẽ hình chữ nhật trước (vẽ bằng click phải)
     * Sử dụng phím (chọn phím sau đó vẽ bằng click trái):
-
         * Phím '0' - Để chọn các vùng có sure background
         * Phím '1' - Để chọn các vùng có sure foreground
         * Phím '2' - Để chọn các vùng probable background
@@ -67,13 +66,31 @@ if uploaded_file is not None:
         mime="image/png"
     )
 
-    # Lắng nghe sự kiện chuột
-    mouse_x = st.text_input("Mouse X:", "")
-    mouse_y = st.text_input("Mouse Y:", "")
-    
-    # Cập nhật vị trí chuột
-    if mouse_x and mouse_y:
-        mouse_position.text(f"Vị trí chuột: ({mouse_x}, {mouse_y})")
+    # JavaScript để theo dõi vị trí chuột
+    st.markdown(
+        """
+        <script>
+        const img = document.querySelector('img');
+        img.addEventListener('mousemove', function(event) {
+            const rect = img.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const mousePosition = `(${Math.round(x)}, ${Math.round(y)})`;
+            window.parent.postMessage({ type: 'mouse_position', position: mousePosition }, '*');
+        });
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Xử lý thông điệp từ JavaScript
+    st.session_state.mouse_position = st.empty()  # Tạo không gian hiển thị cho vị trí chuột
+    st.session_state.mouse_in_image = st.empty()  # Tạo không gian hiển thị trạng thái chuột
+
+    # Đoạn mã này sẽ được gọi để cập nhật vị trí chuột
+    if 'position' in st.session_state:
+        pos = st.session_state.position
+        mouse_position.text(f"Vị trí chuột: {pos}")
         mouse_in_image.text("Đã vào bức ảnh")
     else:
         mouse_position.text("Vị trí chuột: (0, 0)")
