@@ -17,10 +17,10 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGBA")  # Convert to RGBA
     image_np = np.array(image)  # Convert the image to a NumPy array
 
-    # Ensure the image has 4 channels
+    # Check the dimensions of the image
     if image_np.ndim == 3 and image_np.shape[2] == 4:
         # Get the dimensions of the original image
-        original_width, original_height = image.size
+        original_height, original_width, _ = image_np.shape
 
         # Display the uploaded image
         st.image(image, caption="Input Image", use_column_width=True)
