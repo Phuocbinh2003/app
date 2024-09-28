@@ -1,93 +1,33 @@
 import streamlit as st
-import numpy as np
-from PIL import Image
-import io
-import cv2
-from grabcut_processor import GrabCutProcessor
 
-# Cấu hình trang Streamlit
-st.set_page_config(layout="wide", page_title="Deploy GrabCut")
+# Function to update mouse position
+def mouse_position():
+    st.session_state.mouse_x = st.session_state.get('mouse_x', 0)
+    st.session_state.mouse_y = st.session_state.get('mouse_y', 0)
 
-st.write("# Xóa Background GrabCut")
+# Create a placeholder for mouse position display
+mouse_pos_placeholder = st.empty()
 
-st.divider()
+# JavaScript to track mouse position
+mouse_tracking_code = """
+<script>
+    document.addEventListener('mousemove', function(event) {
+        // Send mouse coordinates to Streamlit
+        window.parent.streamlit.setMousePosition(event.clientX, event.clientY);
+    });
+</script>
+"""
 
-st.markdown("""
-    ## Hướng dẫn cách dùng
+# Add the JavaScript to the app
+st.markdown(mouse_tracking_code, unsafe_allow_html=True)
 
-    * Vẽ hình chữ nhật trước (vẽ bằng click phải)
-    * Sử dụng phím (chọn phím sau đó vẽ bằng click trái):
-        * Phím '0' - Để chọn các vùng có sure background
-        * Phím '1' - Để chọn các vùng có sure foreground
-        * Phím '2' - Để chọn các vùng probable background
-        * Phím '3' - Để chọn các vùng probable foreground
-        * Phím 'n' - Để cập nhật phân đoạn
-        * Phím 'r' - Để thiết lập lại 
-""")
+# Create the function to update mouse position in Streamlit
+st.session_state.mouse_x = 0
+st.session_state.mouse_y = 0
 
-st.divider()
+# Run the function to update mouse position
+if 'mouse_x' in st.session_state and 'mouse_y' in st.session_state:
+    mouse_position()
 
-# Sidebar để tải ảnh
-st.sidebar.write("## Upload Image")
-uploaded_file = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
-
-def remove_even_pixels(image):
-    # Chuyển đổi ảnh sang định dạng NumPy array
-    img_array = np.array(image)
-    
-    # Tạo một mask cho các pixel có vị trí chẵn
-    mask = (np.indices(img_array.shape[:2]) % 2 == 0).all(axis=0)
-
-    # Đặt các pixel chẵn thành màu trắng (hoặc giá trị khác nếu cần)
-    img_array[mask] = [255, 255, 255]  # Màu trắng
-
-    return img_array
-
-if uploaded_file is not None:
-    # Đọc ảnh
-    image = Image.open(uploaded_file)
-    image = np.array(image)
-
-    # Khởi tạo GrabCutProcessor
-    grabcut_processor = GrabCutProcessor(image)
-
-    # Xóa các pixel chẵn trong ảnh
-    modified_image = remove_even_pixels(image)
-
-    # Phần xử lý ảnh
-    st.write("### Kết quả")
-    col1, col2 = st.columns([0.5, 0.5])
-
-    with col1:
-        # Embed the original image with pointer events disabled
-        st.markdown(
-            f'<div style="pointer-events: none;">'
-            f'<img src="data:image/png;base64,{Image.fromarray(image).convert("RGBA").tobytes().decode()}" style="width: 100%; height: auto;"/>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-
-    with col2:
-        # Embed the modified image with pointer events disabled
-        st.markdown(
-            f'<div style="pointer-events: none;">'
-            f'<img src="data:image/png;base64,{Image.fromarray(modified_image).convert("RGBA").tobytes().decode()}" style="width: 100%; height: auto;"/>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-
-    # Nút tải ảnh
-    output_image_pil = Image.fromarray(cv2.cvtColor(modified_image, cv2.COLOR_BGR2RGB))
-    buf = io.BytesIO()
-    output_image_pil.save(buf, format="PNG")
-    byte_im = buf.getvalue()
-
-    st.download_button(
-        label="Tải ảnh xuống",
-        data=byte_im,
-        file_name="modified_image.png",
-        mime="image/png"
-    )
-
-    # Hiển thị vị trí chuột (không cần thiết, có thể xóa nếu không cần)
-    st.write("Vị trí chuột: (0, 0)")  # Chỉ để giữ lại giao diện, có thể xóa
+# Display the current mouse position
+mouse_pos_placeholder.write(f"Vị trí chuột: (X: {st.session_state.mouse_x}, Y: {st.session_state.mouse_y})")
