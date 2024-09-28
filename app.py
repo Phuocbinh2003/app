@@ -23,6 +23,9 @@ if uploaded_file is not None:
     # Display the uploaded image
     st.image(image, caption="Input Image", use_column_width=True)
 
+    # Check the shape and type of the NumPy array
+    st.write(f"Image shape: {image_np.shape}, dtype: {image_np.dtype}")
+
     # Set up drawing parameters
     stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
