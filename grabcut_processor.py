@@ -2,25 +2,25 @@ import numpy as np
 import cv2
 
 class GrabCutProcessor:
-    BLUE = [255, 0, 0]        # rectangle color
-    RED = [0, 0, 255]         # PR BG
-    GREEN = [0, 255, 0]       # PR FG
-    BLACK = [0, 0, 0]         # sure BG
-    WHITE = [255, 255, 255]   # sure FG
+    BLUE = [255, 0, 0]        # Màu cho hình chữ nhật
+    RED = [0, 0, 255]         # Màu cho dự đoán nền
+    GREEN = [0, 255, 0]       # Màu cho dự đoán foreground
+    BLACK = [0, 0, 0]         # Màu cho nền chắc chắn
+    WHITE = [255, 255, 255]   # Màu cho foreground chắc chắn
 
     DRAW_BG = {'color': BLACK, 'val': 0}
     DRAW_FG = {'color': WHITE, 'val': 1}
     DRAW_PR_BG = {'color': RED, 'val': 2}
     DRAW_PR_FG = {'color': GREEN, 'val': 3}
 
-    # setting up flags
+    # Cài đặt các cờ
     rect = (0, 0, 1, 1)
-    drawing = False         # flag for drawing curves
-    rectangle = False       # flag for drawing rect
-    rect_over = False       # flag to check if rect drawn
-    rect_or_mask = 100      # flag for selecting rect or mask mode
-    value = DRAW_FG         # drawing initialized to FG
-    thickness = 3           # brush thickness
+    drawing = False         # Cờ cho việc vẽ
+    rectangle = False       # Cờ cho việc vẽ hình chữ nhật
+    rect_over = False       # Cờ kiểm tra nếu hình chữ nhật đã được vẽ
+    rect_or_mask = 100      # Cờ chọn giữa hình chữ nhật và mặt nạ
+    value = DRAW_FG         # Giá trị vẽ khởi tạo cho FG
+    thickness = 3           # Độ dày cọ vẽ
 
     def __init__(self, image):
         self.img = image.copy()
@@ -29,6 +29,7 @@ class GrabCutProcessor:
         self.output = np.zeros(self.img.shape, np.uint8)
 
     def onmouse(self, event, x, y, flags, param):
+        # Vẽ hình chữ nhật với chuột phải
         if event == cv2.EVENT_RBUTTONDOWN:
             self.rectangle = True
             self.ix, self.iy = x, y
@@ -49,6 +50,7 @@ class GrabCutProcessor:
                          abs(self.ix - x), abs(self.iy - y))
             self.rect_or_mask = 0
 
+        # Vẽ trên ảnh với chuột trái
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drawing = True
             cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
@@ -68,10 +70,10 @@ class GrabCutProcessor:
         bgdmodel = np.zeros((1, 65), np.float64)
         fgdmodel = np.zeros((1, 65), np.float64)
 
-        if self.rect_or_mask == 0:         # grabcut with rectangle
+        if self.rect_or_mask == 0:         # GrabCut với hình chữ nhật
             cv2.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_RECT)
             self.rect_or_mask = 1
-        elif self.rect_or_mask == 1:       # grabcut with mask
+        elif self.rect_or_mask == 1:       # GrabCut với mặt nạ
             cv2.grabCut(self.img2, self.mask, None, bgdmodel, fgdmodel, 1, cv2.GC_INIT_WITH_MASK)
 
         mask2 = np.where((self.mask == 1) | (self.mask == 3), 255, 0).astype('uint8')
