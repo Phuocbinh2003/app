@@ -15,15 +15,13 @@ st.divider()
 st.markdown("""
     ## Hướng dẫn cách dùng
     
-    * Vẽ hình chữ nhật trước (vẽ bằng click phải)
-    * Sử dụng phím (chọn phím sau đó vẽ bằng click trái):
-
+    * Chọn chế độ vẽ bằng các phím sau:
         * Phím '0' - Để chọn các vùng có sure background
         * Phím '1' - Để chọn các vùng có sure foreground
         * Phím '2' - Để chọn các vùng probable background
         * Phím '3' - Để chọn các vùng probable foreground
         * Phím 'n' - Để cập nhật phân đoạn
-        * Phím 'r' - Để thiết lập lại 
+        * Phím 'r' - Để thiết lập lại
 """)
 
 st.divider()
@@ -39,6 +37,27 @@ if uploaded_file is not None:
 
     # Khởi tạo GrabCutProcessor
     grabcut_processor = GrabCutProcessor(image)
+
+    # Tùy chọn để chọn chế độ vẽ
+    st.sidebar.write("## Chọn chế độ vẽ")
+    draw_mode = st.sidebar.radio("Chọn chế độ:", ('Sure BG (0)', 'Sure FG (1)', 'Prob BG (2)', 'Prob FG (3)'))
+
+    # Map chế độ vẽ thành giá trị trong GrabCutProcessor
+    if draw_mode == 'Sure BG (0)':
+        grabcut_processor.value = grabcut_processor.DRAW_BG
+    elif draw_mode == 'Sure FG (1)':
+        grabcut_processor.value = grabcut_processor.DRAW_FG
+    elif draw_mode == 'Prob BG (2)':
+        grabcut_processor.value = grabcut_processor.DRAW_PR_BG
+    elif draw_mode == 'Prob FG (3)':
+        grabcut_processor.value = grabcut_processor.DRAW_PR_FG
+
+    # Nút cập nhật và reset
+    if st.sidebar.button("Cập nhật phân đoạn (n)"):
+        grabcut_processor.apply_grabcut()
+
+    if st.sidebar.button("Thiết lập lại (r)"):
+        grabcut_processor.reset()
 
     # Phần xử lý ảnh
     st.write("### Kết quả")
