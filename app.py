@@ -17,6 +17,9 @@ st.title("GrabCut Background Removal with Rectangle Drawing")
 # Sidebar for image upload
 uploaded_file = st.sidebar.file_uploader("Chọn một hình ảnh để tải lên", type=["jpg", "jpeg", "png"])
 
+# Variable to store rectangle coordinates
+rect_coordinates = None
+
 if uploaded_file is not None:
     # Read the image
     image = Image.open(uploaded_file)
@@ -98,9 +101,6 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
-    # Placeholder to store rectangle coordinates
-    rect_coords = st.empty()
-
     # JavaScript to receive the rectangle coordinates
     st.markdown(
         """
@@ -121,7 +121,7 @@ if uploaded_file is not None:
     # Button to apply GrabCut
     if st.button("Áp dụng GrabCut"):
         # Get rectangle coordinates
-        rect_data = rect_coords.empty()
+        rect_data = st.session_state.get("rect_data", None)  # Retrieve rectangle coordinates from session state
         if rect_data is not None:
             x = int(rect_data["x"])
             y = int(rect_data["y"])
@@ -141,6 +141,6 @@ if uploaded_file is not None:
     """)
 
     # Display rectangle coordinates (hidden)
-    st.markdown("### Tọa độ hình chữ nhật (ẩn)")
-    st.write(rect_coords)
-
+    if rect_coordinates is not None:
+        st.markdown("### Tọa độ hình chữ nhật")
+        st.write(rect_coordinates)
