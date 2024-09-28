@@ -32,7 +32,7 @@ if uploaded_file is not None:
             right: 0;
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
-            pointer-events: auto;  /* Cho phép nhận sự kiện chuột */
+            pointer-events: all;  /* Cho phép nhận sự kiện chuột */
             z-index: 10;  /* Đảm bảo overlay nằm trên tất cả */
         }
         img {
