@@ -1,9 +1,9 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
+import io
 import cv2
 from grabcut_processor import GrabCutProcessor
-import io
 
 # Cấu hình trang Streamlit
 st.set_page_config(layout="wide", page_title="Deploy GrabCut")
@@ -51,7 +51,6 @@ if uploaded_file is not None:
 
     # Hiển thị vị trí chuột
     mouse_position = st.empty()  # Tạo không gian hiển thị vị trí chuột
-    mouse_in_image = st.empty()  # Tạo không gian hiển thị trạng thái chuột
 
     # Nút tải ảnh
     output_image_pil = Image.fromarray(cv2.cvtColor(grabcut_processor.get_output_image(), cv2.COLOR_BGR2RGB))
@@ -84,14 +83,14 @@ if uploaded_file is not None:
     )
 
     # Xử lý thông điệp từ JavaScript
-    st.session_state.mouse_position = st.empty()  # Tạo không gian hiển thị cho vị trí chuột
-    st.session_state.mouse_in_image = st.empty()  # Tạo không gian hiển thị trạng thái chuột
-
-    # Đoạn mã này sẽ được gọi để cập nhật vị trí chuột
     if 'position' in st.session_state:
         pos = st.session_state.position
         mouse_position.text(f"Vị trí chuột: {pos}")
-        mouse_in_image.text("Đã vào bức ảnh")
     else:
         mouse_position.text("Vị trí chuột: (0, 0)")
-        mouse_in_image.text("Chưa vào bức ảnh")
+
+# Lắng nghe các thông điệp từ JavaScript
+st.session_state.mouse_position = st.empty()  # Tạo không gian hiển thị cho vị trí chuột
+if st.button('Cập nhật vị trí chuột'):
+    pos = st.session_state.position if 'position' in st.session_state else "(0, 0)"
+    st.session_state.mouse_position.text(f"Vị trí chuột: {pos}")
