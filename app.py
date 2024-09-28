@@ -27,7 +27,7 @@ if uploaded_file is not None:
 
     # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
-        fill_color="rgba(0, 0, 0, 0)",        # Transparent fill
+     
         stroke_width=stroke_width,           # Độ rộng nét vẽ
         stroke_color=stroke_color,           # Màu vẽ
         background_image=image,              # Đặt ảnh nền là ảnh đã tải lên
