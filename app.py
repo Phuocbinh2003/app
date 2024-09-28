@@ -3,7 +3,6 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import base64
-import json
 from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
 
 # Function to encode image to base64
@@ -13,31 +12,10 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Streamlit app
-st.title("GrabCut Background Removal with Rectangle Drawing")
-
-# Displaying instructions
-st.markdown("""
-### Instructions:
-1. **Upload an Image**: Use the sidebar to upload a JPG or PNG image.
-2. **Draw a Rectangle**: 
-   - Right-click and drag on the canvas to draw a rectangle around the object you want to keep.
-   - The rectangle will be outlined in blue.
-3. **Apply GrabCut**: Click the "Apply GrabCut" button to remove the background based on the rectangle drawn.
-4. **Reset**: If you want to draw a new rectangle or upload a different image, simply refresh the page.
-
-### Features:
-- **Image Upload**: Select an image from your local files.
-- **Rectangle Drawing**: Draw a rectangle around the area of interest using the right mouse button.
-- **Background Removal**: Apply the GrabCut algorithm to segment the foreground from the background.
-- **Output Display**: View the processed image with the background removed.
-
-""")
+st.title("Xóa nền bằng GrabCut với chức năng vẽ hình chữ nhật")
 
 # Sidebar for image upload
-uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
-
-# Placeholder for rectangle coordinates
-rect_coords = st.empty()
+uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh để tải lên", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     # Read the image
@@ -83,7 +61,7 @@ if uploaded_file is not None:
             let startX, startY;
 
             canvas.addEventListener('mousedown', (event) => {{
-                if (event.button === 2) {{ // Right mouse button
+                if (event.button === 2) {{ // Chuột phải
                     drawing = true;
                     startX = event.offsetX;
                     startY = event.offsetY;
@@ -92,15 +70,14 @@ if uploaded_file is not None:
 
             canvas.addEventListener('mousemove', (event) => {{
                 if (drawing) {{
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-                    ctx.drawImage(img, 0, 0); // Redraw the image
                     const endX = event.offsetX;
                     const endY = event.offsetY;
-                    const width = Math.abs(startX - endX);
-                    const height = Math.abs(startY - endY);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+                    ctx.drawImage(img, 0, 0); // Vẽ lại hình ảnh
+                    ctx.rect(startX, startY, endX - startX, endY - startY);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
+                    ctx.stroke();
                 }}
             }});
 
@@ -109,14 +86,13 @@ if uploaded_file is not None:
                     drawing = false;
                     const endX = event.offsetX;
                     const endY = event.offsetY;
-                    const width = Math.abs(startX - endX);
-                    const height = Math.abs(startY - endY);
+                    ctx.rect(startX, startY, endX - startX, endY - startY);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
+                    ctx.stroke();
 
-                    // Send rectangle coordinates to Python
-                    const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
+                    // Gửi tọa độ hình chữ nhật đến Python
+                    const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: Math.abs(endX - startX), height: Math.abs(endY - startY) }};
                     const jsonString = JSON.stringify(rect);
                     window.parent.postMessage(jsonString, '*');
                 }}
@@ -129,6 +105,9 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
+    # Placeholder to store rectangle coordinates
+    rect_coords = st.empty()
+
     # JavaScript to receive the rectangle coordinates
     st.markdown(
         """
@@ -136,8 +115,8 @@ if uploaded_file is not None:
         window.addEventListener('message', function(event) {
             const rect = JSON.parse(event.data);
             if (rect) {
-                // Send rectangle data to Streamlit
-                const data = {{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }};
+                // Gửi dữ liệu hình chữ nhật đến Streamlit
+                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
                 document.body.innerText = JSON.stringify(data);
             }
         });
@@ -147,21 +126,25 @@ if uploaded_file is not None:
     )
 
     # Button to apply GrabCut
-    if st.button("Apply GrabCut"):
+    if st.button("Áp dụng GrabCut"):
         # Get rectangle coordinates
-        rect_data = json.loads(st.session_state.get('rect_data', '{}'))
+        rect_data = st.text_input("Tọa độ hình chữ nhật (hidden)")  # Hộp nhập cho tọa độ
         if rect_data:
-            x = int(rect_data['x'])
-            y = int(rect_data['y'])
-            width = int(rect_data['width'])
-            height = int(rect_data['height'])
+            rect_data = json.loads(rect_data)
+            x = int(rect_data["x"])
+            y = int(rect_data["y"])
+            width = int(rect_data["width"])
+            height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
-            st.image(output_image, caption="Output Image", use_column_width=True)
+            st.image(output_image, caption="Hình ảnh đã cắt", use_column_width=True)
 
-            # Display rectangle coordinates
-            st.markdown(f"### Rectangle Coordinates: `x: {x}, y: {y}, width: {width}, height: {height}`")
-
-    # To store the rectangle data
-    st.session_state['rect_data'] = rect_coords.empty()
+    # Hướng dẫn sử dụng
+    st.markdown("""
+    ## Hướng dẫn sử dụng
+    1. Tải lên hình ảnh bạn muốn xóa nền.
+    2. Sử dụng chuột phải để vẽ một hình chữ nhật quanh khu vực bạn muốn giữ lại.
+    3. Nhấn nút "Áp dụng GrabCut" để thực hiện cắt nền.
+    4. Hình ảnh đã cắt sẽ được hiển thị.
+    """)
