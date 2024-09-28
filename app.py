@@ -114,10 +114,6 @@ if uploaded_file is not None:
         unsafe_allow_html=True
     )
 
-    # Dropdown to select drawing type
-    drawing_type = st.selectbox("Chọn loại miền:", ["foreground", "background", "probable foreground", "probable background"])
-    grabcut_processor.set_drawing_color(drawing_type)
-
     # Button to apply GrabCut
     if st.button("Áp dụng GrabCut"):
         # Get rectangle coordinates
@@ -136,13 +132,8 @@ if uploaded_file is not None:
     st.markdown("""
     ## Hướng dẫn sử dụng
     1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
-    2. Sử dụng chuột trái để vẽ các vùng khác nhau:
-        - **Foreground**: Chọn "foreground" từ danh sách và vẽ vùng đối tượng.
-        - **Background**: Chọn "background" từ danh sách và vẽ vùng nền.
-        - **Probable Foreground**: Chọn "probable foreground" để vẽ các vùng có khả năng là đối tượng.
-        - **Probable Background**: Chọn "probable background" để vẽ các vùng có khả năng là nền.
-    3. Kéo và thả chuột phải để vẽ một hình chữ nhật bao quanh đối tượng.
-    4. Nhấn nút "Áp dụng GrabCut" để cắt nền.
+    2. Sử dụng chuột trái để vẽ một hình chữ nhật quanh đối tượng bạn muốn cắt.
+    3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
     """)
 
     # Display rectangle coordinates (hidden)
