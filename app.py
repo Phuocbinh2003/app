@@ -49,10 +49,6 @@ if uploaded_file is not None:
     with col2:
         st.image(grabcut_processor.get_output_image(), caption='Ảnh được phân đoạn', use_column_width=True)
 
-    # Hiển thị vị trí chuột
-    mouse_x = st.number_input("Vị trí X:", min_value=0, value=0)
-    mouse_y = st.number_input("Vị trí Y:", min_value=0, value=0)
-
     # Nút tải ảnh
     output_image_pil = Image.fromarray(cv2.cvtColor(grabcut_processor.get_output_image(), cv2.COLOR_BGR2RGB))
     buf = io.BytesIO()
@@ -66,6 +62,25 @@ if uploaded_file is not None:
         mime="image/png"
     )
 
-    # Hiển thị vị trí chuột
-    st.write(f"Vị trí chuột: ({mouse_x}, {mouse_y})")
+    # HTML and JavaScript for mouse position tracking
+    st.markdown("""
+        <script>
+        const img = document.querySelector('img[alt="Ảnh đầu vào"]');
+        img.addEventListener('mousemove', function(event) {
+            const rect = img.getBoundingClientRect();
+            const x = Math.round(event.clientX - rect.left);
+            const y = Math.round(event.clientY - rect.top);
+            const mousePos = {x: x, y: y};
+            window.parent.postMessage(mousePos, "*");
+        });
+        </script>
+    """, unsafe_allow_html=True)
 
+    # Listen for messages from the JavaScript
+    if "mouse_position" in st.session_state:
+        mouse_x, mouse_y = st.session_state.mouse_position
+    else:
+        mouse_x, mouse_y = 0, 0
+
+    # Display mouse position
+    st.write(f"Vị trí chuột: ({mouse_x}, {mouse_y})")
