@@ -26,6 +26,7 @@ class GrabCutProcessor:
         self.thickness = 3
 
     def clear_drawing(self):
+        # Thiết lập lại hình ảnh và mask
         self.img = self.img2.copy()
         self.mask = np.zeros(self.img.shape[:2], dtype=np.uint8)
         self.output = np.zeros(self.img.shape, np.uint8)
@@ -40,8 +41,9 @@ class GrabCutProcessor:
 
         elif event == cv2.EVENT_MOUSEMOVE:
             if self.rectangle:
-                self.clear_drawing()  # Xoá hình chữ nhật cũ
-                self.img = self.img2.copy()
+                # Xoá hình đã vẽ trước đó
+                self.clear_drawing()
+                self.img = self.img2.copy()  # Khôi phục hình ảnh gốc
                 cv2.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
                 self.rect = (min(self.ix, x), min(self.iy, y),
                              abs(self.ix - x), abs(self.iy - y))
@@ -52,6 +54,18 @@ class GrabCutProcessor:
             cv2.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
             self.rect = (min(self.ix, x), min(self.iy, y),
                          abs(self.ix - x), abs(self.iy - y))
+
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.drawing = True
+
+        elif event == cv2.EVENT_MOUSEMOVE and self.drawing:
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
+
+        elif event == cv2.EVENT_LBUTTONUP:
+            self.drawing = False
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
     def apply_grabcut(self):
         bgdmodel = np.zeros((1, 65), np.float64)
