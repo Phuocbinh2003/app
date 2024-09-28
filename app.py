@@ -59,12 +59,22 @@ if uploaded_file is not None:
     col1, col2 = st.columns([0.5, 0.5])
 
     with col1:
-        # Disable pointer events on the original image
-        st.markdown(f'<div style="pointer-events: none;">{st.image(image, caption="Ảnh đầu vào", use_column_width=True)}</div>', unsafe_allow_html=True)
+        # Embed the original image with pointer events disabled
+        st.markdown(
+            f'<div style="pointer-events: none;">'
+            f'<img src="data:image/png;base64,{Image.fromarray(image).convert("RGBA").tobytes().decode()}" style="width: 100%; height: auto;"/>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
 
     with col2:
-        # Disable pointer events on the modified image
-        st.markdown(f'<div style="pointer-events: none;">{st.image(modified_image, caption="Ảnh sau khi xóa pixel chẵn", use_column_width=True)}</div>', unsafe_allow_html=True)
+        # Embed the modified image with pointer events disabled
+        st.markdown(
+            f'<div style="pointer-events: none;">'
+            f'<img src="data:image/png;base64,{Image.fromarray(modified_image).convert("RGBA").tobytes().decode()}" style="width: 100%; height: auto;"/>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
 
     # Nút tải ảnh
     output_image_pil = Image.fromarray(cv2.cvtColor(modified_image, cv2.COLOR_BGR2RGB))
