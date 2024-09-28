@@ -31,6 +31,18 @@ st.divider()
 st.sidebar.write("## Upload Image")
 uploaded_file = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
 
+def remove_even_pixels(image):
+    # Chuyển đổi ảnh sang định dạng NumPy array
+    img_array = np.array(image)
+    
+    # Tạo một mask cho các pixel có vị trí chẵn
+    mask = (np.indices(img_array.shape[:2]) % 2 == 0).all(axis=0)
+
+    # Đặt các pixel chẵn thành màu trắng (hoặc giá trị khác nếu cần)
+    img_array[mask] = [255, 255, 255]  # White color
+
+    return img_array
+
 if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
@@ -38,6 +50,9 @@ if uploaded_file is not None:
 
     # Khởi tạo GrabCutProcessor
     grabcut_processor = GrabCutProcessor(image)
+
+    # Xóa các pixel chẵn trong ảnh
+    modified_image = remove_even_pixels(image)
 
     # Phần xử lý ảnh
     st.write("### Kết quả")
@@ -47,10 +62,10 @@ if uploaded_file is not None:
         st.image(image, caption='Ảnh đầu vào', use_column_width=True)
 
     with col2:
-        st.image(grabcut_processor.get_output_image(), caption='Ảnh được phân đoạn', use_column_width=True)
+        st.image(modified_image, caption='Ảnh sau khi xóa pixel chẵn', use_column_width=True)
 
     # Nút tải ảnh
-    output_image_pil = Image.fromarray(cv2.cvtColor(grabcut_processor.get_output_image(), cv2.COLOR_BGR2RGB))
+    output_image_pil = Image.fromarray(cv2.cvtColor(modified_image, cv2.COLOR_BGR2RGB))
     buf = io.BytesIO()
     output_image_pil.save(buf, format="PNG")
     byte_im = buf.getvalue()
@@ -58,29 +73,9 @@ if uploaded_file is not None:
     st.download_button(
         label="Tải ảnh xuống",
         data=byte_im,
-        file_name="segmented_image.png",
+        file_name="modified_image.png",
         mime="image/png"
     )
 
-    # HTML and JavaScript for mouse position tracking
-    st.markdown("""
-        <script>
-        const img = document.querySelector('img[alt="Ảnh đầu vào"]');
-        img.addEventListener('mousemove', function(event) {
-            const rect = img.getBoundingClientRect();
-            const x = Math.round(event.clientX - rect.left);
-            const y = Math.round(event.clientY - rect.top);
-            const mousePos = {x: x, y: y};
-            window.parent.postMessage(mousePos, "*");
-        });
-        </script>
-    """, unsafe_allow_html=True)
-
-    # Listen for messages from the JavaScript
-    if "mouse_position" in st.session_state:
-        mouse_x, mouse_y = st.session_state.mouse_position
-    else:
-        mouse_x, mouse_y = 0, 0
-
-    # Display mouse position
-    st.write(f"Vị trí chuột: ({mouse_x}, {mouse_y})")
+    # Hiển thị vị trí chuột
+    st.write("Vị trí chuột: (0, 0)")  # Keep this for mouse position tracking
