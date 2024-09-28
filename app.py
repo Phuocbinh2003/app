@@ -128,3 +128,4 @@ if uploaded_file is not None:
             grabcut_processor.apply_grabcut()
             output_image = grabcut_processor.get_output_image()
             st.image(output_image, caption="Output Image", use_column_width=True)
+
