@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import base64
-from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
+from grabcut_processor import GrabCutProcessor
 
 # Function to encode image to base64
 def convert_image_to_base64(image):
@@ -12,13 +12,10 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Streamlit app
-st.title("GrabCut Background Removal with Rectangle Drawing")
+st.title("Cắt nền bằng GrabCut")
 
 # Sidebar for image upload
-uploaded_file = st.sidebar.file_uploader("Chọn một hình ảnh để tải lên", type=["jpg", "jpeg", "png"])
-
-# Variable to store rectangle coordinates
-rect_coordinates = None
+uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     # Read the image
@@ -89,8 +86,7 @@ if uploaded_file is not None:
 
                     // Send rectangle coordinates to Python
                     const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
-                    const jsonString = JSON.stringify(rect);
-                    window.parent.postMessage(jsonString, '*');
+                    window.parent.postMessage(JSON.stringify(rect), '*');
                 }}
             }});
         </script>
@@ -101,26 +97,9 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
-    # JavaScript to receive the rectangle coordinates
-    st.markdown(
-        """
-        <script>
-        window.addEventListener('message', function(event) {
-            const rect = JSON.parse(event.data);
-            if (rect) {
-                // Send rectangle data to Streamlit
-                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-                document.body.innerText = JSON.stringify(data);
-            }
-        });
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
-
     # Button to apply GrabCut
     if st.button("Áp dụng GrabCut"):
-        # Get rectangle coordinates
+        # Get rectangle coordinates from JavaScript message
         rect_data = st.session_state.get("rect_data", None)  # Retrieve rectangle coordinates from session state
         if rect_data is not None:
             x = int(rect_data["x"])
@@ -132,15 +111,10 @@ if uploaded_file is not None:
             output_image = grabcut_processor.get_output_image()
             st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
-    # Instructions in Vietnamese
+    # Hướng dẫn sử dụng
     st.markdown("""
     ## Hướng dẫn sử dụng
     1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
     2. Sử dụng chuột trái để vẽ một hình chữ nhật quanh đối tượng bạn muốn cắt.
     3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
     """)
-
-    # Display rectangle coordinates (hidden)
-    if rect_coordinates is not None:
-        st.markdown("### Tọa độ hình chữ nhật")
-        st.write(rect_coordinates)
