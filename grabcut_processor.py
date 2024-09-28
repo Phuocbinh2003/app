@@ -21,6 +21,7 @@ class GrabCutProcessor:
     rect_or_mask = 100      # Cờ chọn giữa hình chữ nhật và mặt nạ
     value = DRAW_FG         # Giá trị vẽ khởi tạo cho FG
     thickness = 3           # Độ dày cọ vẽ
+    locked = False           # Cờ để kiểm soát việc tương tác với hình ảnh
 
     def __init__(self, image):
         self.img = image.copy()
@@ -29,6 +30,10 @@ class GrabCutProcessor:
         self.output = np.zeros(self.img.shape, np.uint8)
 
     def onmouse(self, event, x, y, flags, param):
+        # Nếu đang khóa không cho phép kéo ảnh
+        if self.locked:
+            return
+
         # Vẽ hình chữ nhật với chuột phải
         if event == cv2.EVENT_RBUTTONDOWN:
             self.rectangle = True
@@ -53,18 +58,15 @@ class GrabCutProcessor:
         # Vẽ trên ảnh với chuột trái
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drawing = True
-            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
-            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
         elif event == cv2.EVENT_MOUSEMOVE and self.drawing:
             cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
             cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
         elif event == cv2.EVENT_LBUTTONUP:
-            if self.drawing:
-                self.drawing = False
-                cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
-                cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
+            self.drawing = False  # Kết thúc vẽ khi thả chuột trái
+            cv2.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+            cv2.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
     def apply_grabcut(self):
         bgdmodel = np.zeros((1, 65), np.float64)
