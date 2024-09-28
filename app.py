@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 
 # Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Theo Dõi Vị Trí Chuột")
+st.set_page_config(layout="wide", page_title="Tải Ảnh và Theo Dõi Vị Trí Chuột")
 
 st.title("Tải Ảnh Lên và Theo Dõi Vị Trí Chuột")
 
@@ -22,11 +22,18 @@ if uploaded_file is not None:
     # Placeholder để hiển thị vị trí chuột
     mouse_pos_placeholder = st.empty()
 
-    # JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
+    # JavaScript để theo dõi vị trí chuột
     st.markdown("""
         <style>
-        img {
-            pointer-events: none;  /* Ngăn chặn mọi sự kiện chuột trên ảnh */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);  /* Màu đen với độ trong suốt */
+            pointer-events: none;  /* Ngăn chặn sự kiện chuột trên overlay */
+            z-index: 10;  /* Đảm bảo overlay nằm trên tất cả */
         }
         </style>
         <script>
@@ -42,6 +49,7 @@ if uploaded_file is not None:
             window.parent.postMessage({x: x, y: y}, "*");
         });
         </script>
+        <div class="overlay"></div>
     """, unsafe_allow_html=True)
 
     # Cập nhật vị trí chuột từ tin nhắn
