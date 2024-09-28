@@ -25,11 +25,8 @@ if uploaded_file is not None:
     stroke_width = st.sidebar.slider("Độ rộng nét vẽ:", 1, 25, 3)
     stroke_color = st.sidebar.color_picker("Chọn màu vẽ:", "#FF0000")
 
-    # Fill color with full transparency for rectangles
+    # Transparent fill for rectangles
     fill_color = "rgba(0, 0, 0, 0.0)"  # Transparent fill
-
-    # Hiển thị ảnh trước khi vẽ
-    st.image(image, caption="Ảnh đầu vào", use_column_width=True)
 
     # Vẽ canvas với kích thước ảnh đã tải lên
     canvas_result = st_canvas(
