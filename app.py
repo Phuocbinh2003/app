@@ -39,7 +39,7 @@ def remove_even_pixels(image):
     mask = (np.indices(img_array.shape[:2]) % 2 == 0).all(axis=0)
 
     # Đặt các pixel chẵn thành màu trắng (hoặc giá trị khác nếu cần)
-    img_array[mask] = [255, 255, 255]  # White color
+    img_array[mask] = [255, 255, 255]  # Màu trắng
 
     return img_array
 
@@ -77,5 +77,5 @@ if uploaded_file is not None:
         mime="image/png"
     )
 
-    # Hiển thị vị trí chuột
-    st.write("Vị trí chuột: (0, 0)")  # Keep this for mouse position tracking
+    # Hiển thị vị trí chuột (không cần thiết, có thể xóa nếu không cần)
+    st.write("Vị trí chuột: (0, 0)")  # Chỉ để giữ lại giao diện, có thể xóa
