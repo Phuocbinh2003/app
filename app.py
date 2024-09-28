@@ -46,6 +46,11 @@ if uploaded_file is not None:
         <script>
         const img = document.querySelector("img[alt='Ảnh đầu vào']");
         
+        // Ngăn chặn kéo ảnh mặc định
+        img.addEventListener('dragstart', function(event) {{
+            event.preventDefault();
+        }});
+
         // Theo dõi vị trí chuột
         img.addEventListener('mousemove', function(event) {{
             const rect = img.getBoundingClientRect();
