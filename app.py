@@ -1,12 +1,11 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import cv2
 
 # Cấu hình trang Streamlit
-st.set_page_config(layout="wide", page_title="Mouse Position Tracking")
+st.set_page_config(layout="wide", page_title="Fixed Background Image")
 
-st.write("# Theo dõi vị trí chuột trên hình ảnh")
+st.write("# Hình ảnh Nền Cố định")
 
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
@@ -15,37 +14,28 @@ uploaded_file = st.sidebar.file_uploader("", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
-    image = np.array(image)
-
-    # Hiển thị ảnh trong Streamlit
     st.image(image, caption='Ảnh đầu vào', use_column_width=True)
 
-    # Tạo một thẻ HTML để theo dõi vị trí chuột
+    # Thêm một khung hình ẩn để xử lý sự kiện
     st.markdown(
         """
         <style>
-        .mouse-info {
+        .fixed-image {
             position: relative;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px;
-            border-radius: 5px;
-            display: inline-block;
+            width: 100%;
+            height: auto;
+            pointer-events: none;  /* Ngăn chặn tương tác chuột */
         }
         </style>
-        <div id="mouse-position" class="mouse-info"></div>
-        <script>
-        const img = document.querySelector("img");
-        img.addEventListener("mousemove", (event) => {
-            const rect = img.getBoundingClientRect();
-            const x = Math.round(event.clientX - rect.left);
-            const y = Math.round(event.clientY - rect.top);
-            const mouseInfo = document.getElementById("mouse-position");
-            mouseInfo.style.left = event.clientX + "px";
-            mouseInfo.style.top = event.clientY + "px";
-            mouseInfo.innerHTML = "X: " + x + ", Y: " + y;
-        });
-        </script>
         """,
         unsafe_allow_html=True
     )
+
+    # Hiển thị ảnh
+    st.image(image, caption='Ảnh cố định', use_column_width=True)
+
+    # Thêm widget khác để xử lý các tương tác
+    st.button("Nút Bất Kỳ", key="some_button")
+
+    # Hiển thị thông tin hoặc điều khiển khác
+    st.write("Thông tin khác hoặc các điều khiển khác ở đây.")
