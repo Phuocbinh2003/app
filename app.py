@@ -3,6 +3,7 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import base64
+import json
 from grabcut_processor import GrabCutProcessor  # Importing the GrabCutProcessor
 
 # Function to encode image to base64
@@ -79,7 +80,11 @@ if uploaded_file is not None:
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
                     ctx.stroke();
-                    // Send rectangle coordinates to Python (handle this part with Streamlit)
+
+                    // Send rectangle coordinates to Python
+                    const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
+                    const jsonString = JSON.stringify(rect);
+                    window.parent.postMessage(jsonString, '*');
                 }}
             }});
         </script>
@@ -90,8 +95,36 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
+    # Placeholder to store rectangle coordinates
+    rect_coords = st.empty()
+
+    # JavaScript to receive the rectangle coordinates
+    st.markdown(
+        """
+        <script>
+        window.addEventListener('message', function(event) {
+            const rect = JSON.parse(event.data);
+            if (rect) {
+                // Send rectangle data to Streamlit
+                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+                document.body.innerText = JSON.stringify(data);
+            }
+        });
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Button to apply GrabCut
     if st.button("Apply GrabCut"):
-        grabcut_processor.apply_grabcut()
-        output_image = grabcut_processor.get_output_image()
-        st.image(output_image, caption="Output Image", use_column_width=True)
+        # Get rectangle coordinates
+        rect_data = rect_coords.empty()
+        if rect_data is not None:
+            x = int(rect_data["x"])
+            y = int(rect_data["y"])
+            width = int(rect_data["width"])
+            height = int(rect_data["height"])
+            grabcut_processor.rect = (x, y, width, height)
+            grabcut_processor.apply_grabcut()
+            output_image = grabcut_processor.get_output_image()
+            st.image(output_image, caption="Output Image", use_column_width=True)
