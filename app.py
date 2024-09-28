@@ -22,15 +22,19 @@ if uploaded_file is not None:
     # Placeholder để hiển thị vị trí chuột
     mouse_pos_placeholder = st.empty()
 
+    # Thiết lập kích thước lớp phủ lớn hơn ảnh một chút (thêm 20px)
+    overlay_width = width + 20
+    overlay_height = height + 20
+
     # CSS và JavaScript để theo dõi vị trí chuột và ngăn chặn sự kiện nhấp chuột
     st.markdown(f"""
         <style>
         .overlay {{
             position: absolute; /* Sử dụng absolute để phủ lên ảnh */
-            top: 0;
-            left: 0;
-            width: {width}px; /* Chiều rộng của overlay bằng chiều rộng ảnh */
-            height: {height}px; /* Chiều cao của overlay bằng chiều cao ảnh */
+            top: -10px; /* Đẩy lên 10px */
+            left: -10px; /* Đẩy sang trái 10px */
+            width: {overlay_width}px; /* Chiều rộng của overlay lớn hơn ảnh */
+            height: {overlay_height}px; /* Chiều cao của overlay lớn hơn ảnh */
             background-color: rgba(255, 255, 255, 0); /* Trong suốt */
             pointer-events: all; /* Cho phép nhận sự kiện chuột */
             z-index: 100; /* Đảm bảo overlay nằm trên tất cả */
