@@ -14,8 +14,7 @@ uploaded_file = st.sidebar.file_uploader("Chọn ảnh để tải lên", type=[
 if uploaded_file is not None:
     # Đọc ảnh
     image = Image.open(uploaded_file)
-    st.image(image, caption='Ảnh đầu vào', use_column_width=True)
-
+    
     # Hiển thị kích thước ảnh
     width, height = image.size
     st.write(f"Kích thước ảnh: {width} x {height}")
@@ -27,10 +26,10 @@ if uploaded_file is not None:
 
     # Canvas setup
     canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Màu tô
+        fill_color="rgba(255, 165, 0, 0.3)",  # Màu tô (nếu vẽ hình chữ nhật)
         stroke_width=stroke_width,            # Độ rộng nét vẽ
         stroke_color=stroke_color,            # Màu vẽ
-        background_image=image,               # Ảnh nền
+        background_image=image,               # Ảnh nền để vẽ lên
         update_streamlit=True,
         drawing_mode="freedraw" if drawing_mode == "Vẽ tự do" else "rect",
         height=height,
@@ -38,8 +37,9 @@ if uploaded_file is not None:
         key="canvas",
     )
 
-    # Kiểm tra kết quả canvas
+    # Hiển thị kết quả canvas sau khi vẽ
     if canvas_result.image_data is not None:
         st.image(canvas_result.image_data, caption="Ảnh sau khi vẽ", use_column_width=True)
+
 else:
     st.write("Vui lòng tải lên một bức ảnh.")
