@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from io import BytesIO  # Import BytesIO
+from io import BytesIO
 import base64
 
 # Function to encode image to base64
@@ -10,9 +10,9 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Configure the Streamlit app
-st.set_page_config(layout="wide", page_title="Draw on Image with CSS")
+st.set_page_config(layout="wide", page_title="Draw Rectangles on Image")
 
-st.title("Upload Image and Draw on It")
+st.title("Upload Image and Draw Rectangles on It")
 
 # Sidebar to upload the image
 st.sidebar.write("## Upload Image")
@@ -57,9 +57,12 @@ if uploaded_file is not None:
             }};
 
             let drawing = false;
+            let startX, startY;
 
-            canvas.addEventListener('mousedown', () => {{
+            canvas.addEventListener('mousedown', (event) => {{
                 drawing = true;
+                startX = event.offsetX;
+                startY = event.offsetY;
             }});
 
             canvas.addEventListener('mouseup', () => {{
@@ -69,13 +72,19 @@ if uploaded_file is not None:
 
             canvas.addEventListener('mousemove', (event) => {{
                 if (!drawing) return;
-                ctx.lineWidth = 5;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = 'red';
-                ctx.lineTo(event.offsetX, event.offsetY);
-                ctx.stroke();
+                const mouseX = event.offsetX;
+                const mouseY = event.offsetY;
+
+                // Clear the canvas and redraw the image
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+
+                // Draw the rectangle
                 ctx.beginPath();
-                ctx.moveTo(event.offsetX, event.offsetY);
+                ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 5;
+                ctx.stroke();
             }});
         </script>
     </body>
