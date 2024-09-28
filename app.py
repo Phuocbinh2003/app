@@ -17,7 +17,7 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGBA")
     image_np = np.array(image)  # Convert the image to a NumPy array
 
-    # Ensure the image is in the expected format
+    # Check if the image has an alpha channel
     if image_np.ndim == 3 and image_np.shape[2] == 4:
         # Get the dimensions of the original image
         original_height, original_width, _ = image_np.shape
@@ -33,19 +33,26 @@ if uploaded_file is not None:
         canvas_result = st_canvas(
             fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
             stroke_width=stroke_width,      # Stroke width
-            stroke_color=stroke_color,      # Stroke color (directly using the color)
-            background_image=image,         # Use uploaded image as background (PIL Image)
+            stroke_color=stroke_color,      # Stroke color
+            background_image=image_np,      # Use uploaded image as background (NumPy array)
             update_streamlit=True,
             drawing_mode="freedraw",        # Allow free drawing
             height=original_height,         # Height of the canvas
             width=original_width,           # Width of the canvas
             key="canvas",
-            display_toolbar=False            # Hide toolbar for a cleaner UI
+            display_toolbar=True             # Show toolbar for more options
         )
 
         # Show the resulting canvas image if drawn
         if canvas_result.image_data is not None:
-            st.image(canvas_result.image_data, caption="Image with Drawings", use_column_width=True)
+            # Convert the canvas image data back to a PIL image
+            drawn_image = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
+            
+            # Composite the original image with the drawn image
+            combined_image = Image.alpha_composite(image, drawn_image)
+
+            # Show the final combined image
+            st.image(combined_image, caption="Image with Drawings", use_column_width=True)
     
     else:
         st.error("Uploaded image does not have the expected format (RGBA). Please upload a valid image.")
