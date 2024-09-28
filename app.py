@@ -4,9 +4,9 @@ from streamlit_drawable_canvas import st_canvas
 import numpy as np
 
 # Cấu hình ứng dụng Streamlit
-st.set_page_config(layout="wide", page_title="Vẽ Trên Ảnh")
+st.set_page_config(layout="wide", page_title="Vẽ Trực Tiếp Trên Ảnh")
 
-st.title("Tải Ảnh Lên và Vẽ Hình Chữ Nhật Trực Tiếp Trên Ảnh")
+st.title("Tải Ảnh Lên và Vẽ Trực Tiếp Trên Ảnh")
 
 # Sidebar để tải ảnh
 st.sidebar.write("## Upload Image")
@@ -21,10 +21,10 @@ if uploaded_file is not None:
     original_width, original_height = image.size
 
     # Xác định kích thước canvas theo tỷ lệ màn hình
-    max_canvas_width = st.sidebar.slider("Chọn kích thước canvas tối đa (px):", 300, 1200, 700)
+    max_canvas_width = st.sidebar.slider("Chọn kích thước canvas tối đa (px):", 300, 1200, original_width)
     ratio = max_canvas_width / original_width
     new_height = int(original_height * ratio)
-    
+
     # Hiển thị ảnh đầu vào
     st.image(image, caption="Ảnh đầu vào", use_column_width=False, width=max_canvas_width)
 
