@@ -36,6 +36,9 @@ st.markdown("""
 # Sidebar for image upload
 uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
 
+# Placeholder for rectangle coordinates
+rect_coords = st.empty()
+
 if uploaded_file is not None:
     # Read the image
     image = Image.open(uploaded_file)
@@ -87,6 +90,20 @@ if uploaded_file is not None:
                 }}
             }});
 
+            canvas.addEventListener('mousemove', (event) => {{
+                if (drawing) {{
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                    ctx.drawImage(img, 0, 0); // Redraw the image
+                    const endX = event.offsetX;
+                    const endY = event.offsetY;
+                    const width = Math.abs(startX - endX);
+                    const height = Math.abs(startY - endY);
+                    ctx.strokeStyle = 'blue';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
+                }}
+            }});
+
             canvas.addEventListener('mouseup', (event) => {{
                 if (drawing) {{
                     drawing = false;
@@ -94,10 +111,9 @@ if uploaded_file is not None:
                     const endY = event.offsetY;
                     const width = Math.abs(startX - endX);
                     const height = Math.abs(startY - endY);
-                    ctx.rect(startX, startY, width, height);
                     ctx.strokeStyle = 'blue';
                     ctx.lineWidth = 2;
-                    ctx.stroke();
+                    ctx.strokeRect(Math.min(startX, endX), Math.min(startY, endY), width, height);
 
                     // Send rectangle coordinates to Python
                     const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
@@ -113,9 +129,6 @@ if uploaded_file is not None:
     # Display the canvas
     st.components.v1.html(drawing_html, height=image.height + 100)
 
-    # Placeholder to store rectangle coordinates
-    rect_coords = st.empty()
-
     # JavaScript to receive the rectangle coordinates
     st.markdown(
         """
@@ -124,7 +137,7 @@ if uploaded_file is not None:
             const rect = JSON.parse(event.data);
             if (rect) {
                 // Send rectangle data to Streamlit
-                const data = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+                const data = {{ x: rect.x, y: rect.y, width: rect.width, height: rect.height }};
                 document.body.innerText = JSON.stringify(data);
             }
         });
@@ -136,8 +149,8 @@ if uploaded_file is not None:
     # Button to apply GrabCut
     if st.button("Apply GrabCut"):
         # Get rectangle coordinates
-        rect_data = st.session_state.get('rect_data')
-        if rect_data is not None:
+        rect_data = json.loads(st.session_state.get('rect_data', '{}'))
+        if rect_data:
             x = int(rect_data['x'])
             y = int(rect_data['y'])
             width = int(rect_data['width'])
