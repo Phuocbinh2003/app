@@ -13,11 +13,11 @@ st.sidebar.write("## Upload Image")
 uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Read the image
-    image = Image.open(uploaded_file).convert("RGBA")  # Convert to RGBA
+    # Read the image and convert to RGBA
+    image = Image.open(uploaded_file).convert("RGBA")
     image_np = np.array(image)  # Convert the image to a NumPy array
 
-    # Check the dimensions of the image
+    # Check if the image has an alpha channel
     if image_np.ndim == 3 and image_np.shape[2] == 4:
         # Get the dimensions of the original image
         original_height, original_width, _ = image_np.shape
@@ -29,36 +29,18 @@ if uploaded_file is not None:
         stroke_width = st.sidebar.slider("Stroke Width:", 1, 25, 3)
         stroke_color = st.sidebar.color_picker("Stroke Color:", "#FF0000")
 
-        # Convert background image to a format st_canvas expects
-        background_image = Image.fromarray(image_np)
-
         # Create the canvas with the uploaded image as the background
         canvas_result = st_canvas(
             fill_color="rgba(0, 0, 0, 0)",  # Transparent fill color
             stroke_width=stroke_width,      # Stroke width
             stroke_color=stroke_color,      # Stroke color
-            background_image=background_image,  # Use uploaded image as background
+            background_image=image_np,      # Use uploaded image as background
             update_streamlit=True,
             drawing_mode="freedraw",        # Allow free drawing
             height=original_height,         # Height of the canvas
             width=original_width,           # Width of the canvas
             key="canvas",
-            display_toolbar=False            # Hide toolbar for cleaner UI
-        )
-
-        # Custom CSS to adjust canvas styling and cursor
-        st.markdown(
-            """
-            <style>
-            .stCanvas {
-                cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAJklEQVR42mJ8//8/A5cD3gB2igO3AAAAAElFTkSuQmCC') 8 8, auto;
-                border: 2px solid #CCCCCC; /* Add a border to the canvas */
-                margin: 10px; /* Add margin to prevent overflow */
-                background: rgba(255, 255, 255, 0.5); /* Optional: set a background color */
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
+            display_toolbar=False            # Hide toolbar for a cleaner UI
         )
 
         # Show the resulting canvas image if drawn
