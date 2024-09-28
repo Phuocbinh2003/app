@@ -14,7 +14,7 @@ uploaded_file = st.sidebar.file_uploader("Choose an image to upload", type=["jpg
 
 if uploaded_file is not None:
     # Read the image
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).convert("RGBA")  # Convert to RGBA
     image_np = np.array(image)  # Convert the image to a NumPy array
 
     # Get the dimensions of the original image
