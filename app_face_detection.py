@@ -4,7 +4,10 @@ from sklearn.neighbors import KNeighborsClassifier
 import streamlit as st
 from PIL import Image
 
-# Hàm phát hiện khuôn mặt trong bức ảnh test
+def run_app2():
+    st.title("Ứng dụng 1")
+    st.write("Đây là nội dung của ứng dụng 1")
+
 def detect_faces_in_test_image(knn_model, image):
     # Chuyển đổi ảnh PIL thành định dạng OpenCV (BGR)
     img = np.array(image.convert('RGB'))
