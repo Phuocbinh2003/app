@@ -5,15 +5,9 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
+
+
 def run_app1():
-    st.title("Ứng dụng 1")
-    st.write("Đây là nội dung của ứng dụng 1")
-
-def run_app2():
-    st.title("Ứng dụng 2")
-    st.write("Đây là nội dung của ứng dụng 2")
-
-def run_app3():
     st.title("Ứng dụng 3 - Cắt nền bằng GrabCut")
     
     # Sidebar for image upload
@@ -131,9 +125,4 @@ def convert_image_to_base64(image):
 st.sidebar.title("Chọn ứng dụng")
 app_mode = st.sidebar.selectbox("Chọn ứng dụng", ["Ứng dụng 1", "Ứng dụng 2", "Ứng dụng 3"])
 
-if app_mode == "Ứng dụng 1":
-    run_app1()
-elif app_mode == "Ứng dụng 2":
-    run_app2()
-elif app_mode == "Ứng dụng 3":
-    run_app3()
+
