@@ -1,5 +1,5 @@
 import streamlit as st
-from app1 import run_app1
+from GrabCut import run_app1
 from app2 import run_app2
 from app3 import run_app3
 
