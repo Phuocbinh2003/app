@@ -4,10 +4,27 @@ from sklearn.neighbors import KNeighborsClassifier
 import streamlit as st
 from PIL import Image
 
+# Function cho ứng dụng 3 (Phát hiện khuôn mặt)
 def run_app3():
-    st.title("Ứng dụng 1")
-    st.write("Đây là nội dung của ứng dụng 1")
+    st.title("Ứng dụng phát hiện khuôn mặt")
 
+    # Tải lên ảnh
+    uploaded_image = st.file_uploader("Tải lên một ảnh", type=["jpg", "jpeg", "png"])
+
+    if uploaded_image is not None:
+        # Đọc ảnh tải lên
+        image = Image.open(uploaded_image)
+
+        # Hiển thị ảnh đã tải lên
+        st.image(image, caption="Ảnh đã tải lên", use_column_width=True)
+
+        # Khởi tạo mô hình k-NN (giả định đã được huấn luyện trước đó)
+        knn_model = KNeighborsClassifier(n_neighbors=5)
+
+        # Gọi hàm phát hiện khuôn mặt
+        detect_faces_in_test_image(knn_model, image)
+
+# Hàm phát hiện khuôn mặt trong ảnh tải lên
 def detect_faces_in_test_image(knn_model, image):
     # Chuyển đổi ảnh PIL thành định dạng OpenCV (BGR)
     img = np.array(image.convert('RGB'))
@@ -34,25 +51,3 @@ def detect_faces_in_test_image(knn_model, image):
 
     # Hiển thị ảnh với bounding box
     st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Kết quả phát hiện khuôn mặt", use_column_width=True)
-
-# Khởi tạo giao diện Streamlit
-st.title("Ứng dụng phát hiện khuôn mặt")
-
-# Tải lên ảnh
-uploaded_image = st.file_uploader("Tải lên một ảnh", type=["jpg", "jpeg", "png"])
-
-if uploaded_image is not None:
-    # Đọc ảnh tải lên
-    image = Image.open(uploaded_image)
-
-    # Hiển thị ảnh đã tải lên
-    st.image(image, caption="Ảnh đã tải lên", use_column_width=True)
-
-    # Khởi tạo mô hình k-NN
-    knn_model = KNeighborsClassifier(n_neighbors=5)
-
-    # Kiểm tra xem mô hình đã được huấn luyện chưa (giả sử mô hình đã được train trước đó)
-    # knn_model.fit(training_data, training_labels)
-
-    # Gọi hàm phát hiện khuôn mặt
-    detect_faces_in_test_image(knn_model, image)
