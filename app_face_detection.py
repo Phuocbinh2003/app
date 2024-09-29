@@ -4,7 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import streamlit as st
 from PIL import Image
 
-def run_app2():
+def run_app3():
     st.title("Ứng dụng 1")
     st.write("Đây là nội dung của ứng dụng 1")
 
