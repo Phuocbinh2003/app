@@ -5,6 +5,10 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
+def run_app1():
+    st.title("Ứng dụng 1")
+    st.write("Đây là nội dung của ứng dụng 1")
+    
 # Function to encode image to base64
 def convert_image_to_base64(image):
     buffered = BytesIO()
