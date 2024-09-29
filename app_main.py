@@ -3,9 +3,6 @@ from GrabCut_app import run_app1
 from app_face_detection import run_app3
 
 
-# Tạo tiêu đề cho ứng dụng chính
-st.title("Ứng dụng tổng hợp")
-
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
