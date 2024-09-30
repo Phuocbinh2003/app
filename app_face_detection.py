@@ -8,7 +8,7 @@ def run_app3():
     st.title("Ứng dụng phát hiện khuôn mặt")
 
     # Thay thế đường dẫn đến mô hình đã lưu
-     knn_model_path = 'knn_model.joblib'  # Đặt đường dẫn chính xác tới file
+    knn_model_path = 'knn_model.joblib'  # Đặt đường dẫn chính xác tới file
     knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
 
     # Tải lên ảnh
