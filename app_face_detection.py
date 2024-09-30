@@ -38,7 +38,7 @@ def run_app3():
         # Hiển thị kết quả
         st.image(result_img, caption="Kết quả phát hiện khuôn mặt", use_column_width=True)
 
-def sliding_window_detect(img, model, step_size=5, window_size=(24, 24)):
+def sliding_window_detect(img, model, step_size=5, window_size=(100, 100)):
     boxes = []
     height, width = img.shape
 
