@@ -8,7 +8,7 @@ def run_app3():
     st.title("Ứng dụng phát hiện khuôn mặt")
 
     # Thay thế đường dẫn đến mô hình đã lưu
-    knn_model_path = '/content/drive/MyDrive/Mydrive/Githut/faces_and_non_faces_data/knn_model.joblib'  # Đường dẫn đến file mô hình kNN
+    knn_model_path = 'knn_model.joblib'  # Đường dẫn đến file mô hình kNN
     knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
 
     # Tải lên ảnh
