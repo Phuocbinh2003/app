@@ -4,12 +4,12 @@ import streamlit as st
 from PIL import Image
 import joblib  # Thư viện để tải mô hình đã lưu
 
-# Bước 1: Tải mô hình kNN
-knn_model_path = '/content/drive/MyDrive/Mydrive/Githut/faces_and_non_faces_data/knn_model.pkl'  # Đường dẫn đến file mô hình kNN
-knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
-
 def run_app3():
     st.title("Ứng dụng phát hiện khuôn mặt")
+
+    # Thay thế đường dẫn đến mô hình đã lưu
+    knn_model_path = '/content/drive/MyDrive/Mydrive/Githut/faces_and_non_faces_data/knn_model.joblib'  # Đường dẫn đến file mô hình kNN
+    knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
 
     # Tải lên ảnh
     uploaded_image = st.file_uploader("Tải lên một ảnh", type=["jpg", "jpeg", "png"])
@@ -17,13 +17,13 @@ def run_app3():
     if uploaded_image is not None:
         # Đọc ảnh tải lên
         image = Image.open(uploaded_image)
-        image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)  # Chuyển đổi sang ảnh xám
+        image = np.array(image.convert("L"))  # Chuyển đổi ảnh sang dạng grayscale
 
         # Hiển thị ảnh đã tải lên
         st.image(image, caption="Ảnh đã tải lên", use_column_width=True)
 
         # Gọi hàm phát hiện khuôn mặt
-        boxes = sliding_window_detect(image, knn_model)
+        boxes = sliding_window_detect(image, knn_model)  # Sử dụng mô hình đã tải
 
         # Chọn box tốt nhất
         selected_boxes = non_max_suppression(boxes, overlap_threshold=0.3)
@@ -46,23 +46,41 @@ def sliding_window_detect(img, model, step_size=5, window_size=(100, 100)):
             window = img[y:y + window_height, x:x + window_width]
             if window.shape[0] != window_height or window.shape[1] != window_width:
                 continue
-
+            
             pred = detect_face(window, model)
             if pred == 1:  # Nếu dự đoán là khuôn mặt
-                boxes.append((x, y, window_width, window_height))
-
+                boxes.append((x, y, window_width, window_height))  # (x, y, width, height)
+    
     return boxes
 
+# Bước 4: Phát hiện khuôn mặt
 def detect_face(img, model):
     img_resized = cv2.resize(img, (24, 24)).flatten()  # Resize ảnh về 24x24
     pred = model.predict([img_resized])  # Dự đoán
     return pred[0]  # Trả về nhãn
 
+# Bước 5: Vẽ các box phát hiện
 def draw_boxes(img, boxes):
     for (x, y, w, h) in boxes:
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Vẽ hình chữ nhật màu xanh lá cây
     return img
 
+# Bước 6: Thay đổi kích thước ảnh giữ nguyên cấu trúc
+def resize_image_aspect_ratio(image, target_size):
+    height, width = image.shape
+    aspect_ratio = width / height
+
+    if aspect_ratio > 1:  # Nếu chiều rộng lớn hơn chiều cao
+        new_width = target_size
+        new_height = int(target_size / aspect_ratio)
+    else:  # Nếu chiều cao lớn hơn hoặc bằng chiều rộng
+        new_height = target_size
+        new_width = int(target_size * aspect_ratio)
+
+    resized_image = cv2.resize(image, (new_width, new_height))
+    return resized_image
+
+# Bước 7: Non-Maximum Suppression để chọn box tốt nhất
 def non_max_suppression(boxes, overlap_threshold=0.3):
     if len(boxes) == 0:
         return []
@@ -98,6 +116,6 @@ def non_max_suppression(boxes, overlap_threshold=0.3):
 
     return picked_boxes
 
-# Bước 2: Chạy ứng dụng
+# Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    run_app3()  # Gọi hàm chạy ứng dụng 3
+    run_app3()
