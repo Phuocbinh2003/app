@@ -4,6 +4,10 @@ import streamlit as st
 from PIL import Image
 import joblib  # Thư viện để tải mô hình đã lưu
 
+# Bước 1: Tải mô hình kNN
+knn_model_path = '/content/drive/MyDrive/Mydrive/Githut/faces_and_non_faces_data/knn_model.pkl'  # Đường dẫn đến file mô hình kNN
+knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
+
 def run_app3():
     st.title("Ứng dụng phát hiện khuôn mặt")
 
@@ -44,19 +48,19 @@ def sliding_window_detect(img, model, step_size=5, window_size=(100, 100)):
                 continue
 
             pred = detect_face(window, model)
-            if pred == 1:
+            if pred == 1:  # Nếu dự đoán là khuôn mặt
                 boxes.append((x, y, window_width, window_height))
 
     return boxes
 
 def detect_face(img, model):
-    img_resized = cv2.resize(img, (24, 24)).flatten()
-    pred = model.predict([img_resized])
-    return pred[0]
+    img_resized = cv2.resize(img, (24, 24)).flatten()  # Resize ảnh về 24x24
+    pred = model.predict([img_resized])  # Dự đoán
+    return pred[0]  # Trả về nhãn
 
 def draw_boxes(img, boxes):
     for (x, y, w, h) in boxes:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Vẽ hình chữ nhật màu xanh lá cây
     return img
 
 def non_max_suppression(boxes, overlap_threshold=0.3):
@@ -70,14 +74,15 @@ def non_max_suppression(boxes, overlap_threshold=0.3):
     y2 = boxes[:, 1] + boxes[:, 3]
 
     areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-    order = np.argsort(y2)
+    order = np.argsort(y2)  # Sắp xếp theo tọa độ y của box dưới cùng
 
     picked_boxes = []
 
     while len(order) > 0:
-        i = order[-1]
+        i = order[-1]  # Box có y dưới cùng
         picked_boxes.append(boxes[i])
 
+        # Tính toán overlap với box đã chọn
         xx1 = np.maximum(x1[i], x1[order[:-1]])
         yy1 = np.maximum(y1[i], y1[order[:-1]])
         xx2 = np.minimum(x2[i], x2[order[:-1]])
@@ -88,11 +93,11 @@ def non_max_suppression(boxes, overlap_threshold=0.3):
 
         overlap = (w * h) / areas[order[:-1]]
 
+        # Chọn các box không có overlap vượt quá ngưỡng
         order = order[np.where(overlap <= overlap_threshold)[0]]
 
     return picked_boxes
 
+# Bước 2: Chạy ứng dụng
 if __name__ == "__main__":
-    knn_model_path = '/content/drive/MyDrive/Mydrive/Githut/faces_and_non_faces_data/knn_model.pkl'
-    knn_model = joblib.load(knn_model_path)
-    run_app3()
+    run_app3()  # Gọi hàm chạy ứng dụng 3
