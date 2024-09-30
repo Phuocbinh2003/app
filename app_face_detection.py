@@ -19,6 +19,10 @@ def run_app3():
         image = Image.open(uploaded_image)
         image = np.array(image.convert("L"))  # Chuyển đổi ảnh sang dạng grayscale
 
+        # Giảm kích thước ảnh
+        target_size = 240  # Kích thước mục tiêu (chiều dài hoặc chiều rộng)
+        image = resize_image_aspect_ratio(image, target_size)
+
         # Hiển thị ảnh đã tải lên
         st.image(image, caption="Ảnh đã tải lên", use_column_width=True)
 
@@ -29,12 +33,12 @@ def run_app3():
         selected_boxes = non_max_suppression(boxes, overlap_threshold=0.3)
 
         # Vẽ các box lên ảnh
-        result_img = draw_boxes(image, selected_boxes)
+        result_img = draw_boxes(image.copy(), selected_boxes)
 
         # Hiển thị kết quả
         st.image(result_img, caption="Kết quả phát hiện khuôn mặt", use_column_width=True)
 
-def sliding_window_detect(img, model, step_size=5, window_size=(100, 100)):
+def sliding_window_detect(img, model, step_size=5, window_size=(24, 24)):
     boxes = []
     height, width = img.shape
 
