@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import streamlit as st
 from PIL import Image
-import joblib  # Thư viện để tải mô hình đã lưu
+import knn_model as joblib  # Thư viện để tải mô hình đã lưu
 
 def run_app3():
     st.title("Ứng dụng phát hiện khuôn mặt")
