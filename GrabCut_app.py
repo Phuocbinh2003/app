@@ -3,11 +3,9 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
-import json
 from grabcut_processor import GrabCutProcessor
 
-
-def run_app1():
+def run_app():
     st.title("Cắt nền bằng GrabCut")
 
     # Sidebar for image upload
@@ -43,11 +41,13 @@ def run_app1():
                 .canvas-container {{
                     position: relative; /* Để có thể căn chỉnh canvas */
                     border: 1px solid black; /* Đường viền cho vùng vẽ */
+                    width: {img_width}px; /* Đặt chiều rộng cho vùng vẽ */
+                    height: {img_height}px; /* Đặt chiều cao cho vùng vẽ */
                 }}
                 canvas {{
                     cursor: crosshair;
-                    width: {img_width}px;  /* Đặt chiều rộng của canvas */
-                    height: {img_height}px; /* Đặt chiều cao của canvas */
+                    width: 100%; /* Chiều rộng canvas 100% để chiếm toàn bộ vùng vẽ */
+                    height: 100%; /* Chiều cao canvas 100% để chiếm toàn bộ vùng vẽ */
                     display: block; /* Đảm bảo canvas không có khoảng cách */
                 }}
             </style>
@@ -139,4 +139,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    run_app1()
+    run_app()
