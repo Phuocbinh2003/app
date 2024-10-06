@@ -6,7 +6,8 @@ import base64
 import json
 from grabcut_processor import GrabCutProcessor
 
-def run_app1():
+
+def run_app():
     st.title("Cắt nền bằng GrabCut")
 
     # Sidebar for image upload
@@ -30,13 +31,14 @@ def run_app1():
         <head>
             <style>
                 body {{
-                    margin: 0;  /* Xóa margin của body */
-                    padding: 0; /* Xóa padding của body */
+                    margin: 0;
+                    padding: 0;
                 }}
                 canvas {{
                     border: 1px solid black;
                     cursor: crosshair;
-                    display: block; /* Đảm bảo canvas không có khoảng trắng */
+                    display: block;
+                    position: relative; /* Đặt canvas ở vị trí tương đối */
                 }}
             </style>
         </head>
@@ -60,6 +62,7 @@ def run_app1():
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
+                        console.log("Start Drawing at: ", startX, startY); // Log tọa độ
                     }}
                     event.preventDefault(); // Ngăn chặn hành vi kéo ảnh
                 }});
@@ -82,7 +85,6 @@ def run_app1():
                     }}
                 }});
 
-                // Ngăn chặn hành vi kéo chuột khi di chuyển
                 canvas.addEventListener('mousemove', (event) => {{
                     if (drawing) {{
                         event.preventDefault();
@@ -126,4 +128,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    run_app1()
+    run_app()
