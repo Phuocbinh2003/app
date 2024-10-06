@@ -1,29 +1,14 @@
 import streamlit as st
 import os
-import requests
-from firebase_admin import firestore, storage, credentials
 import firebase_admin
+from firebase_admin import credentials, firestore, storage
 
-# Tải tệp JSON từ GitHub
-def download_json_from_github(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open('firebase_credentials.json', 'wb') as f:
-            f.write(response.content)
-        return 'firebase_credentials.json'
-    else:
-        raise Exception("Không thể tải tệp JSON.")
-
-# Đường dẫn tới tệp JSON trong kho GitHub của bạn
-json_url = 'https://raw.githubusercontent.com/Phuocbinh2003/app/063fc630eba23414d94b5e8f989519ae51c7c034/phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json'
-
-# Tải tệp JSON
-cred_path = download_json_from_github(json_url)
-cred = credentials.Certificate(cred_path)
-
-# Khởi tạo Firebase app nếu chưa được khởi tạo
+# Kiểm tra xem ứng dụng đã được khởi tạo chưa
 if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com'})
+    cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'phuocbinh2003-cf142.appspot.com'
+    })
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
@@ -78,7 +63,6 @@ def run_app4():
             except Exception as e:
                 st.error(f"Đã xảy ra lỗi: {str(e)}")
 
-            # Xóa các file tạm sau khi upload
             os.remove(image_file_1_path)
             os.remove(image_file_2_path)
         else:
