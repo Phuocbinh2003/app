@@ -5,7 +5,7 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
-def run_app():
+def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
     # Sidebar for image upload
@@ -139,4 +139,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    run_app()
+    run_app1()
