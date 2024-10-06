@@ -1,4 +1,6 @@
 import streamlit as st
+from Update_Firebase import add_student  # Import hàm add_student từ Update_Firebase.py
+import os
 
 def run_app4():
     # Giao diện người dùng
@@ -27,9 +29,12 @@ def run_app4():
             with open(image_file_2_path, "wb") as f:
                 f.write(image_file_2.getbuffer())
 
-            # Thêm sinh viên và tải ảnh
-            message = add_student(student_id, Ten, Ngay_sinh, Lop, Khoa, image_file_1_path, image_file_2_path)
-            st.success(message)
+            # Thêm sinh viên và tải ảnh lên Firebase
+            try:
+                message = add_student(student_id, Ten, Ngay_sinh, Lop, Khoa, image_file_1_path, image_file_2_path)
+                st.success(message)
+            except Exception as e:
+                st.error(f"Đã xảy ra lỗi: {str(e)}")
 
             # Xóa các file tạm sau khi upload
             os.remove(image_file_1_path)
