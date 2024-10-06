@@ -10,9 +10,9 @@ if not firebase_admin._apps:
         'storageBucket': 'phuocbinh2003-cf142.appspot.com'
     })
 
-# Khởi tạo Firestore và Storage
-db = firestore.client()
-bucket = storage.bucket()
+app = firebase_admin.get_app()
+db = firestore.client(app)  # Kết nối với Firestore
+bucket = storage.bucket()  # Kết nối với Firebase Storage
 
 def upload_image(student_id, image_path, image_type):
     blob = bucket.blob(f'student-images/{student_id}/{image_type}.jpg')
