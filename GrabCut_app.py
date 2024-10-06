@@ -5,12 +5,6 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
-# Xử lý tin nhắn từ JavaScript (với postMessage)
-def handle_js_messages():
-    message = st.experimental_get_query_params()
-    if "rect_data" in message:
-        st.session_state.rect_data = message["rect_data"]
-
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
@@ -79,10 +73,10 @@ def run_app1():
 
                 let drawing = false;
                 let startX, startY;
-                let hasDrawnRectangle = false; 
+                let hasDrawnRectangle = false; // Biến để kiểm tra xem đã vẽ hình vuông chưa
 
                 canvas.addEventListener('mousedown', (event) => {{
-                    if (event.button === 0 && !hasDrawnRectangle) {{
+                    if (event.button === 0 && !hasDrawnRectangle) {{ // Nút chuột trái và chưa vẽ hình vuông
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
@@ -98,17 +92,18 @@ def run_app1():
                         const width = Math.abs(startX - endX);
                         const height = Math.abs(startY - endY);
                         
+                        // Giới hạn vẽ thành hình vuông
                         const size = Math.min(width, height);
 
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                        ctx.rect(startX, startY, size, size); 
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+                        ctx.rect(startX, startY, size, size); // Vẽ hình vuông
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
                         const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: size, height: size }};
-                        hasDrawnRectangle = true;
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+                        hasDrawnRectangle = true; // Đánh dấu là đã vẽ hình vuông
+                        window.parent.postMessage(JSON.stringify(rect), '*');
                     }}
                 }});
 
@@ -128,9 +123,6 @@ def run_app1():
         # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
         if 'rect_data' not in st.session_state:
             st.session_state.rect_data = None
-
-        # Nhận thông điệp từ JavaScript
-        handle_js_messages()
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
         if st.session_state["rect_data"] is not None:
@@ -164,9 +156,17 @@ def convert_image_to_base64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
+# Xử lý tin nhắn từ JavaScript
+def handle_js_messages():
+    message = st.experimental_get_query_params()
+    if "rect_data" in message:
+        st.session_state.rect_data = message["rect_data"]
+
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
+    # Khởi tạo trạng thái phiên
     if 'rect_data' not in st.session_state:
         st.session_state.rect_data = None
 
+    # Chạy ứng dụng
     run_app1()
