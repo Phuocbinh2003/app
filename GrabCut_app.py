@@ -1,14 +1,11 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
+import cv2 as cv
 from io import BytesIO
 import base64
-from grabcut_processor import GrabCutProcessor
 
-
-
-def run_app1():
-    class GrabCutProcessor:
+class GrabCutProcessor:
     def __init__(self, image):
         self.image = image
         self.rect = None
@@ -25,7 +22,12 @@ def run_app1():
     def get_output_image(self):
         return self.image
 
-def run_app():
+def convert_image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
+
+def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
     # Sidebar for image upload
@@ -119,12 +121,6 @@ def run_app():
         2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt.
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
-
-# Function to encode image to base64
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
