@@ -1,6 +1,7 @@
 import streamlit as st
 from GrabCut_app import run_app1
 from app_face_detection import run_app3
+from app_update_firebase(app4) import run_app4
 
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
