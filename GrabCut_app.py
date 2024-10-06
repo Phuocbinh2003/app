@@ -8,24 +8,24 @@ from grabcut_processor import GrabCutProcessor
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
-    # Sidebar for image upload
+    # Thanh bên để tải lên hình ảnh
     uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        # Read the image
+        # Đọc hình ảnh
         image = Image.open(uploaded_file)
         image_np = np.array(image)
 
-        # Display the original image
+        # Hiển thị hình ảnh gốc
         st.image(image, caption="Hình ảnh gốc", use_column_width=True)
 
-        # Initialize GrabCut processor
+        # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
 
-        # Get dimensions of the image
+        # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
 
-        # HTML and CSS for drawing
+        # HTML và CSS cho việc vẽ
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -35,20 +35,20 @@ def run_app1():
                     margin: 0;
                     padding: 0;
                     display: flex;
-                    flex-direction: column; /* Sắp xếp các phần tử theo cột */
-                    align-items: center; /* Căn giữa */
+                    flex-direction: column; 
+                    align-items: center; 
                 }}
                 .canvas-container {{
-                    position: relative; /* Để có thể căn chỉnh canvas */
-                    border: 1px solid black; /* Đường viền cho vùng vẽ */
-                    width: {img_width}px; /* Đặt chiều rộng cho vùng vẽ */
-                    height: {img_height}px; /* Đặt chiều cao cho vùng vẽ */
+                    position: relative; 
+                    border: 1px solid black; 
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                 }}
                 canvas {{
                     cursor: crosshair;
-                    width: 100%; /* Chiều rộng canvas 100% để chiếm toàn bộ vùng vẽ */
-                    height: 100%; /* Chiều cao canvas 100% để chiếm toàn bộ vùng vẽ */
-                    display: block; /* Đảm bảo canvas không có khoảng cách */
+                    width: 100%; 
+                    height: 100%; 
+                    display: block; 
                 }}
             </style>
         </head>
@@ -75,7 +75,7 @@ def run_app1():
                         startX = event.offsetX;
                         startY = event.offsetY;
                     }}
-                    event.preventDefault(); // Ngăn chặn hành vi kéo ảnh
+                    event.preventDefault();
                 }});
 
                 canvas.addEventListener('mouseup', (event) => {{
@@ -92,10 +92,12 @@ def run_app1():
                         ctx.stroke();
 
                         const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
+                        // Gửi tọa độ hình chữ nhật về Streamlit
                         window.parent.postMessage(JSON.stringify(rect), '*');
                     }}
                 }});
 
+                // Ngăn chặn việc kéo ảnh khi vẽ
                 canvas.addEventListener('mousemove', (event) => {{
                     if (drawing) {{
                         event.preventDefault();
@@ -106,24 +108,26 @@ def run_app1():
         </html>
         """
 
-        # Display the canvas
-        st.components.v1.html(drawing_html, height=img_height + 50)  # Cộng thêm 50 để hiển thị khoảng cách cho các phần tử
+        # Hiển thị canvas
+        st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Button to apply GrabCut
-        if st.button("Áp dụng GrabCut"):
-            # Get rectangle coordinates from JavaScript message
-            if st.session_state.get("rect_data", None) is not None:
-                rect_data = st.session_state.rect_data
-                x = int(rect_data["x"])
-                y = int(rect_data["y"])
-                width = int(rect_data["width"])
-                height = int(rect_data["height"])
-                grabcut_processor.rect = (x, y, width, height)
+        # Xử lý dữ liệu hình chữ nhật từ JavaScript
+        rect_data = st.session_state.get("rect_data", None)
+
+        if rect_data:
+            x = int(rect_data["x"])
+            y = int(rect_data["y"])
+            width = int(rect_data["width"])
+            height = int(rect_data["height"])
+            grabcut_processor.rect = (x, y, width, height)
+
+            # Nút để áp dụng GrabCut
+            if st.button("Áp dụng GrabCut"):
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
-        # Instructions
+        # Hướng dẫn sử dụng
         st.markdown("""
         ## Hướng dẫn sử dụng
         1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
@@ -131,12 +135,23 @@ def run_app1():
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
-# Function to encode image to base64
+# Hàm để mã hóa hình ảnh thành base64
 def convert_image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
+# Xử lý tin nhắn từ JavaScript
+def handle_js_messages():
+    message = st.experimental_get_query_params()
+    if "rect_data" in message:
+        st.session_state.rect_data = message["rect_data"]
+
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
+    # Khởi tạo trạng thái phiên
+    if 'rect_data' not in st.session_state:
+        st.session_state.rect_data = None
+
+    # Chạy ứng dụng
     run_app1()
