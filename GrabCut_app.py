@@ -16,9 +16,6 @@ def run_app1():
         image = Image.open(uploaded_file)
         image_np = np.array(image)
 
-        # Hiển thị hình ảnh gốc
-        st.image(image, caption="Hình ảnh gốc", use_column_width=True)
-
         # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
 
@@ -63,7 +60,7 @@ def run_app1():
                 img.src = '{convert_image_to_base64(image)}';
 
                 img.onload = function() {{
-                    ctx.drawImage(img, 0, 0);
+                    ctx.drawImage(img, 0, 0);  // Vẽ hình ảnh lên canvas
                 }};
 
                 let drawing = false;
@@ -97,7 +94,6 @@ def run_app1():
                     }}
                 }});
 
-                // Ngăn chặn việc kéo ảnh khi vẽ
                 canvas.addEventListener('mousemove', (event) => {{
                     if (drawing) {{
                         event.preventDefault();
@@ -112,9 +108,8 @@ def run_app1():
         st.components.v1.html(drawing_html, height=img_height + 50)
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        rect_data = st.session_state.get("rect_data", None)
-
-        if rect_data:
+        if st.session_state.get("rect_data") is not None:
+            rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
