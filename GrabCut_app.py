@@ -120,9 +120,13 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
+        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
+        if 'rect_data' not in st.session_state:
+            st.session_state.rect_data = None
+
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if "rect_data" in st.session_state and st.session_state["rect_data"] is not None:
-            rect_data = st.session_state.rect_data
+        if st.session_state["rect_data"] is not None:
+            rect_data = st.session_state["rect_data"]
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
