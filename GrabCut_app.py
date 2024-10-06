@@ -73,9 +73,10 @@ def run_app1():
 
                 let drawing = false;
                 let startX, startY;
+                let hasDrawnRectangle = false; // Biến để kiểm tra xem đã vẽ hình vuông chưa
 
                 canvas.addEventListener('mousedown', (event) => {{
-                    if (event.button === 0) {{ // Nút chuột trái
+                    if (event.button === 0 && !hasDrawnRectangle) {{ // Nút chuột trái và chưa vẽ hình vuông
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
@@ -90,14 +91,18 @@ def run_app1():
                         const endY = event.offsetY;
                         const width = Math.abs(startX - endX);
                         const height = Math.abs(startY - endY);
+                        
+                        // Giới hạn vẽ thành hình vuông
+                        const size = Math.min(width, height);
 
-                        ctx.rect(startX, startY, width, height);
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+                        ctx.rect(startX, startY, size, size); // Vẽ hình vuông
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
-                        const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
-                        // Gửi tọa độ hình chữ nhật về Streamlit
+                        const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: size, height: size }};
+                        hasDrawnRectangle = true; // Đánh dấu là đã vẽ hình vuông
                         window.parent.postMessage(JSON.stringify(rect), '*');
                     }}
                 }});
@@ -134,7 +139,7 @@ def run_app1():
         st.markdown("""
         ## Hướng dẫn sử dụng
         1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
-        2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt.
+        2. Nhấn chuột trái để vẽ hình vuông quanh đối tượng bạn muốn cắt.
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
