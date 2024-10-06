@@ -1,31 +1,8 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import cv2 as cv
-from io import BytesIO
-import base64
-
-class GrabCutProcessor:
-    def __init__(self, image):
-        self.image = image
-        self.rect = None
-        self.mask = np.zeros(image.shape[:2], dtype=np.uint8)
-
-    def apply_grabcut(self):
-        bgd_model = np.zeros((1, 65), np.float64)
-        fgd_model = np.zeros((1, 65), np.float64)
-        if self.rect is not None:
-            cv.grabCut(self.image, self.mask, self.rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-            self.mask2 = np.where((self.mask == 2) | (self.mask == 0), 0, 1).astype('uint8')
-            return cv.bitwise_and(self.image, self.image, mask=self.mask2)
-
-    def get_output_image(self):
-        return self.image
-
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
+import cv2
+from grabcut_processor import GrabCutProcessor
 
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
@@ -41,78 +18,22 @@ def run_app1():
         # Initialize GrabCut processor
         grabcut_processor = GrabCutProcessor(image_np)
 
-        # HTML and CSS for drawing
-        drawing_html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                canvas {{
-                    border: 1px solid black;
-                    cursor: crosshair;
-                }}
-            </style>
-        </head>
-        <body>
-            <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
-            <script>
-                const canvas = document.getElementById('drawingCanvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                img.src = '{convert_image_to_base64(image)}';
+        # Show the image
+        st.image(image, caption="Hình ảnh gốc", use_column_width=True)
 
-                img.onload = function() {{
-                    ctx.drawImage(img, 0, 0);
-                }};
+        # Create a drawing canvas
+        drawing_area = st.empty()
+        canvas = drawing_area.image(grabcut_processor.img, channels="RGB")
 
-                let drawing = false;
-                let startX, startY;
-
-                canvas.addEventListener('mousedown', (event) => {{
-                    if (event.button === 0) {{ // Left mouse button
-                        drawing = true;
-                        startX = event.offsetX;
-                        startY = event.offsetY;
-                    }}
-                }});
-
-                canvas.addEventListener('mouseup', (event) => {{
-                    if (drawing) {{
-                        drawing = false;
-                        const endX = event.offsetX;
-                        const endY = event.offsetY;
-                        const width = Math.abs(startX - endX);
-                        const height = Math.abs(startY - endY);
-
-                        ctx.rect(startX, startY, width, height);
-                        ctx.strokeStyle = 'blue';
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-
-                        const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
-                        window.parent.postMessage(JSON.stringify(rect), '*');
-                    }}
-                }});
-            </script>
-        </body>
-        </html>
-        """
-
-        # Display the canvas
-        st.components.v1.html(drawing_html, height=image.height + 50)
+        # Mouse event handling for rectangle drawing and mask
+        # This would require OpenCV to handle events which may not work in Streamlit directly
+        # Therefore, consider using JavaScript as shown in the previous example to handle mouse events
 
         # Button to apply GrabCut
         if st.button("Áp dụng GrabCut"):
-            # Get rectangle coordinates from JavaScript message
-            rect_data = st.session_state.get("rect_data", None)
-            if rect_data is not None:
-                x = int(rect_data["x"])
-                y = int(rect_data["y"])
-                width = int(rect_data["width"])
-                height = int(rect_data["height"])
-                grabcut_processor.rect = (x, y, width, height)
-                output_image = grabcut_processor.apply_grabcut()
-                st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
+            grabcut_processor.apply_grabcut()
+            output_image = grabcut_processor.get_output_image()
+            st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
         # Instructions
         st.markdown("""
