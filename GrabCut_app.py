@@ -1,149 +1,74 @@
 import streamlit as st
 from PIL import Image
-from io import BytesIO
-import base64
+from streamlit_drawable_canvas import st_canvas
 import numpy as np
 import cv2 as cv
 
-# Import GrabCutProcessor
+# Import lớp GrabCutProcessor từ file grabcut_processor
 from grabcut_processor import GrabCutProcessor
 
-# Helper function to convert image to base64
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
-
-# Main function to run the Streamlit app
 def run_app1():
-    st.title("Interactive GrabCut Segmentation")
+    st.title("GrabCut Segmentation with Streamlit Drawable Canvas")
 
-    # Sidebar to upload image
+    # Sidebar to upload an image
     uploaded_file = st.sidebar.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
+        # Open the uploaded image
         image = Image.open(uploaded_file)
         img_np = np.array(image)
 
         # Initialize the GrabCutProcessor
         grabcut_processor = GrabCutProcessor(img_np)
 
-        # HTML and JS for drawing
-        drawing_html = f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                }}
-                .canvas-container {{
-                    position: relative;
-                    border: 1px solid black;
-                    width: {image.width}px;
-                    height: {image.height}px;
-                }}
-                canvas {{
-                    cursor: crosshair;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: {image.width}px;
-                    height: {image.height}px;
-                    z-index: 1;
-                }}
-                img {{
-                    width: {image.width}px;
-                    height: {image.height}px;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    z-index: 0;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="canvas-container">
-                <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
-                <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
-            </div>
-            <script>
-                var canvas = document.getElementById('drawingCanvas');
-                var ctx = canvas.getContext('2d');
-                var drawing = false;
+        # Streamlit Drawable Canvas
+        st.sidebar.markdown("### Drawing Tools")
+        drawing_mode = st.sidebar.selectbox(
+            "Drawing tool:", ("rectangle", "freedraw")
+        )
+        stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 3)
 
-                canvas.addEventListener('mousedown', function(e) {{
-                    drawing = true;
-                    var rect = canvas.getBoundingClientRect();
-                    var x = e.clientX - rect.left;
-                    var y = e.clientY - rect.top;
-                    window.parent.postMessage({{x: x, y: y, event: 'mousedown'}}, '*');
-                }});
+        # Create a canvas component for drawing
+        canvas_result = st_canvas(
+            fill_color="rgba(255, 0, 0, 0.3)",  # Color for the rectangle or mask
+            stroke_width=stroke_width,
+            stroke_color="#FF0000",
+            background_image=image,
+            update_streamlit=True,
+            height=image.height,
+            width=image.width,
+            drawing_mode=drawing_mode,
+            key="canvas",
+        )
 
-                canvas.addEventListener('mousemove', function(e) {{
-                    if (drawing) {{
-                        var rect = canvas.getBoundingClientRect();
-                        var x = e.clientX - rect.left;
-                        var y = e.clientY - rect.top;
-                        window.parent.postMessage({{x: x, y: y, event: 'mousemove'}}, '*');
-                    }}
-                }});
+        # After drawing, apply GrabCut based on the drawn region
+        if canvas_result.json_data is not None:
+            # Extract rectangle coordinates from the drawn shape
+            for shape in canvas_result.json_data["objects"]:
+                if shape["type"] == "rect":
+                    left = shape["left"]
+                    top = shape["top"]
+                    width = shape["width"]
+                    height = shape["height"]
+                    rect = (int(left), int(top), int(width), int(height))
 
-                canvas.addEventListener('mouseup', function(e) {{
-                    drawing = false;
-                    var rect = canvas.getBoundingClientRect();
-                    var x = e.clientX - rect.left;
-                    var y = e.clientY - rect.top;
-                    window.parent.postMessage({{x: x, y: y, event: 'mouseup'}}, '*');
-                }});
-            </script>
-        </body>
-        </html>
-        """
+                    # Apply GrabCut with the selected rectangle
+                    output_img = grabcut_processor.apply_grabcut(rect)
+                    st.image(output_img, caption="GrabCut Result", use_column_width=True)
 
-        st.components.v1.html(drawing_html, height=image.height + 50)
-
-        # Handle JavaScript events from the canvas
-        if "canvas_event" in st.session_state:
-            event_data = st.session_state.canvas_event
-            x, y, event_type = event_data['x'], event_data['y'], event_data['event']
-            grabcut_processor.update_mask(x, y, event_type)
-
-            # Display the updated image
-            st.image(grabcut_processor.img_copy, caption="Drawing on Image", use_column_width=True)
-
-        if "rect_data" in st.session_state:
-            rect_data = st.session_state.rect_data
-            rect = (rect_data["x"], rect_data["y"], rect_data["width"], rect_data["height"])
-
-            # Apply GrabCut using the rectangle
-            output_img = grabcut_processor.apply_grabcut(rect)
-            st.image(output_img, caption="GrabCut Output", use_column_width=True)
-
-        if "reset" in st.session_state:
-            # Reset the image
+        # Option to reset the image
+        if st.button("Reset"):
             reset_img = grabcut_processor.reset()
-            st.image(reset_img, caption="Reset Image", use_column_width=True)
+            st.image(reset_img, caption="Image Reset", use_column_width=True)
 
-        # Handle the drawing value changes (0, 1, 2, 3)
-        if "set_drawing_value" in st.session_state:
-            grabcut_processor.set_drawing_value(st.session_state.set_drawing_value)
-
-        # Instructions for the user
+        # Instructions for user
         st.markdown("""
-        ### Instructions
-        1. Upload an image using the sidebar.
-        2. Use mouse to draw a rectangle around the object.
-        3. Press the following keys:
-            - `0`: Mark definite background
-            - `1`: Mark definite foreground
-            - `2`: Mark probable background
-            - `3`: Mark probable foreground
-            - `n`: Apply GrabCut
-            - `r`: Reset the image
+        ### Instructions:
+        1. Draw a rectangle around the object you want to segment.
+        2. Select "rectangle" mode in the sidebar for precise bounding box drawing.
+        3. Adjust the stroke width as needed.
+        4. After drawing, the segmentation result will automatically appear below.
+        5. Use the "Reset" button to start over.
         """)
 
 if __name__ == "__main__":
