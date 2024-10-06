@@ -166,7 +166,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_data' not in st.session_state:
-        st.session_state.rect_data = None
-
     run_app1()
