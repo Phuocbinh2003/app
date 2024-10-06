@@ -15,7 +15,7 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Main function to run the Streamlit app
-def run_app():
+def run_app1():
     st.title("Interactive GrabCut Segmentation")
 
     # Sidebar to upload image
@@ -109,4 +109,4 @@ def run_app():
         """)
 
 if __name__ == "__main__":
-    run_app()
+    run_app1()
