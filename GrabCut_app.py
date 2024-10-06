@@ -3,10 +3,10 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
+import json
 from grabcut_processor import GrabCutProcessor
 
-
-def run_app1():
+def run_app():
     st.title("Cắt nền bằng GrabCut")
 
     # Sidebar for image upload
@@ -16,6 +16,9 @@ def run_app1():
         # Read the image
         image = Image.open(uploaded_file)
         image_np = np.array(image)
+
+        # Display the original image
+        st.image(image, caption="Hình ảnh gốc", use_column_width=True)
 
         # Initialize GrabCut processor
         grabcut_processor = GrabCutProcessor(image_np)
@@ -91,14 +94,15 @@ def run_app1():
         # Button to apply GrabCut
         if st.button("Áp dụng GrabCut"):
             # Get rectangle coordinates from JavaScript message
-            rect_data = st.session_state.get("rect_data", None)
-            if rect_data is not None:
+            if st.session_state.get("rect_data", None) is not None:
+                rect_data = st.session_state.rect_data
                 x = int(rect_data["x"])
                 y = int(rect_data["y"])
                 width = int(rect_data["width"])
                 height = int(rect_data["height"])
                 grabcut_processor.rect = (x, y, width, height)
-                output_image = grabcut_processor.apply_grabcut()
+                grabcut_processor.apply_grabcut()
+                output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
         # Instructions
@@ -117,4 +121,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    run_app1()
+    run_app()
