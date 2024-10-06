@@ -1,7 +1,7 @@
 import streamlit as st
 from GrabCut_app import run_app1
 from app_face_detection import run_app3
-#from app_update_firebase import run_app4
+from app_update_firebase import run_app4
 
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
@@ -14,7 +14,7 @@ if option == 'Ứng dụng 1':
     run_app1()  # Gọi hàm chạy ứng dụng 1
 elif option == 'Ứng dụng 3':
     run_app3()  # Gọi hàm chạy ứng dụng 3
-#elif option == 'Ứng dụng 4':
-    #run_app4()  # Gọi hàm chạy ứng dụng 4
+elif option == 'Ứng dụng 4':
+    run_app4()  # Gọi hàm chạy ứng dụng 4
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
