@@ -10,9 +10,11 @@ load_dotenv()
 # Lấy thông tin xác thực từ biến môi trường
 firebase_key = os.getenv('FIREBASE_KEY')
 
-# Chuyển đổi chuỗi JSON thành đối tượng JSON
-cred = credentials.Certificate(json.loads(firebase_key))
-firebase_admin.initialize_app(cred)
+# Kiểm tra xem ứng dụng Firebase đã được khởi tạo chưa
+if not firebase_admin._apps:
+    # Chuyển đổi chuỗi JSON thành đối tượng JSON
+    cred = credentials.Certificate(json.loads(firebase_key))
+    firebase_admin.initialize_app(cred)
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
@@ -20,23 +22,29 @@ bucket = storage.bucket()
 
 # Hàm để upload ảnh lên Firebase Storage
 def upload_image(student_id, image_path, image_type):
-    blob = bucket.blob(f'student-images/{student_id}/{image_type}.jpg')
-    blob.upload_from_filename(image_path)
-    print(f"Image {image_type} uploaded successfully.")
+    try:
+        blob = bucket.blob(f'student-images/{student_id}/{image_type}.jpg')
+        blob.upload_from_filename(image_path)
+        print(f"Image {image_type} uploaded successfully.")
+    except Exception as e:
+        print(f"Failed to upload image {image_type}: {e}")
 
 # Thêm thông tin sinh viên vào Firestore
 def add_student(student_id, Ten, Ngay_sinh, Lop, Khoa, image_file_1, image_file_2):
-    # Thêm dữ liệu sinh viên vào Firestore
-    doc_ref = db.collection('students').document(student_id)
-    doc_ref.set({
-        'Ten': Ten,
-        'Ngay_sinh': Ngay_sinh,
-        'Lop': Lop,
-        'Khoa': Khoa
-    })
-    
-    # Tải ảnh lên Firebase Storage
-    upload_image(student_id, image_file_1, 'photo_Chan_dung')
-    upload_image(student_id, image_file_2, 'photo_The_sinh_vien')
+    try:
+        # Thêm dữ liệu sinh viên vào Firestore
+        doc_ref = db.collection('students').document(student_id)
+        doc_ref.set({
+            'Ten': Ten,
+            'Ngay_sinh': Ngay_sinh,
+            'Lop': Lop,
+            'Khoa': Khoa
+        })
 
-    return f"Data for student {Ten} has been uploaded successfully."
+        # Tải ảnh lên Firebase Storage
+        upload_image(student_id, image_file_1, 'photo_Chan_dung')
+        upload_image(student_id, image_file_2, 'photo_The_sinh_vien')
+
+        return f"Data for student {Ten} has been uploaded successfully."
+    except Exception as e:
+        return f"Failed to add student {Ten}: {e}"
