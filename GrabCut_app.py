@@ -24,6 +24,9 @@ def run_app1():
         # Initialize GrabCut processor
         grabcut_processor = GrabCutProcessor(image_np)
 
+        # Get dimensions of the image
+        img_width, img_height = image.size
+
         # HTML and CSS for drawing
         drawing_html = f"""
         <!DOCTYPE html>
@@ -38,12 +41,11 @@ def run_app1():
                     border: 1px solid black;
                     cursor: crosshair;
                     display: block;
-                    position: relative; /* Đặt canvas ở vị trí tương đối */
                 }}
             </style>
         </head>
         <body>
-            <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
+            <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
@@ -62,7 +64,6 @@ def run_app1():
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
-                        console.log("Start Drawing at: ", startX, startY); // Log tọa độ
                     }}
                     event.preventDefault(); // Ngăn chặn hành vi kéo ảnh
                 }});
@@ -96,7 +97,7 @@ def run_app1():
         """
 
         # Display the canvas
-        st.components.v1.html(drawing_html, height=image.height)
+        st.components.v1.html(drawing_html, height=img_height)
 
         # Button to apply GrabCut
         if st.button("Áp dụng GrabCut"):
