@@ -28,3 +28,5 @@ def run_app1():
     
             st.image(output, caption="Hình ảnh đã phân đoạn", use_column_width=True)
 
+if __name__ == "__main__":
+    run_app1()
