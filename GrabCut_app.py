@@ -121,7 +121,7 @@ def run_app1():
         st.components.v1.html(drawing_html, height=img_height + 50)
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state.get("rect_data") is not None:
+        if "rect_data" in st.session_state and st.session_state["rect_data"] is not None:
             rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
             y = int(rect_data["y"])
