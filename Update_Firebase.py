@@ -1,12 +1,17 @@
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
-import os
+from dotenv import load_dotenv
+import json
 
-# Khởi tạo ứng dụng Firebase bằng file key.json
-# Đảm bảo rằng đường dẫn đến file JSON là chính xác
-cred = credentials.Certificate('D:/GitHub/app/phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')
+# Tải biến môi trường từ file .env
+load_dotenv()
 
-# Khởi tạo ứng dụng Firebase
+# Lấy thông tin xác thực từ biến môi trường
+firebase_key = os.getenv('FIREBASE_KEY')
+
+# Chuyển đổi chuỗi JSON thành đối tượng JSON
+cred = credentials.Certificate(json.loads(firebase_key))
 firebase_admin.initialize_app(cred)
 
 # Khởi tạo Firestore và Storage
