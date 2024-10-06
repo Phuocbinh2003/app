@@ -37,12 +37,14 @@ def run_app1():
                     margin: 0;
                     padding: 0;
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: {img_height}px; /* Chiều cao theo kích thước hình ảnh */
+                    flex-direction: column; /* Sắp xếp các phần tử theo cột */
+                    align-items: center; /* Căn giữa */
+                }}
+                .canvas-container {{
+                    position: relative; /* Để có thể căn chỉnh canvas */
+                    border: 1px solid black; /* Đường viền cho vùng vẽ */
                 }}
                 canvas {{
-                    border: 1px solid black;
                     cursor: crosshair;
                     width: {img_width}px;  /* Đặt chiều rộng của canvas */
                     height: {img_height}px; /* Đặt chiều cao của canvas */
@@ -51,7 +53,9 @@ def run_app1():
             </style>
         </head>
         <body>
-            <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
+            <div class="canvas-container">
+                <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
+            </div>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
@@ -103,7 +107,7 @@ def run_app1():
         """
 
         # Display the canvas
-        st.components.v1.html(drawing_html, height=img_height)
+        st.components.v1.html(drawing_html, height=img_height + 50)  # Cộng thêm 50 để hiển thị khoảng cách cho các phần tử
 
         # Button to apply GrabCut
         if st.button("Áp dụng GrabCut"):
