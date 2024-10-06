@@ -14,7 +14,11 @@ firebase_key = os.getenv('FIREBASE_KEY')
 if not firebase_admin._apps:
     # Chuyển đổi chuỗi JSON thành đối tượng JSON
     cred = credentials.Certificate(json.loads(firebase_key))
-    firebase_admin.initialize_app(cred)
+    
+    # Khởi tạo ứng dụng Firebase với tên bucket
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'phuocbinh2003-cf142.appspot.com'  # Thay đổi tên bucket ở đây
+    })
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
