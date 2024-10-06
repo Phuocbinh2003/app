@@ -3,44 +3,26 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
-import cv2 as cv
-
-# Constants for drawing
-BLUE = [255, 0, 0]      # Rectangle color
-RED = [0, 0, 255]       # PR BG
-GREEN = [0, 255, 0]     # PR FG
-BLACK = [0, 0, 0]       # Sure BG
-WHITE = [255, 255, 255] # Sure FG
-
-# Drawing modes
-DRAW_BG = {'color': BLACK, 'val': 0}
-DRAW_FG = {'color': WHITE, 'val': 1}
-DRAW_PR_FG = {'color': GREEN, 'val': 3}
-DRAW_PR_BG = {'color': RED, 'val': 2}
+from grabcut_processor import GrabCutProcessor
 
 def run_app1():
-    st.title("Interactive GrabCut Segmentation")
+    st.title("Cắt nền bằng GrabCut")
 
-    # Sidebar to upload image
-    uploaded_file = st.sidebar.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    # Thanh bên để tải lên hình ảnh
+    uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
+        # Đọc hình ảnh
         image = Image.open(uploaded_file)
         image_np = np.array(image)
-        img2 = image_np.copy()  # Copy of the original image
-        mask = np.zeros(img2.shape[:2], dtype=np.uint8)  # Mask initialized to PR_BG
-        output = np.zeros(img2.shape, np.uint8)  # Output image to be shown
 
-        # Initialize rectangle and drawing flags
-        rect = (0, 0, 1, 1)
-        drawing = False
-        rectangle = False
-        rect_over = False
-        rect_or_mask = 100
-        value = DRAW_FG  # Drawing initialized to FG
-        thickness = 3  # Brush thickness
+        # Khởi tạo bộ xử lý GrabCut
+        grabcut_processor = GrabCutProcessor(image_np)
 
-        # HTML and CSS for the drawing canvas
+        # Lấy kích thước của hình ảnh
+        img_width, img_height = image.size
+
+        # HTML và CSS cho việc vẽ
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -56,22 +38,22 @@ def run_app1():
                 .canvas-container {{
                     position: relative; 
                     border: 1px solid black; 
-                    width: {image.width}px; 
-                    height: {image.height}px; 
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                 }}
                 canvas {{
                     cursor: crosshair;
                     position: absolute; 
                     top: 0;
                     left: 0;
-                    width: {image.width}px; 
-                    height: {image.height}px; 
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                     display: block; 
                     z-index: 1; 
                 }}
                 img {{
-                    width: {image.width}px; 
-                    height: {image.height}px; 
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                     position: absolute; 
                     top: 0;
                     left: 0;
@@ -82,7 +64,7 @@ def run_app1():
         <body>
             <div class="canvas-container">
                 <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
-                <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
+                <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
@@ -91,10 +73,10 @@ def run_app1():
 
                 let drawing = false;
                 let startX, startY;
-                let hasDrawnRectangle = false; // Flag to check if rectangle is drawn
+                let hasDrawnRectangle = false; // Biến để kiểm tra xem đã vẽ hình vuông chưa
 
                 canvas.addEventListener('mousedown', (event) => {{
-                    if (event.button === 0 && !hasDrawnRectangle) {{ // Left mouse button
+                    if (event.button === 0 && !hasDrawnRectangle) {{ // Nút chuột trái và chưa vẽ hình vuông
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
@@ -109,50 +91,25 @@ def run_app1():
                         const endY = event.offsetY;
                         const width = Math.abs(startX - endX);
                         const height = Math.abs(startY - endY);
-
+                        
+                        // Giới hạn vẽ thành hình vuông
                         const size = Math.min(width, height);
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-                        ctx.rect(startX, startY, size, size); // Draw square
+
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa canvas
+                        ctx.rect(startX, startY, size, size); // Vẽ hình vuông
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
                         const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: size, height: size }};
-                        hasDrawnRectangle = true; // Mark rectangle drawn
+                        hasDrawnRectangle = true; // Đánh dấu là đã vẽ hình vuông
                         window.parent.postMessage(JSON.stringify(rect), '*');
                     }}
                 }});
 
-                // Other events for key actions (1, 2, 3, n, r, s)
-                document.addEventListener('keydown', (event) => {{
-                    // Key handling for foreground/background drawing and segmentation
-                    switch(event.key) {{
-                        case '0':
-                            // Mark background
-                            alert('Mark background regions with left mouse button');
-                            break;
-                        case '1':
-                            // Mark foreground
-                            alert('Mark foreground regions with left mouse button');
-                            break;
-                        case '2':
-                            // PR_BG drawing
-                            break;
-                        case '3':
-                            // PR_FG drawing
-                            break;
-                        case 'n':
-                            // Update segmentation
-                            window.parent.postMessage(JSON.stringify({{action: 'update_segmentation', rect: {{} }} }), '*');
-                            break;
-                        case 'r':
-                            // Reset
-                            window.parent.postMessage(JSON.stringify({{action: 'reset' }}), '*');
-                            break;
-                        case 's':
-                            // Save result
-                            window.parent.postMessage(JSON.stringify({{action: 'save' }}), '*');
-                            break;
+                canvas.addEventListener('mousemove', (event) => {{
+                    if (drawing) {{
+                        event.preventDefault();
                     }}
                 }});
             </script>
@@ -160,44 +117,49 @@ def run_app1():
         </html>
         """
 
-        # Display canvas and image
-        st.components.v1.html(drawing_html, height=image.height + 50)
+        # Hiển thị canvas và hình ảnh
+        st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Update based on messages from JavaScript
+        # Xử lý dữ liệu hình chữ nhật từ JavaScript
         if st.session_state.get("rect_data") is not None:
             rect_data = st.session_state.rect_data
-            rect = (rect_data["x"], rect_data["y"], rect_data["width"], rect_data["height"])
+            x = int(rect_data["x"])
+            y = int(rect_data["y"])
+            width = int(rect_data["width"])
+            height = int(rect_data["height"])
+            grabcut_processor.rect = (x, y, width, height)
 
-            if rect_or_mask == 0:  # GrabCut with rectangle
-                bgdmodel = np.zeros((1, 65), np.float64)
-                fgdmodel = np.zeros((1, 65), np.float64)
-                cv.grabCut(img2, mask, rect, bgdmodel, fgdmodel, 1, cv.GC_INIT_WITH_RECT)
-                rect_or_mask = 1
-            elif rect_or_mask == 1:  # GrabCut with mask
-                bgdmodel = np.zeros((1, 65), np.float64)
-                fgdmodel = np.zeros((1, 65), np.float64)
-                cv.grabCut(img2, mask, rect, bgdmodel, fgdmodel, 1, cv.GC_INIT_WITH_MASK)
+            # Nút để áp dụng GrabCut
+            if st.button("Áp dụng GrabCut"):
+                grabcut_processor.apply_grabcut()
+                output_image = grabcut_processor.get_output_image()
+                st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
 
-            mask2 = np.where((mask == 1) + (mask == 3), 255, 0).astype('uint8')
-            output = cv.bitwise_and(img2, img2, mask=mask2)
-            st.image(output, caption="Output Image", use_column_width=True)
-
-        # Instructions
+        # Hướng dẫn sử dụng
         st.markdown("""
-        ## Instructions
-        1. Upload an image using the sidebar.
-        2. Use the right mouse button to draw a rectangle around the object.
-        3. Press 'n' to segment the image.
-        4. Press 'r' to reset.
-        5. Press 's' to save the result.
+        ## Hướng dẫn sử dụng
+        1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
+        2. Nhấn chuột trái để vẽ hình vuông quanh đối tượng bạn muốn cắt.
+        3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
-# Convert image to base64
+# Hàm để mã hóa hình ảnh thành base64
 def convert_image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
-# Run the application
+# Xử lý tin nhắn từ JavaScript
+def handle_js_messages():
+    message = st.experimental_get_query_params()
+    if "rect_data" in message:
+        st.session_state.rect_data = message["rect_data"]
+
+# Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
+    # Khởi tạo trạng thái phiên
+    if 'rect_data' not in st.session_state:
+        st.session_state.rect_data = None
+
+    # Chạy ứng dụng
     run_app1()
