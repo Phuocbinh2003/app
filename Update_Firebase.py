@@ -3,7 +3,9 @@ from firebase_admin import credentials, firestore, storage
 
 # Khởi tạo ứng dụng Firebase bằng file key.json
 cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')  
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'phuocbinh2003-cf142.appspot.com'  # Thêm bucket mặc định từ Firebase
+})
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
