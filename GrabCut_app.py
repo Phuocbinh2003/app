@@ -126,6 +126,6 @@ def convert_image_to_base64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
-# Main app logic
-st.sidebar.title("Chọn ứng dụng")
-app_mode = st.sidebar.selectbox("Chọn ứng dụng", ["Ứng dụng 1", "Ứng dụng 2", "Ứng dụng 3"])
+# Bước 8: Chạy ứng dụng
+if __name__ == "__main__":
+    run_app1()
