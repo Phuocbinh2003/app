@@ -21,8 +21,9 @@ json_url = 'https://raw.githubusercontent.com/Phuocbinh2003/app/063fc630eba23414
 cred_path = download_json_from_github(json_url)
 cred = credentials.Certificate(cred_path)
 
-# Khởi tạo Firebase app
-firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com'})
+# Khởi tạo Firebase app nếu chưa được khởi tạo
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com'})
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
