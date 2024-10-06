@@ -6,11 +6,12 @@ from firebase_admin import credentials, firestore, storage
 # Kiểm tra xem ứng dụng đã được khởi tạo chưa
 if not firebase_admin._apps:
     cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')
+    # Khởi tạo ứng dụng với bucket storage
     firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com'})
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
-bucket = storage.bucket()
+bucket = storage.bucket()  # Lấy bucket đã được chỉ định trong quá trình khởi tạo
 
 def upload_image(student_id, image_path, image_type):
     blob = bucket.blob(f'student-images/{student_id}/{image_type}.jpg')
