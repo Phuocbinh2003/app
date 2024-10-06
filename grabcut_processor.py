@@ -19,6 +19,7 @@ class GrabCutProcessor:
         self.drawing = False
         self.value = DRAW_FG  # Default to drawing foreground
         self.thickness = 3
+        self.ix, self.iy = -1, -1  # For drawing rectangle
 
     def set_drawing_value(self, val):
         """ Set the value to draw either background, foreground, probable background, or probable foreground """
@@ -44,10 +45,18 @@ class GrabCutProcessor:
         output = cv.bitwise_and(self.img_copy, self.img_copy, mask=mask2)
         return output
 
-    def update_mask(self, x, y):
+    def update_mask(self, x, y, event_type):
         """ Update the mask with the current drawing value """
-        cv.circle(self.img_copy, (x, y), self.thickness, self.value['color'], -1)
-        cv.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
+        if event_type == 'mousedown':
+            self.drawing = True
+            self.ix, self.iy = x, y
+        elif event_type == 'mousemove' and self.drawing:
+            cv.circle(self.img_copy, (x, y), self.thickness, self.value['color'], -1)
+            cv.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
+        elif event_type == 'mouseup':
+            self.drawing = False
+            cv.circle(self.img_copy, (x, y), self.thickness, self.value['color'], -1)
+            cv.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
     def reset(self):
         """ Reset the image and mask """
