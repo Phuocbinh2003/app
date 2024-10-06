@@ -129,11 +129,14 @@ def run_app1():
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
 
-            # Nút để áp dụng GrabCut
-            if st.button("Áp dụng GrabCut"):
+        # Hiển thị nút để áp dụng GrabCut
+        if st.button("Áp dụng GrabCut"):
+            if st.session_state.rect_data:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
+            else:
+                st.warning("Vui lòng vẽ một hình vuông trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
         st.markdown("""
