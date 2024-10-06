@@ -1,25 +1,46 @@
 import streamlit as st
 import os
-from Update_Firebase import add_student  # Import hàm add_student từ Update_Firebase.py
+from firebase_admin import firestore, storage
+from firebase_config import *  # Nhập tệp cấu hình Firebase
+
+# Khởi tạo Firestore và Storage
+db = firestore.client()
+bucket = storage.bucket()
+
+def upload_image(student_id, image_path, image_type):
+    blob = bucket.blob(f'student-images/{student_id}/{image_type}.jpg')
+    blob.upload_from_filename(image_path)
+    st.success(f"Image {image_type} uploaded successfully.")
+
+def add_student(student_id, Ten, Ngay_sinh, Lop, Khoa, image_file_1, image_file_2):
+    doc_ref = db.collection('students').document(student_id)
+    doc_ref.set({
+        'Ten': Ten,
+        'Ngay_sinh': Ngay_sinh,
+        'Lop': Lop,
+        'Khoa': Khoa
+    })
+    
+    # Tải ảnh lên Firebase Storage
+    upload_image(student_id, image_file_1, 'photo_Chan_dung')
+    upload_image(student_id, image_file_2, 'photo_The_sinh_vien')
+
+    return f"Data for student {Ten} has been uploaded successfully."
 
 def run_app4():
-    # Giao diện người dùng
     st.title("Tải Thông Tin Sinh Viên Lên")
 
-    # Nhập thông tin sinh viên
     student_id = st.text_input("Mã Sinh Viên")
     Ten = st.text_input("Họ và Tên")
     Ngay_sinh = st.date_input("Ngày Sinh")
     Lop = st.text_input("Lớp")
     Khoa = st.text_input("Khoa")
 
-    # Tải ảnh lên
     image_file_1 = st.file_uploader("Tải Ảnh Chân Dung", type=['jpg', 'jpeg', 'png'])
     image_file_2 = st.file_uploader("Tải Ảnh Thẻ Sinh Viên", type=['jpg', 'jpeg', 'png'])
 
     if st.button("Gửi Thông Tin"):
-        if image_file_1 and image_file_2:
-            # Lưu ảnh vào thư mục tạm thời
+        if image_file_1 is not None and image_file_2 is not None:
             image_file_1_path = f"temp_{student_id}_1.jpg"
             image_file_2_path = f"temp_{student_id}_2.jpg"
 
@@ -29,7 +50,6 @@ def run_app4():
             with open(image_file_2_path, "wb") as f:
                 f.write(image_file_2.getbuffer())
 
-            # Thêm sinh viên và tải ảnh lên Firebase
             try:
                 message = add_student(student_id, Ten, Ngay_sinh, Lop, Khoa, image_file_1_path, image_file_2_path)
                 st.success(message)

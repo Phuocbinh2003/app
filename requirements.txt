@@ -5,3 +5,5 @@ Pillow
 streamlit-drawable-canvas
 scikit-learn
 firebase-admin
+python-dotenv
+
