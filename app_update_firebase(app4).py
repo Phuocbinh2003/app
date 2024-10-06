@@ -36,4 +36,5 @@ def run_app4():
             os.remove(image_file_2_path)
         else:
             st.error("Please upload both images.")
-            
+if __name__ == "__main__":
+    run_app4()
