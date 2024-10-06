@@ -29,9 +29,14 @@ def run_app1():
         <html>
         <head>
             <style>
+                body {{
+                    margin: 0;  /* Xóa margin của body */
+                    padding: 0; /* Xóa padding của body */
+                }}
                 canvas {{
                     border: 1px solid black;
                     cursor: crosshair;
+                    display: block; /* Đảm bảo canvas không có khoảng trắng */
                 }}
             </style>
         </head>
@@ -89,7 +94,7 @@ def run_app1():
         """
 
         # Display the canvas
-        st.components.v1.html(drawing_html, height=image.height + 50)
+        st.components.v1.html(drawing_html, height=image.height)
 
         # Button to apply GrabCut
         if st.button("Áp dụng GrabCut"):
