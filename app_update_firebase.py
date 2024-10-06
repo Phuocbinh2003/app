@@ -1,10 +1,12 @@
 import streamlit as st
 import os
-from firebase_admin import firestore, storage,credentials
+import firebase_admin
+from firebase_admin import firestore, storage, credentials
 
-
+# Khởi tạo Firebase Admin
 cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')
-firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com' })
+firebase_admin.initialize_app(cred, {'storageBucket': 'phuocbinh2003-cf142.appspot.com'})
+
 # Khởi tạo Firestore và Storage
 db = firestore.client()
 bucket = storage.bucket()
