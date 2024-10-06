@@ -63,7 +63,7 @@ def run_app1():
         </head>
         <body>
             <div class="canvas-container">
-                <img id="originalImage" src="{convert_image_to_base64(image)}" />
+                <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
                 <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
             <script>
