@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore, storage
 import os
 
 # Khởi tạo ứng dụng Firebase bằng file key.json
-cred = credentials.Certificate('path_to_your_key.json')  # Thay 'path_to_your_key.json' bằng đường dẫn đến file key
+cred = credentials.Certificate('config/phuocbinh2003-cf142-firebase-adminsdk-elr02-7f6024b622.json')  
 firebase_admin.initialize_app(cred)
 
 # Khởi tạo Firestore và Storage
