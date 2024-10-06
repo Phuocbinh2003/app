@@ -1,0 +1,227 @@
+[33mcommit aee8ec7ba6e7f6c4a4f31bd44caf2a37ca7b9ffd[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:16:25 2024 +0700
+
+    Create phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json
+
+[33mcommit 46561f3cf69e7366196cda2671443fa609d6900c[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:15:47 2024 +0700
+
+    Remove Firebase admin SDK JSON file and update .gitignore
+
+[33mcommit 883c3af23609a15bccf62fd0deb02ba5eca4adbf[m
+Merge: 80d439e 300300e
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:08:31 2024 +0700
+
+    Merge branch 'main' of https://github.com/Phuocbinh2003/app
+
+[33mcommit 80d439edaa80b0a25f8aaeb69bdffb958e5eb6d2[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:08:15 2024 +0700
+
+    Create phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json
+
+[33mcommit 300300e0b4701f8de3a7a38f73118e28fb932a4c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:04:42 2024 +0700
+
+    Update Update_Firebase.py
+
+[33mcommit 7bb574bfac9b5f1c03e8101bd83d3690c54702e6[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:02:02 2024 +0700
+
+    Update app_main.py
+
+[33mcommit 07b0538fdd42090296b642ed3bebaa97a0945fb3[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 21:01:05 2024 +0700
+
+    Update Update_Firebase.py
+
+[33mcommit c5b3529f88b6bbc2b07d22d9580d5e69d6791ec9[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 20:53:11 2024 +0700
+
+    Add .json file to .gitignore
+
+[33mcommit 72fb65a2c4b8b5fdc29341b39ec45c7d97d42e1a[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 20:37:21 2024 +0700
+
+    Add .gitignore and update project files
+
+[33mcommit dca4071eea99578fb3ad39c31eb0719aaf458320[m[33m ([m[mrefs/original/refs/remotes/origin/main[m[33m)[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 20:18:27 2024 +0700
+
+    Delete .gitignore
+
+[33mcommit b3425ce88cf955580b3eb5f49ff328c87725c190[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 19:09:20 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 4ab93ad8623a7a4b8034c4faa21ea7ddd0b8635a[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:56:08 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit e3d1b4df9f74a938bcfd71e997b5df72b96bc6ab[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:53:49 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 99ba7408fa34581a74d6f04aae210d94a0ddd5ce[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:36:56 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 2c8810812b11b4b034375de431750bc054dde87c[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:24:35 2024 +0700
+
+    Update app_main.py
+
+[33mcommit 2b7a1fa3d0c401297e426d5bc37529108348d5a8[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:06:32 2024 +0700
+
+    Update requirements.txt
+
+[33mcommit d30465b5c5d15729fb49f5bb87e82c6f1441776f[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:03:05 2024 +0700
+
+    Update app_update_firebase.py
+
+[33mcommit ae568719f75085718d55d021cca176fefe6fae0b[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 18:00:16 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 871a28499fce2bb2d28d9acd5d3a6b8bc36f4aaa[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 17:59:31 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 6ba363929e7e40a28808ceba73ef01dbdb20818f[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 16:40:32 2024 +0700
+
+    Update app_update_firebase.py
+
+[33mcommit f3d0920375c33231b3c7c70c915cd13467d24c90[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 15:48:17 2024 +0700
+
+    Update Update_Firebase.py
+
+[33mcommit e8b0acd52319d885d0af83f3b49901ed988449ea[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:45:40 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 86c46a424862339ebec09743946030a493254b01[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:43:59 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 99039dc54b49b3dba5e62a27bcdc251b1a7b9836[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:42:36 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit e9fc364b5ebca158a9c05345641e98c579900372[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:40:07 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 473455786cda4771d69c33e3bf1d7d6f23269613[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:39:27 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 7f01a74d64046a4c8b261fcc681d2d92c6d3c898[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:37:24 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 2c5e620150e7f83b506213c10f8f6c00240bc0e2[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:36:55 2024 +0700
+
+    Update grabcut_processor.py
+
+[33mcommit f4884b0273dbcb63c718ba4ac332d0b64f62a72b[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:34:52 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 5e3a152b0bf417f04ef87f8180c9b3bb3c83212e[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:34:35 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 8a7087244ebf831f74eb42b71de8585ab0c6dbaa[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 14:33:47 2024 +0700
+
+    Update grabcut_processor.py
+
+[33mcommit 5fe51ec6199146a432f538c943345ced03471c9f[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:43:00 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 599f12e6dd8f74a8c55d0a45513aa4aac5416bd9[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:36:56 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit fbddc797808f17a15c50d8145a65715a0ef30cd2[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:36:33 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 6ee7070d5251d9a0bcd4c5fe6ca0948976bc37a8[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:34:09 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 32a4894a06a4698c47d675bb68eb31b8bfda08b5[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:31:21 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit b703b12b2ac66c4abcd6a9ada3da6545124d374b[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 13:24:27 2024 +0700
+
+    Update GrabCut_app.py
+
+[33mcommit 1545103cdcf66dc7d6344102dbd55fb7d652afdb[m
+Author: Nguyễn Phước Bình <106498497+Phuocbinh2003@users.noreply.github.com>
+Date:   Sun Oct 6 11:42:11 2024 +0700
+
