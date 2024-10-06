@@ -8,7 +8,7 @@ from grabcut_processor import GrabCutProcessor
 
 
 def run_app1():
-    st.title("Ứng dụng 3 - Cắt nền bằng GrabCut")
+    st.title("- Cắt nền bằng GrabCut")
     
     # Sidebar for image upload
     uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
