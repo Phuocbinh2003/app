@@ -46,8 +46,8 @@ def run_app1():
                 }}
                 canvas {{
                     cursor: crosshair;
-                    width: 100%; 
-                    height: 100%; 
+                    width: {img_width}px; /* Đặt chiều rộng của canvas */
+                    height: {img_height}px; /* Đặt chiều cao của canvas */
                     display: block; 
                 }}
             </style>
