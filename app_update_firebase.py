@@ -1,6 +1,19 @@
 import streamlit as st
 import os
+import firebase_admin
+from firebase_admin import credentials, firestore, storage
 from Update_Firebase import add_student  # Import hàm add_student từ Update_Firebase.py
+
+# Kiểm tra xem ứng dụng đã được khởi tạo chưa
+if not firebase_admin._apps:
+    cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'phuocbinh2003-cf142.appspot.com'
+    })
+
+# Khởi tạo Firestore và Storage
+db = firestore.client()
+bucket = storage.bucket()  # Gọi bucket sau khi khởi tạo app
 
 def run_app4():
     # Giao diện người dùng
