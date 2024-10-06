@@ -4,7 +4,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
 # Kiểm tra xem ứng dụng đã được khởi tạo chưa
-cred = credentials.Certificate('/content/drive/MyDrive/Mydrive/Githut/phuocbinh2003-cf142-firebase-adminsdk-elr02-7f6024b622.json')  # Thay bằng đường dẫn đến file key đúng
+cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-7f6024b622.json')  # Thay bằng đường dẫn đến file key đúng
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'phuocbinh2003-cf142.appspot.com'  # Thêm bucket mặc định từ Firebase
 })
