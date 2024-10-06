@@ -70,6 +70,36 @@ def run_app1():
                 <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
                 <canvas id="drawingCanvas" width="{image.width}" height="{image.height}"></canvas>
             </div>
+            <script>
+                var canvas = document.getElementById('drawingCanvas');
+                var ctx = canvas.getContext('2d');
+                var drawing = false;
+
+                canvas.addEventListener('mousedown', function(e) {{
+                    drawing = true;
+                    var rect = canvas.getBoundingClientRect();
+                    var x = e.clientX - rect.left;
+                    var y = e.clientY - rect.top;
+                    window.parent.postMessage({{x: x, y: y, event: 'mousedown'}}, '*');
+                }});
+
+                canvas.addEventListener('mousemove', function(e) {{
+                    if (drawing) {{
+                        var rect = canvas.getBoundingClientRect();
+                        var x = e.clientX - rect.left;
+                        var y = e.clientY - rect.top;
+                        window.parent.postMessage({{x: x, y: y, event: 'mousemove'}}, '*');
+                    }}
+                }});
+
+                canvas.addEventListener('mouseup', function(e) {{
+                    drawing = false;
+                    var rect = canvas.getBoundingClientRect();
+                    var x = e.clientX - rect.left;
+                    var y = e.clientY - rect.top;
+                    window.parent.postMessage({{x: x, y: y, event: 'mouseup'}}, '*');
+                }});
+            </script>
         </body>
         </html>
         """
@@ -77,6 +107,14 @@ def run_app1():
         st.components.v1.html(drawing_html, height=image.height + 50)
 
         # Handle JavaScript events from the canvas
+        if "canvas_event" in st.session_state:
+            event_data = st.session_state.canvas_event
+            x, y, event_type = event_data['x'], event_data['y'], event_data['event']
+            grabcut_processor.update_mask(x, y, event_type)
+
+            # Display the updated image
+            st.image(grabcut_processor.img_copy, caption="Drawing on Image", use_column_width=True)
+
         if "rect_data" in st.session_state:
             rect_data = st.session_state.rect_data
             rect = (rect_data["x"], rect_data["y"], rect_data["width"], rect_data["height"])
