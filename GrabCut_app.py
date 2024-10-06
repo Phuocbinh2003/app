@@ -18,7 +18,7 @@ DRAW_FG = {'color': WHITE, 'val': 1}
 DRAW_PR_FG = {'color': GREEN, 'val': 3}
 DRAW_PR_BG = {'color': RED, 'val': 2}
 
-def run_app():
+def run_app1():
     st.title("Interactive GrabCut Segmentation")
 
     # Sidebar to upload image
@@ -200,4 +200,4 @@ def convert_image_to_base64(image):
 
 # Run the application
 if __name__ == "__main__":
-    run_app()
+    run_app1()
