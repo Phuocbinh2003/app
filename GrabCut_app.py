@@ -49,6 +49,7 @@ def run_app1():
                     width: {img_width}px; 
                     height: {img_height}px; 
                     display: block; 
+                    z-index: 1; 
                 }}
                 img {{
                     width: {img_width}px; 
@@ -56,7 +57,7 @@ def run_app1():
                     position: absolute; 
                     top: 0;
                     left: 0;
-                    z-index: -1; 
+                    z-index: 0; 
                 }}
             </style>
         </head>
