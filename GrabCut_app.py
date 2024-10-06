@@ -36,11 +36,17 @@ def run_app1():
                 body {{
                     margin: 0;
                     padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: {img_height}px; /* Chiều cao theo kích thước hình ảnh */
                 }}
                 canvas {{
                     border: 1px solid black;
                     cursor: crosshair;
-                    display: block;
+                    width: {img_width}px;  /* Đặt chiều rộng của canvas */
+                    height: {img_height}px; /* Đặt chiều cao của canvas */
+                    display: block; /* Đảm bảo canvas không có khoảng cách */
                 }}
             </style>
         </head>
