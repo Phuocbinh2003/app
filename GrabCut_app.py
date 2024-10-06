@@ -43,20 +43,20 @@ def run_app1():
                 }}
                 canvas {{
                     cursor: crosshair;
-                    position: absolute; /* Đặt canvas ở vị trí tuyệt đối */
+                    position: absolute; 
                     top: 0;
                     left: 0;
-                    width: {img_width}px; /* Đặt chiều rộng của canvas */
-                    height: {img_height}px; /* Đặt chiều cao của canvas */
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                     display: block; 
                 }}
                 img {{
-                    width: {img_width}px; /* Đặt chiều rộng của hình ảnh */
-                    height: {img_height}px; /* Đặt chiều cao của hình ảnh */
-                    position: absolute; /* Đặt hình ảnh ở vị trí tuyệt đối */
+                    width: {img_width}px; 
+                    height: {img_height}px; 
+                    position: absolute; 
                     top: 0;
                     left: 0;
-                    z-index: -1; /* Đưa hình ảnh về phía dưới canvas */
+                    z-index: -1; 
                 }}
             </style>
         </head>
