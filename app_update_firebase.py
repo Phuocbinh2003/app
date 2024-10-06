@@ -1,15 +1,7 @@
 import streamlit as st
 import os
-import firebase_admin
-from firebase_admin import credentials, firestore, storage
-
-# Kiểm tra xem ứng dụng đã được khởi tạo chưa
-cred = credentials.Certificate('phuocbinh2003-cf142-firebase-adminsdk-elr02-c3eb3c501c.json')  # Thay bằng đường dẫn đến file key đúng
-# Trong tệp khởi tạo Firebase
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'phuocbinh2003-cf142.appspot.com'
-}, name='my_second_app')
-
+from firebase_admin import firestore, storage
+from firebase_config import *  # Nhập tệp cấu hình Firebase
 
 # Khởi tạo Firestore và Storage
 db = firestore.client()
@@ -64,6 +56,7 @@ def run_app4():
             except Exception as e:
                 st.error(f"Đã xảy ra lỗi: {str(e)}")
 
+            # Xóa các file tạm sau khi upload
             os.remove(image_file_1_path)
             os.remove(image_file_2_path)
         else:
