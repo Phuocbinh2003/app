@@ -43,25 +43,32 @@ def run_app1():
                 }}
                 canvas {{
                     cursor: crosshair;
+                    position: absolute; /* Đặt canvas ở vị trí tuyệt đối */
+                    top: 0;
+                    left: 0;
                     width: {img_width}px; /* Đặt chiều rộng của canvas */
                     height: {img_height}px; /* Đặt chiều cao của canvas */
                     display: block; 
+                }}
+                img {{
+                    width: {img_width}px; /* Đặt chiều rộng của hình ảnh */
+                    height: {img_height}px; /* Đặt chiều cao của hình ảnh */
+                    position: absolute; /* Đặt hình ảnh ở vị trí tuyệt đối */
+                    top: 0;
+                    left: 0;
+                    z-index: -1; /* Đưa hình ảnh về phía dưới canvas */
                 }}
             </style>
         </head>
         <body>
             <div class="canvas-container">
+                <img id="originalImage" src="{convert_image_to_base64(image)}" />
                 <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
-                const img = new Image();
-                img.src = '{convert_image_to_base64(image)}';
-
-                img.onload = function() {{
-                    ctx.drawImage(img, 0, 0);  // Vẽ hình ảnh lên canvas
-                }};
+                const img = document.getElementById('originalImage');
 
                 let drawing = false;
                 let startX, startY;
@@ -104,7 +111,7 @@ def run_app1():
         </html>
         """
 
-        # Hiển thị canvas
+        # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
