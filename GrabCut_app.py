@@ -69,6 +69,7 @@ def get_image_with_canvas(image, target_width=800):
             const rectInput = document.getElementById('rectInfo');
             rectInput.value = rectInfo; // Lưu thông tin hình chữ nhật vào input ẩn
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
+            // Gửi thông tin hình chữ nhật về phía Streamlit
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
     </script>
@@ -87,7 +88,7 @@ def run_app1():
         # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Kiểm tra thông tin hình chữ nhật từ session_state
+        # Kiểm tra sự kiện hình chữ nhật
         if 'rect_info' in st.session_state:
             rect_info = st.session_state.rect_info
             if rect_info is not None:
