@@ -95,5 +95,9 @@ def run_app1():
                     output_image = processor.apply_grabcut(grabcut_data.rect)
                     st.image(output_image, channels="BGR", caption="GrabCut Output")
 
+        # In nội dung của st.session_state
+        st.write("Nội dung của st.session_state:")
+        st.json(st.session_state)
+
 if __name__ == "__main__":
     run_app1()
