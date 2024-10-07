@@ -5,7 +5,6 @@ import base64
 import re
 from grabcut_processor import GrabCutProcessor
 
-# Lớp GrabCutData để lưu trữ thông tin hình chữ nhật
 class GrabCutData:
     def __init__(self):
         self.rect = None
@@ -13,11 +12,9 @@ class GrabCutData:
     def set_rectangle(self, rect):
         self.rect = rect
 
-# Tạo đối tượng GrabCutData
 grabcut_data = GrabCutData()
 
 def get_image_with_canvas(image, target_width=800):
-    """Trả về HTML cho hình ảnh với lớp canvas để vẽ."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -77,28 +74,26 @@ def run_app1():
         
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state.rect_info
-            if rect_info:
-                match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-                if match:
-                    x, y, w, h = map(int, match.groups())
-                    rect = (x, y, w, h)
+        # Lắng nghe sự kiện 'rectangle-drawn'
+        if 'rectangle-drawn' in st.session_state:
+            rect_info = st.session_state.rectangle_drawn.detail
+            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+            if match:
+                x, y, w, h = map(int, match.groups())
+                rect = (x, y, w, h)
 
-                    grabcut_data.set_rectangle(rect)
+                grabcut_data.set_rectangle(rect)
 
-                    st.success("Thông tin hình chữ nhật đã được đọc thành công!")
-                    st.write("Thông tin hình chữ nhật:")
-                    st.write(f"- X: {x}")
-                    st.write(f"- Y: {y}")
-                    st.write(f"- Width: {w}")
-                    st.write(f"- Height: {h}")
+                st.success("Thông tin hình chữ nhật đã được đọc thành công!")
+                st.write("Thông tin hình chữ nhật:")
+                st.write(f"- X: {x}")
+                st.write(f"- Y: {y}")
+                st.write(f"- Width: {w}")
+                st.write(f"- Height: {h}")
 
-                    if st.button("Apply GrabCut"):
-                        output_image = processor.apply_grabcut(grabcut_data.rect)
-                        st.image(output_image, channels="BGR", caption="GrabCut Output")
-
-        st.session_state.rect_info = None  # Reset after reading
+                if st.button("Apply GrabCut"):
+                    output_image = processor.apply_grabcut(grabcut_data.rect)
+                    st.image(output_image, channels="BGR", caption="GrabCut Output")
 
 if __name__ == "__main__":
     run_app1()
