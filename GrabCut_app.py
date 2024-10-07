@@ -5,7 +5,6 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
-# Xử lý tin nhắn từ JavaScript (với postMessage)
 def handle_js_messages():
     message = st.experimental_get_query_params()
     if "rect_data" in message:
@@ -81,29 +80,29 @@ def run_app1():
                 let startX, startY;
                 let hasDrawnRectangle = false; 
 
-                canvas.addEventListener('mousedown', (event) => {
-                    if (event.button === 0 && !hasDrawnRectangle) {
+                canvas.addEventListener('mousedown', (event) => {{
+                    if (event.button === 0 && !hasDrawnRectangle) {{
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
-                    }
+                    }}
                     event.preventDefault();
-                });
+                }});
 
-                canvas.addEventListener('mouseup', (event) => {
-                    if (drawing) {
+                canvas.addEventListener('mouseup', (event) => {{
+                    if (drawing) {{
                         drawing = false;
                         const endX = event.offsetX;
                         const endY = event.offsetY;
                         const width = Math.abs(startX - endX);
                         const height = Math.abs(startY - endY);
                         
-                        const rect = { 
+                        const rect = {{ 
                             x: Math.min(startX, endX), 
                             y: Math.min(startY, endY), 
                             width: width, 
                             height: height 
-                        };
+                        }};
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height); 
                         ctx.rect(rect.x, rect.y, rect.width, rect.height); 
@@ -114,18 +113,26 @@ def run_app1():
                         hasDrawnRectangle = true;
 
                         // Gửi thông tin hình chữ nhật về Python
-                        window.parent.postMessage(JSON.stringify({ type: 'rect_data', rect }), '*');
+                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
 
                         // Hiển thị thông tin vị trí hình chữ nhật
-                        alert(`Hình chữ nhật đã được vẽ:\nX: ${rect.x}\nY: ${rect.y}\nWidth: ${rect.width}\nHeight: ${rect.height}`);
-                    }
-                });
+                        alert(`Hình chữ nhật đã được vẽ:\\nX: ${{
+                            rect.x
+                        }}\\nY: ${{
+                            rect.y
+                        }}\\nWidth: ${{
+                            rect.width
+                        }}\\nHeight: ${{
+                            rect.height
+                        }}`);
+                    }}
+                }});
 
-                canvas.addEventListener('mousemove', (event) => {
-                    if (drawing) {
+                canvas.addEventListener('mousemove', (event) => {{
+                    if (drawing) {{
                         event.preventDefault();
-                    }
-                });
+                    }}
+                }});
             </script>
         </body>
         </html>
