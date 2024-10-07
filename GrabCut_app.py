@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 import base64
 
-from GrabCutProcessor import GrabCutProcessor
+from grabcut_processor  import GrabCutProcessor
 
 def get_image_with_canvas(image):
     """Return HTML for the image with a canvas overlay for drawing."""
