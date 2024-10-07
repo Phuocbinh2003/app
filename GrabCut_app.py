@@ -5,6 +5,7 @@ import base64
 import re
 from grabcut_processor import GrabCutProcessor
 
+# Lớp GrabCutData để lưu trữ thông tin hình chữ nhật
 class GrabCutData:
     def __init__(self):
         self.rect = None
@@ -12,24 +13,18 @@ class GrabCutData:
     def set_rectangle(self, rect):
         self.rect = rect
 
-    def clear(self):
-        self.rect = None
-
 # Tạo đối tượng GrabCutData
 grabcut_data = GrabCutData()
 
 def get_image_with_canvas(image, target_width=800):
-    """Return HTML for the image with a canvas overlay for drawing."""
-    # Encode image as base64
+    """Trả về HTML cho hình ảnh với lớp canvas để vẽ."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Tính toán tỷ lệ kích thước mới
     height, width = image.shape[:2]
     aspect_ratio = height / width
     target_height = int(target_width * aspect_ratio)
 
-    # HTML for the canvas
     html = f"""
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
@@ -43,7 +38,6 @@ def get_image_with_canvas(image, target_width=800):
         canvas.height = {target_height};
 
         let startX, startY, isDrawing = false;
-        let rectInfo = "";  // Khởi tạo biến để lưu thông tin hình chữ nhật
 
         canvas.addEventListener('mousedown', function(e) {{
             startX = e.offsetX;
@@ -65,9 +59,9 @@ def get_image_with_canvas(image, target_width=800):
             isDrawing = false;
             const endX = e.offsetX;
             const endY = e.offsetY;
-            rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
+            const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
-            streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));  // Gửi thông tin hình chữ nhật về phía Streamlit
+            streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
     </script>
     """
@@ -76,31 +70,23 @@ def get_image_with_canvas(image, target_width=800):
 def run_app1():
     st.title("GrabCut Application")
     
-    # Upload image
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
     if uploaded_file is not None:
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
         
-        # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Kiểm tra sự kiện hình chữ nhật
         if 'rect_info' in st.session_state:
             rect_info = st.session_state.rect_info
-            if rect_info is not None:
+            if rect_info:
                 match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
                 if match:
-                    x = int(match.group(1))
-                    y = int(match.group(2))
-                    w = int(match.group(3))
-                    h = int(match.group(4))
+                    x, y, w, h = map(int, match.groups())
                     rect = (x, y, w, h)
 
-                    # Lưu trữ hình chữ nhật vào đối tượng GrabCutData
                     grabcut_data.set_rectangle(rect)
 
-                    # Hiển thị thông tin hình chữ nhật
                     st.success("Thông tin hình chữ nhật đã được đọc thành công!")
                     st.write("Thông tin hình chữ nhật:")
                     st.write(f"- X: {x}")
@@ -108,18 +94,11 @@ def run_app1():
                     st.write(f"- Width: {w}")
                     st.write(f"- Height: {h}")
 
-                    # Hiển thị nút Apply GrabCut nếu hình chữ nhật đã được xác định
                     if st.button("Apply GrabCut"):
                         output_image = processor.apply_grabcut(grabcut_data.rect)
                         st.image(output_image, channels="BGR", caption="GrabCut Output")
-                else:
-                    st.error("Không thể đọc thông tin hình chữ nhật!")
-            else:
-                st.warning("Chưa có thông tin hình chữ nhật.")
 
-        # Reset rectangle info after reading
-        st.session_state.rect_info = None
+        st.session_state.rect_info = None  # Reset after reading
 
-# Main function to run the application
 if __name__ == "__main__":
     run_app1()
