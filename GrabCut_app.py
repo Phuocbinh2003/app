@@ -88,25 +88,35 @@ def run_app1():
         # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Listen for rectangle drawn event
-        if 'rect_info' in st.session_state and st.session_state.rect_info is not None:
+        # Hiển thị thông tin hình chữ nhật
+        if 'rect_info' in st.session_state:
             rect_info = st.session_state.rect_info
-            st.session_state.rect_info = None  # Reset after reading
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
+            if rect_info is not None:
+                match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+                if match:
+                    x = int(match.group(1))
+                    y = int(match.group(2))
+                    w = int(match.group(3))
+                    h = int(match.group(4))
+                    rect = (x, y, w, h)
 
-                # Lưu trữ hình chữ nhật vào đối tượng GrabCutData
-                grabcut_data.set_rectangle(rect)
+                    # Lưu trữ hình chữ nhật vào đối tượng GrabCutData
+                    grabcut_data.set_rectangle(rect)
 
-                # Hiển thị nút Apply GrabCut nếu hình chữ nhật đã được xác định
-                if st.button("Apply GrabCut"):
-                    output_image = processor.apply_grabcut(grabcut_data.rect)
-                    st.image(output_image, channels="BGR", caption="GrabCut Output")
+                    # Hiển thị thông tin hình chữ nhật
+                    st.write("Thông tin hình chữ nhật:")
+                    st.write(f"- X: {x}")
+                    st.write(f"- Y: {y}")
+                    st.write(f"- Width: {w}")
+                    st.write(f"- Height: {h}")
+
+                    # Hiển thị nút Apply GrabCut nếu hình chữ nhật đã được xác định
+                    if st.button("Apply GrabCut"):
+                        output_image = processor.apply_grabcut(grabcut_data.rect)
+                        st.image(output_image, channels="BGR", caption="GrabCut Output")
+
+        # Reset rectangle info after reading
+        st.session_state.rect_info = None
 
 # Main function to run the application
 if __name__ == "__main__":
