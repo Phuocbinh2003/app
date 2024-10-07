@@ -51,6 +51,7 @@ def get_image_with_canvas(image, target_width=800):
             const endY = e.offsetY;
             const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
+            // Dispatching the rectangle information to Streamlit
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
     </script>
@@ -70,7 +71,7 @@ def run_app1():
         # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Listen for rectangle drawn event
+        # Check for rectangle drawn event
         if 'rectangle-drawn' in st.session_state:
             rect_info = st.session_state.rectangle_drawn.detail
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
@@ -90,6 +91,10 @@ def run_app1():
                 st.write(f"- Y: {y}")
                 st.write(f"- Width: {w}")
                 st.write(f"- Height: {h}")
+                
+        # Reset state after reading the rectangle info
+        if 'rectangle-drawn' in st.session_state:
+            del st.session_state.rectangle_drawn
 
 # Main function to run the application
 if __name__ == "__main__":
