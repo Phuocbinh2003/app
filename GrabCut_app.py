@@ -13,7 +13,7 @@ def get_image_with_canvas(image):
     
     # HTML for the canvas
     html = f"""
-    <div>
+    <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%;"/>
         <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: 100%;"></canvas>
     </div>
@@ -46,13 +46,14 @@ def get_image_with_canvas(image):
             isDrawing = false;
             const endX = e.offsetX;
             const endY = e.offsetY;
-            const rectInfo = `Hình chữ nhật: X: ${startX}, Y: ${startY}, Width: ${endX - startX}, Height: ${endY - startY}`;
+            const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
     </script>
     """
     return html
+
 
 def run_app1():
     st.title("GrabCut Application")
