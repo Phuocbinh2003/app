@@ -12,7 +12,7 @@ def get_image_with_canvas(image, target_width=800):
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Calculate new size ratio
+    # Calculate new size
     height, width = image.shape[:2]
     aspect_ratio = height / width
     target_height = int(target_width * aspect_ratio)
@@ -60,6 +60,7 @@ def get_image_with_canvas(image, target_width=800):
     """
     return html
 
+
 def run_app1():
     st.title("GrabCut Application")
     
@@ -67,30 +68,14 @@ def run_app1():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
     if uploaded_file is not None:
         # Read image
-        file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
-        image = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
-
-        # Resize the image to keep the aspect ratio
-        height, width = image.shape[:2]
-        target_width = 800
-        
-        # Tính toán chiều cao mới để giữ tỷ lệ khung hình
-        target_height = int(target_width * (height / width))
-        
-        resized_image = cv.resize(image, (target_width, target_height), interpolation=cv.INTER_AREA)
-
-        # Initialize GrabCutProcessor
-        processor = GrabCutProcessor(resized_image)
+        image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv.IMREAD_COLOR)
+        processor = GrabCutProcessor(image)
         
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy, target_width), height=500)
+        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
         # Listen for rectangle drawn event
-        if 'rect_info' not in st.session_state:
-            st.session_state.rect_info = None
-
-        # Event listener for rectangle drawn
-        if st.session_state.rect_info is not None:
+        if st.session_state.get('rect_info') is not None:
             rect_info = st.session_state.rect_info
             st.session_state.rect_info = None  # Reset after reading
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
