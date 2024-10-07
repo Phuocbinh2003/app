@@ -10,9 +10,9 @@ option = st.sidebar.selectbox(
 )
 
 # Hiển thị ứng dụng tương ứng
-if option == 'Ứng dụng 1':
+if option == 'GrapCut':
     run_app1()  # Gọi hàm chạy ứng dụng 1
-elif option == 'Ứng dụng 3':
+elif option == ' Face Verification':
     run_app3()  # Gọi hàm chạy ứng dụng 3
 elif option == 'Ứng dụng 4':
     run_app4()  # Gọi hàm chạy ứng dụng 4
