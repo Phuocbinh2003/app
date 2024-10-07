@@ -64,7 +64,7 @@ def get_image_with_canvas(image, target_width=800):
             isDrawing = false;
             const endX = e.offsetX;
             const endY = e.offsetY;
-            const rectinfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
+            const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
@@ -85,8 +85,8 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
         # Kiểm tra thông tin hình chữ nhật từ session_state
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state.rect_info
+        if 'rectInfo' in st.session_state:
+            rectInfo = st.session_state.rect_info
             if rect_info is not None:
                 match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
                 if match:
