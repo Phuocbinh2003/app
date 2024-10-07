@@ -102,8 +102,8 @@ def run_app1():
 
                 # Lưu trữ hình chữ nhật vào đối tượng GrabCutData
                 grabcut_data.set_rectangle(rect)
-                
-                # Apply GrabCut
+
+                # Hiển thị nút Apply GrabCut nếu hình chữ nhật đã được xác định
                 if st.button("Apply GrabCut"):
                     output_image = processor.apply_grabcut(grabcut_data.rect)
                     st.image(output_image, channels="BGR", caption="GrabCut Output")
