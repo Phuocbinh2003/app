@@ -3,8 +3,24 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
-
 from grabcut_processor import GrabCutProcessor
+
+class GrabCutData:
+    def __init__(self):
+        self.rect = None
+        self.bg_model = None
+        self.fg_model = None
+
+    def set_rectangle(self, rect):
+        self.rect = rect
+
+    def clear(self):
+        self.rect = None
+        self.bg_model = None
+        self.fg_model = None
+
+# Tạo đối tượng GrabCutData
+grabcut_data = GrabCutData()
 
 def get_image_with_canvas(image, target_width=800):
     """Return HTML for the image with a canvas overlay for drawing."""
@@ -66,7 +82,6 @@ def run_app1():
     # Upload image
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
     if uploaded_file is not None:
-        # Read image
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
         
@@ -84,55 +99,14 @@ def run_app1():
                 w = int(match.group(3))
                 h = int(match.group(4))
                 rect = (x, y, w, h)
+
+                # Lưu trữ hình chữ nhật vào đối tượng GrabCutData
+                grabcut_data.set_rectangle(rect)
                 
                 # Apply GrabCut
                 if st.button("Apply GrabCut"):
-                    output_image = processor.apply_grabcut(rect)
+                    output_image = processor.apply_grabcut(grabcut_data.rect)
                     st.image(output_image, channels="BGR", caption="GrabCut Output")
-
-# Main function to run the application
-if __name__ == "__main__":
-    run_app1()
-
-
-
-
-def run_app1():
-    st.title("GrabCut Application")
-    
-    # Upload image
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
-    if uploaded_file is not None:
-        # Read image
-        image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv.IMREAD_COLOR)
-        processor = GrabCutProcessor(image)
-        
-        # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy, target_height=400), height=500)
-
-        # Listen for rectangle drawn event
-        if 'rect_info' in st.session_state and st.session_state.rect_info is not None:
-            rect_info = st.session_state.rect_info
-            st.session_state.rect_info = None  # Reset after reading
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
-                
-                # Apply GrabCut
-                if st.button("Apply GrabCut"):
-                    output_image = processor.apply_grabcut(rect)
-                    st.image(output_image, channels="BGR", caption="GrabCut Output")
-                    st.session_state.rect_info = None  # Reset after processing
-        else:
-            st.warning("Vui lòng vẽ hình chữ nhật trước khi nhấn 'Apply GrabCut'.")
-
-# Main function to run the application
-if __name__ == "__main__":
-    run_app1()
 
 # Main function to run the application
 if __name__ == "__main__":
