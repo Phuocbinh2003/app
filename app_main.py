@@ -12,7 +12,7 @@ option = st.sidebar.selectbox(
 # Hiển thị ứng dụng tương ứng
 if option == 'GrapCut':
     run_app1()  # Gọi hàm chạy ứng dụng 1
-elif option == ' Face_Verification':
+elif option == 'Face_Verification':
     run_app3()  # Gọi hàm chạy ứng dụng 3
 elif option == 'Update_firebase':
     run_app4()  # Gọi hàm chạy ứng dụng 4
