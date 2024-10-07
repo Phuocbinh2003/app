@@ -4,14 +4,13 @@ import numpy as np
 from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
-from streamlit_js_eval import streamlit_js_eval  # Import thư viện mới
+from streamlit_javascript import st_javascript
 
-# Hàm xử lý tin nhắn từ JavaScript
-def handle_js_messages():
-    if 'rect_data' in st.session_state:
-        st.write("Received rect_data:", st.session_state["rect_data"])  # Kiểm tra tin nhắn nhận từ JS
-    else:
-        st.write("No rect_data yet")
+# Hàm để mã hóa hình ảnh thành base64
+def convert_image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
 
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
@@ -111,9 +110,8 @@ def run_app1():
                         const rect = {{ x: startX, y: startY, width: width, height: height }};
                         hasDrawnRectangle = true;
 
-                        // Gửi thông điệp tới Streamlit
-                        const rect_data = JSON.stringify(rect);
-                        streamlitMessage(rect_data);  // Gọi hàm streamlitMessage để gửi dữ liệu
+                        // Gửi dữ liệu trực tiếp đến Streamlit
+                        window.parent.postMessage({{ type: 'rect_data', rect }}, '*');
                     }}
                 }});
 
@@ -122,11 +120,6 @@ def run_app1():
                         event.preventDefault();
                     }}
                 }});
-
-                // Hàm gửi dữ liệu đến Streamlit
-                function streamlitMessage(data) {{
-                    window.parent.postMessage({{ type: 'streamlit:message', data }}, '*');
-                }}
             </script>
         </body>
         </html>
@@ -135,19 +128,19 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Nhận thông điệp từ JavaScript qua streamlit_js_eval
-        streamlit_js_eval(js_code="""
+        # Nhận thông điệp từ JavaScript qua st_javascript
+        rect_data_js = st_javascript("""
             window.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'streamlit:message') {
-                    const rectData = JSON.parse(event.data.data);
-                    Streamlit.setComponentValue(rectData);  // Gửi dữ liệu về phía Python
+                if (event.data && event.data.type === 'rect_data') {
+                    const rectData = event.data.rect;
+                    Streamlit.setComponentValue(rectData);
                 }
             });
-        """, key="rect_data_js", default=None)
+        """)
 
-        # Nhận dữ liệu từ Streamlit và lưu vào session_state
-        if 'rect_data' in st.session_state:
-            rect_data = st.session_state["rect_data"]
+        # Kiểm tra và xử lý dữ liệu từ JavaScript
+        if rect_data_js:
+            rect_data = rect_data_js
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
@@ -157,11 +150,11 @@ def run_app1():
             # Hiển thị thông tin về hình chữ nhật
             st.write(f"Tọa độ hình chữ nhật: (x: {x}, y: {y}), kích thước: {width}x{height}")
         else:
-            st.write("rect_data is None")  # Thông báo nếu không có dữ liệu
+            st.write("Vui lòng vẽ một hình chữ nhật")
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if 'rect_data' in st.session_state:
+            if rect_data_js:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
@@ -176,15 +169,6 @@ def run_app1():
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
-# Hàm để mã hóa hình ảnh thành base64
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
-
 # Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_data' not in st.session_state:
-        st.session_state.rect_data = None
-
     run_app1()
