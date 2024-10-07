@@ -71,9 +71,6 @@ def get_image_with_canvas(image, target_width=800):
             const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
-
-            // In ra vị trí hình chữ nhật
-            console.log('Vị trí hình chữ nhật:', rectInfo);
         }});
     </script>
     """
@@ -91,7 +88,7 @@ def run_app1():
         # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Hiển thị thông tin hình chữ nhật
+        # Kiểm tra thông tin hình chữ nhật từ session_state
         if 'rect_info' in st.session_state:
             rect_info = st.session_state.rect_info
             if rect_info is not None:
