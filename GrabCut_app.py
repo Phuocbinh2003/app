@@ -64,7 +64,7 @@ def get_image_with_canvas(image, target_width=800):
             isDrawing = false;
             const endX = e.offsetX;
             const endY = e.offsetY;
-            const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
+            const rectinfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
