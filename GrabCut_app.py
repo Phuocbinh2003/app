@@ -5,6 +5,7 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
+# Xử lý tin nhắn từ JavaScript (với postMessage)
 def handle_js_messages():
     message = st.experimental_get_query_params()
     if "rect_data" in message:
@@ -64,10 +65,6 @@ def run_app1():
                     left: 0;
                     z-index: 0; 
                 }}
-                .rect-info {{
-                    margin-top: 10px; 
-                    font-size: 16px; 
-                }}
             </style>
         </head>
         <body>
@@ -75,12 +72,10 @@ def run_app1():
                 <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
                 <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
-            <div class="rect-info" id="rectInfo"></div>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
                 const img = document.getElementById('originalImage');
-                const rectInfoDiv = document.getElementById('rectInfo');
 
                 let drawing = false;
                 let startX, startY;
@@ -103,37 +98,18 @@ def run_app1():
                         const width = Math.abs(startX - endX);
                         const height = Math.abs(startY - endY);
                         
-                        const rect = {{ 
-                            x: Math.min(startX, endX), 
-                            y: Math.min(startY, endY), 
-                            width: width, 
-                            height: height 
-                        }};
-
                         ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                        ctx.rect(rect.x, rect.y, rect.width, rect.height); 
+                        ctx.rect(startX, startY, width, height); 
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
+                        const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
                         hasDrawnRectangle = true;
-
-                        // Lưu thông tin hình chữ nhật vào sessionStorage
-                        sessionStorage.setItem('rect_data', JSON.stringify(rect));
-
-                        // Hiển thị thông tin vị trí hình chữ nhật
-                        rectInfoDiv.innerHTML = `Hình chữ nhật: X: ${{
-                            rect.x
-                        }}, Y: ${{
-                            rect.y
-                        }}, Width: ${{
-                            rect.width
-                        }}, Height: ${{
-                            rect.height
-                        }}`;
-
-                        // Gửi thông tin hình chữ nhật về Python
                         window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+
+                        // Hiển thị thông tin hình chữ nhật trong console
+                        console.log("Rectangle Data: ", rect);
                     }}
                 }});
 
@@ -158,7 +134,7 @@ def run_app1():
         handle_js_messages()
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state.rect_data is not None:
+        if st.session_state.rect_data:
             rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
             y = int(rect_data["y"])
@@ -177,10 +153,10 @@ def run_app1():
 
         # Hướng dẫn sử dụng
         st.markdown(""" 
-        ## Hướng dẫn sử dụng
-        1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
-        2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt.
-        3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
+        ## Hướng dẫn sử dụng 
+        1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái. 
+        2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt. 
+        3. Nhấn nút "Áp dụng GrabCut" để cắt nền. 
         """)
 
 # Hàm để mã hóa hình ảnh thành base64
