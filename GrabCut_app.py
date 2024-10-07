@@ -5,12 +5,6 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
-# Xử lý tin nhắn từ JavaScript (với postMessage)
-def handle_js_messages():
-    message = st.experimental_get_query_params()
-    if "rect_data" in message:
-        st.session_state.rect_data = message["rect_data"]
-
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
@@ -79,7 +73,7 @@ def run_app1():
 
                 let drawing = false;
                 let startX, startY;
-                let hasDrawnRectangle = false; 
+                let hasDrawnRectangle = false;
 
                 canvas.addEventListener('mousedown', (event) => {{
                     if (event.button === 0 && !hasDrawnRectangle) {{
@@ -87,7 +81,6 @@ def run_app1():
                         startX = event.offsetX;
                         startY = event.offsetY;
                     }}
-                    event.preventDefault();
                 }});
 
                 canvas.addEventListener('mouseup', (event) => {{
@@ -106,18 +99,18 @@ def run_app1():
 
                         const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
                         hasDrawnRectangle = true;
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
-
-                        // Hiển thị thông tin hình chữ nhật trong console
-                        console.log("Rectangle Data: ", rect);
+                        
+                        // Lưu vào localStorage
+                        localStorage.setItem('rect_data', JSON.stringify(rect));
                     }}
                 }});
 
-                canvas.addEventListener('mousemove', (event) => {{
-                    if (drawing) {{
-                        event.preventDefault();
-                    }}
-                }});
+                // Kiểm tra localStorage để lấy dữ liệu hình chữ nhật
+                const savedRectData = localStorage.getItem('rect_data');
+                if (savedRectData) {{
+                    const rect = JSON.parse(savedRectData);
+                    console.log("Saved Rectangle Data: ", rect);
+                }}
             </script>
         </body>
         </html>
@@ -126,30 +119,27 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
-        if 'rect_data' not in st.session_state:
-            st.session_state.rect_data = None
+        # Khởi tạo bộ xử lý GrabCut
+        if uploaded_file is not None:
+            # Kiểm tra dữ liệu hình chữ nhật trong localStorage
+            rect_data = st.session_state.get("rect_data", None)
 
-        # Nhận thông điệp từ JavaScript
-        handle_js_messages()
+            if st.button("Áp dụng GrabCut"):
+                # Lấy dữ liệu hình chữ nhật từ localStorage
+                if st.session_state.rect_data:
+                    rect_data = st.session_state.rect_data
+                    x = int(rect_data["x"])
+                    y = int(rect_data["y"])
+                    width = int(rect_data["width"])
+                    height = int(rect_data["height"])
+                    grabcut_processor.rect = (x, y, width, height)
 
-        # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state.rect_data:
-            rect_data = st.session_state.rect_data
-            x = int(rect_data["x"])
-            y = int(rect_data["y"])
-            width = int(rect_data["width"])
-            height = int(rect_data["height"])
-            grabcut_processor.rect = (x, y, width, height)
-
-        # Hiển thị nút để áp dụng GrabCut
-        if st.button("Áp dụng GrabCut"):
-            if st.session_state.rect_data:
-                grabcut_processor.apply_grabcut()
-                output_image = grabcut_processor.get_output_image()
-                st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
-            else:
-                st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
+                    # Áp dụng GrabCut
+                    grabcut_processor.apply_grabcut()
+                    output_image = grabcut_processor.get_output_image()
+                    st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
+                else:
+                    st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
         st.markdown(""" 
@@ -167,7 +157,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_data' not in st.session_state:
-        st.session_state.rect_data = None
-
     run_app1()
