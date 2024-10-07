@@ -4,13 +4,13 @@ import numpy as np
 from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
-from streamlit_javascript import st_javascript
 
-# Hàm để mã hóa hình ảnh thành base64
-def convert_image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
+# Hàm xử lý tin nhắn từ JavaScript (với postMessage)
+def handle_js_messages():
+    if 'rect_data' in st.session_state:
+        rect_data = st.session_state['rect_data']
+        return rect_data
+    return None
 
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
@@ -29,7 +29,7 @@ def run_app1():
         # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
 
-        # HTML và CSS cho việc vẽ hình chữ nhật
+        # HTML và CSS cho việc vẽ
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -82,7 +82,6 @@ def run_app1():
                 let startX, startY;
                 let hasDrawnRectangle = false; 
 
-                // Bắt đầu vẽ hình chữ nhật khi nhấn chuột
                 canvas.addEventListener('mousedown', (event) => {{
                     if (event.button === 0 && !hasDrawnRectangle) {{
                         drawing = true;
@@ -92,26 +91,25 @@ def run_app1():
                     event.preventDefault();
                 }});
 
-                // Kết thúc vẽ hình chữ nhật khi thả chuột
                 canvas.addEventListener('mouseup', (event) => {{
                     if (drawing) {{
                         drawing = false;
                         const endX = event.offsetX;
                         const endY = event.offsetY;
-                        const width = endX - startX;
-                        const height = endY - startY;
-
+                        const width = Math.abs(endX - startX);
+                        const height = Math.abs(endY - startY);
+                        
                         ctx.clearRect(0, 0, canvas.width, canvas.height); 
                         ctx.rect(startX, startY, width, height); 
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
-                        const rect = {{ x: startX, y: startY, width: width, height: height }};
+                        const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
                         hasDrawnRectangle = true;
 
-                        // Trả về kết quả qua setComponentValue của Streamlit
-                        Streamlit.setComponentValue(rect);
+                        console.log("Rect data: ", rect); // Kiểm tra xem dữ liệu có đúng không
+                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
                     }}
                 }});
 
@@ -128,30 +126,27 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Nhận thông tin rect_data từ JavaScript
-        rect_data = st_javascript("""
-            window.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'rect_data') {
-                    const rectData = event.data.rect;
-                    Streamlit.setComponentValue(rectData);
-                }
-            });
-        """)
+        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
+        if 'rect_data' not in st.session_state:
+            st.session_state.rect_data = None
 
-        # Hiển thị kết quả hình chữ nhật được vẽ
-        if rect_data:
+        # Nhận thông điệp từ JavaScript
+        if st.session_state.rect_data is None:
+            # Chờ nhận dữ liệu
+            st.session_state.rect_data = st.empty()
+
+        # Xử lý dữ liệu hình chữ nhật từ JavaScript
+        if st.session_state.rect_data:
+            rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
-            st.write(f"Tọa độ hình chữ nhật: (x: {x}, y: {y}), kích thước: {width}x{height}")
-        else:
-            st.write("Vui lòng vẽ một hình chữ nhật")
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if rect_data:
+            if st.session_state.rect_data is not None:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
@@ -159,13 +154,22 @@ def run_app1():
                 st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
-        st.markdown("""
+        st.markdown("""        
         ## Hướng dẫn sử dụng
         1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
         2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt.
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
-# Chạy ứng dụng
+# Hàm để mã hóa hình ảnh thành base64
+def convert_image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
+
+# Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
+    if 'rect_data' not in st.session_state:
+        st.session_state.rect_data = None
+
     run_app1()
