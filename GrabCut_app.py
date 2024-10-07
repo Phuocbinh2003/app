@@ -8,16 +8,12 @@ from grabcut_processor import GrabCutProcessor
 class GrabCutData:
     def __init__(self):
         self.rect = None
-        self.bg_model = None
-        self.fg_model = None
 
     def set_rectangle(self, rect):
         self.rect = rect
 
     def clear(self):
         self.rect = None
-        self.bg_model = None
-        self.fg_model = None
 
 # Tạo đối tượng GrabCutData
 grabcut_data = GrabCutData()
@@ -104,6 +100,7 @@ def run_app1():
                     grabcut_data.set_rectangle(rect)
 
                     # Hiển thị thông tin hình chữ nhật
+                    st.success("Thông tin hình chữ nhật đã được đọc thành công!")
                     st.write("Thông tin hình chữ nhật:")
                     st.write(f"- X: {x}")
                     st.write(f"- Y: {y}")
@@ -114,6 +111,10 @@ def run_app1():
                     if st.button("Apply GrabCut"):
                         output_image = processor.apply_grabcut(grabcut_data.rect)
                         st.image(output_image, channels="BGR", caption="GrabCut Output")
+                else:
+                    st.error("Không thể đọc thông tin hình chữ nhật!")
+            else:
+                st.warning("Chưa có thông tin hình chữ nhật.")
 
         # Reset rectangle info after reading
         st.session_state.rect_info = None
