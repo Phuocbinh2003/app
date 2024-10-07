@@ -14,7 +14,7 @@ if option == 'GrapCut':
     run_app1()  # Gọi hàm chạy ứng dụng 1
 elif option == ' Face Verification':
     run_app3()  # Gọi hàm chạy ứng dụng 3
-elif option == 'Ứng dụng 4':
+elif option == 'Update_firebase':
     run_app4()  # Gọi hàm chạy ứng dụng 4
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
