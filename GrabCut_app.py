@@ -110,8 +110,8 @@ def run_app1():
                         const rect = {{ x: startX, y: startY, width: width, height: height }};
                         hasDrawnRectangle = true;
 
-                        // Gửi dữ liệu trực tiếp đến Streamlit
-                        window.parent.postMessage({{ type: 'rect_data', rect }}, '*');
+                        // Trả về kết quả qua setComponentValue của Streamlit
+                        Streamlit.setComponentValue(rect);
                     }}
                 }});
 
@@ -128,8 +128,8 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Nhận thông điệp từ JavaScript qua st_javascript
-        rect_data_js = st_javascript("""
+        # Nhận thông tin rect_data từ JavaScript
+        rect_data = st_javascript("""
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'rect_data') {
                     const rectData = event.data.rect;
@@ -138,23 +138,20 @@ def run_app1():
             });
         """)
 
-        # Kiểm tra và xử lý dữ liệu từ JavaScript
-        if rect_data_js:
-            rect_data = rect_data_js
+        # Hiển thị kết quả hình chữ nhật được vẽ
+        if rect_data:
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
-
-            # Hiển thị thông tin về hình chữ nhật
             st.write(f"Tọa độ hình chữ nhật: (x: {x}, y: {y}), kích thước: {width}x{height}")
         else:
             st.write("Vui lòng vẽ một hình chữ nhật")
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if rect_data_js:
+            if rect_data:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
