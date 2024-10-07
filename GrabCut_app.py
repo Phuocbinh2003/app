@@ -141,6 +141,9 @@ def run_app1():
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
 
+            # Hiển thị thông tin hình chữ nhật
+            st.write(f"Tọa độ hình chữ nhật: (x: {x}, y: {y}), kích thước: {width}x{height}")
+
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
             if st.session_state.rect_data:
