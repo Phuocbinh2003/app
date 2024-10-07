@@ -6,30 +6,19 @@ import base64
 import json
 from grabcut_processor import GrabCutProcessor
 
-# Xử lý tin nhắn từ JavaScript (với postMessage)
-def handle_js_messages():
-    message = st.experimental_get_query_params()
-    if "rect_data" in message:
-        st.session_state.rect_data = json.loads(message["rect_data"][0])  # Chuyển đổi từ chuỗi JSON
-
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
-    # Thanh bên để tải lên hình ảnh
     uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        # Đọc hình ảnh
         image = Image.open(uploaded_file)
         image_np = np.array(image)
 
-        # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
 
-        # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
 
-        # HTML và CSS cho việc vẽ
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -102,23 +91,22 @@ def run_app1():
                         const rectWidth = Math.abs(startX - endX);
                         const rectHeight = Math.abs(startY - endY);
 
-                        // Đảm bảo hình chữ nhật nằm trong canvas
                         const x = Math.max(0, Math.min(rectX, canvas.width - 1));
                         const y = Math.max(0, Math.min(rectY, canvas.height - 1));
                         const width = Math.min(rectWidth, canvas.width - x);
                         const height = Math.min(rectHeight, canvas.height - y);
 
-                        // Vẽ hình chữ nhật
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                        ctx.rect(x, y, width, height); 
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.rect(x, y, width, height);
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
-                        // Gửi dữ liệu hình chữ nhật về Streamlit
                         const rect = {{ x: x, y: y, width: width, height: height }};
                         hasDrawnRectangle = true;
+                        // Gửi dữ liệu hình chữ nhật về Streamlit
                         window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+                        console.log("Rectangle data sent:", rect); // Ghi thông tin hình chữ nhật ra console
                     }}
                 }});
 
@@ -140,9 +128,6 @@ def run_app1():
             st.session_state.rect_data = None
 
         # Nhận thông điệp từ JavaScript
-        handle_js_messages()
-
-        # Xử lý dữ liệu hình chữ nhật từ JavaScript
         if st.session_state.get("rect_data"):
             rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
@@ -150,6 +135,14 @@ def run_app1():
             width = int(rect_data["width"])
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
+
+        # Xử lý sự kiện từ JavaScript
+        if "rect_data" in st.session_state:
+            # Kiểm tra xem có dữ liệu hình chữ nhật không
+            rect_data = st.session_state.rect_data
+            if rect_data:
+                st.success(f"Dữ liệu hình chữ nhật: {rect_data}")  # Hiển thị dữ liệu hình chữ nhật trên Streamlit
+                grabcut_processor.rect = (rect_data["x"], rect_data["y"], rect_data["width"], rect_data["height"])
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
