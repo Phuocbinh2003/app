@@ -3,12 +3,8 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
+import re
 from grabcut_processor import GrabCutProcessor
-
-def handle_js_messages():
-    message = st.experimental_get_query_params()
-    if "rect_data" in message:
-        st.session_state.rect_data = message["rect_data"]
 
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
@@ -118,9 +114,6 @@ def run_app1():
 
                         hasDrawnRectangle = true;
 
-                        // Lưu thông tin hình chữ nhật vào sessionStorage
-                        sessionStorage.setItem('rect_data', JSON.stringify(rect));
-
                         // Hiển thị thông tin vị trí hình chữ nhật
                         rectInfoDiv.innerHTML = `Hình chữ nhật: X: ${{
                             rect.x
@@ -131,9 +124,6 @@ def run_app1():
                         }}, Height: ${{
                             rect.height
                         }}`;
-
-                        // Gửi thông tin hình chữ nhật về Python
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
                     }}
                 }});
 
@@ -150,30 +140,24 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
-        if 'rect_data' not in st.session_state:
-            st.session_state.rect_data = None
-
-        # Nhận thông điệp từ JavaScript
-        handle_js_messages()
-
-        # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state.rect_data is not None:
-            rect_data = json.loads(st.session_state.rect_data)
-            x = int(rect_data["x"])
-            y = int(rect_data["y"])
-            width = int(rect_data["width"])
-            height = int(rect_data["height"])
-            grabcut_processor.rect = (x, y, width, height)
-
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if st.session_state.rect_data:
+            # Trích xuất thông tin hình chữ nhật từ HTML
+            rect_info = st.components.v1.html(drawing_html, height=img_height + 50)
+            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+            if match:
+                x = int(match.group(1))
+                y = int(match.group(2))
+                width = int(match.group(3))
+                height = int(match.group(4))
+                grabcut_processor.rect = (x, y, width, height)
+
+                # Áp dụng GrabCut
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
             else:
-                st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
+                st.warning("Không tìm thấy dữ liệu hình chữ nhật. Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
         st.markdown(""" 
@@ -191,7 +175,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_data' not in st.session_state:
-        st.session_state.rect_data = None
-
     run_app1()
