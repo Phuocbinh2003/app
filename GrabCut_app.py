@@ -5,24 +5,29 @@ import base64
 
 from grabcut_processor  import GrabCutProcessor
 
-def get_image_with_canvas(image):
+def get_image_with_canvas(image, target_width=800):
     """Return HTML for the image with a canvas overlay for drawing."""
     # Encode image as base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
-    
+
+    # Tính toán tỷ lệ kích thước mới
+    height, width = image.shape[:2]
+    aspect_ratio = height / width
+    target_height = int(target_width * aspect_ratio)
+
     # HTML for the canvas
     html = f"""
     <div style="position: relative;">
-        <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%;"/>
-        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: 100%;"></canvas>
+        <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
+        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: {target_width}px; height: {target_height}px;"></canvas>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const img = document.getElementById('image');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = {target_width};
+        canvas.height = {target_height};
 
         let startX, startY, isDrawing = false;
 
@@ -35,7 +40,7 @@ def get_image_with_canvas(image):
         canvas.addEventListener('mousemove', function(e) {{
             if (isDrawing) {{
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
+                ctx.drawImage(img, 0, 0, {target_width}, {target_height});
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 3;
                 ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
@@ -53,6 +58,7 @@ def get_image_with_canvas(image):
     </script>
     """
     return html
+
 
 
 def run_app1():
