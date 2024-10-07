@@ -6,16 +6,16 @@ import re
 
 from grabcut_processor import GrabCutProcessor
 
-def get_image_with_canvas(image, target_height=400):
+def get_image_with_canvas(image, target_width=800):
     """Return HTML for the image with a canvas overlay for drawing."""
     # Encode image as base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Calculate new width based on target height
+    # Tính toán tỷ lệ kích thước mới
     height, width = image.shape[:2]
-    aspect_ratio = width / height
-    target_width = int(target_height * aspect_ratio)
+    aspect_ratio = height / width
+    target_height = int(target_width * aspect_ratio)
 
     # HTML for the canvas
     html = f"""
@@ -59,6 +59,7 @@ def get_image_with_canvas(image, target_height=400):
     </script>
     """
     return html
+
 
 
 def run_app1():
