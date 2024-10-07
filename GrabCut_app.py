@@ -3,15 +3,19 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
+import json
 from grabcut_processor import GrabCutProcessor
 
 # Hàm xử lý tin nhắn từ JavaScript (với postMessage)
 def handle_js_messages():
     message = st.experimental_get_query_params()
     if "rect_data" in message:
-        # Chuyển đổi dữ liệu từ chuỗi JSON sang dict
-        rect_data = json.loads(message["rect_data"][0])
-        return rect_data
+        try:
+            # Chuyển đổi dữ liệu từ chuỗi JSON sang dict
+            rect_data = json.loads(message["rect_data"][0])
+            return rect_data
+        except json.JSONDecodeError:
+            st.warning("Không thể giải mã dữ liệu hình chữ nhật.")
     return None
 
 def run_app1():
@@ -111,7 +115,8 @@ def run_app1():
                         hasDrawnRectangle = true;
 
                         // Gửi dữ liệu về Python qua URL query parameter
-                        window.location.href = window.location.pathname + "?rect_data=" + JSON.stringify(rect);
+                        const rectData = encodeURIComponent(JSON.stringify(rect));
+                        window.location.href = window.location.pathname + "?rect_data=" + rectData;
                     }}
                 }});
 
@@ -130,6 +135,9 @@ def run_app1():
 
         # Nhận thông điệp từ JavaScript
         rect_data = handle_js_messages()
+
+        # Kiểm tra và hiển thị rect_data
+        st.write("Dữ liệu hình chữ nhật:", rect_data)
 
         # Nếu có dữ liệu hình chữ nhật
         if rect_data is not None:
