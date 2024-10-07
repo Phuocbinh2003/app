@@ -2,8 +2,9 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
+import re
 
-from grabcut_processor  import GrabCutProcessor
+from grabcut_processor import GrabCutProcessor
 
 def get_image_with_canvas(image, target_width=800):
     """Return HTML for the image with a canvas overlay for drawing."""
@@ -11,7 +12,7 @@ def get_image_with_canvas(image, target_width=800):
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Tính toán tỷ lệ kích thước mới
+    # Calculate new size ratio
     height, width = image.shape[:2]
     aspect_ratio = height / width
     target_height = int(target_width * aspect_ratio)
@@ -59,8 +60,6 @@ def get_image_with_canvas(image, target_width=800):
     """
     return html
 
-
-
 def run_app1():
     st.title("GrabCut Application")
     
@@ -68,14 +67,28 @@ def run_app1():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
     if uploaded_file is not None:
         # Read image
-        image = cv.imdecode(np.fromstring(uploaded_file.read(), np.uint8), 1)
-        processor = GrabCutProcessor(image)
+        file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
+        image = cv.imdecode(file_bytes, cv.IMREAD_COLOR)
+
+        # Resize the image to keep the aspect ratio
+        height, width = image.shape[:2]
+        aspect_ratio = height / width
+        target_width = 800
+        target_height = int(target_width * aspect_ratio)
+        resized_image = cv.resize(image, (target_width, target_height), interpolation=cv.INTER_AREA)
+
+        # Initialize GrabCutProcessor
+        processor = GrabCutProcessor(resized_image)
         
         # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
         # Listen for rectangle drawn event
-        if st.session_state.get('rect_info') is not None:
+        if 'rect_info' not in st.session_state:
+            st.session_state.rect_info = None
+
+        # Event listener for rectangle drawn
+        if st.session_state.rect_info is not None:
             rect_info = st.session_state.rect_info
             st.session_state.rect_info = None  # Reset after reading
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
@@ -90,8 +103,6 @@ def run_app1():
                 if st.button("Apply GrabCut"):
                     output_image = processor.apply_grabcut(rect)
                     st.image(output_image, channels="BGR", caption="GrabCut Output")
-
-        # Add other functionality as needed...
 
 # Main function to run the application
 if __name__ == "__main__":
