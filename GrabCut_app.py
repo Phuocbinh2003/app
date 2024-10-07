@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
+import json
 from grabcut_processor import GrabCutProcessor
 
 def run_app1():
@@ -18,10 +19,6 @@ def run_app1():
 
         # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
-
-        # Lưu trữ thông tin hình chữ nhật trong biến trạng thái
-        if 'rect' not in st.session_state:
-            st.session_state.rect = None
 
         # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
@@ -75,15 +72,18 @@ def run_app1():
                 <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
             <div class="rect-info" id="rectInfo"></div>
+            <button id="submitRect" style="margin-top: 10px;">Gửi hình chữ nhật</button>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
                 const img = document.getElementById('originalImage');
                 const rectInfoDiv = document.getElementById('rectInfo');
+                const submitButton = document.getElementById('submitRect');
 
                 let drawing = false;
                 let startX, startY;
                 let hasDrawnRectangle = false; 
+                let rectangleData = {};
 
                 canvas.addEventListener('mousedown', (event) => {{
                     if (event.button === 0 && !hasDrawnRectangle) {{
@@ -128,18 +128,18 @@ def run_app1():
                             rect.height
                         }}`;
 
-                        // Gửi thông tin hình chữ nhật về server
-                        window.parent.document.getElementById('rectData').value = JSON.stringify(rect);
+                        rectangleData = rect; // Lưu dữ liệu hình chữ nhật
                     }}
                 }});
 
-                canvas.addEventListener('mousemove', (event) => {{
-                    if (drawing) {{
-                        event.preventDefault();
+                submitButton.addEventListener('click', () => {{
+                    if (hasDrawnRectangle) {{
+                        // Gửi dữ liệu hình chữ nhật về Python
+                        const rectangleJson = JSON.stringify(rectangleData);
+                        window.parent.postMessage({{ type: 'sendRect', data: rectangleJson }}, '*');
                     }}
                 }});
             </script>
-            <input type="hidden" id="rectData" />
         </body>
         </html>
         """
@@ -147,27 +147,28 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
+        # Đợi nhận thông điệp từ JavaScript
+        msg = st.session_state.get('msg')
+        if msg and msg['type'] == 'sendRect':
+            rect_info = msg['data']
+            rect_data = json.loads(rect_info)
+
+            # Lấy thông tin hình chữ nhật
+            x = rect_data['x']
+            y = rect_data['y']
+            width = rect_data['width']
+            height = rect_data['height']
+            grabcut_processor.rect = (x, y, width, height)
+
+            # Áp dụng GrabCut
+            grabcut_processor.apply_grabcut()
+            output_image = grabcut_processor.get_output_image()
+            st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
+
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            # Truy xuất dữ liệu hình chữ nhật từ hidden input
-            rect_data = st.text_input("rectData", "")
-            if rect_data:
-                rect = json.loads(rect_data)  # Chuyển đổi từ chuỗi JSON
-                x = rect['x']
-                y = rect['y']
-                width = rect['width']
-                height = rect['height']
-                st.session_state.rect = (x, y, width, height)
-
-                # Cập nhật cho GrabCut
-                grabcut_processor.rect = (x, y, width, height)
-
-                # Áp dụng GrabCut
-                grabcut_processor.apply_grabcut()
-                output_image = grabcut_processor.get_output_image()
-                st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
-            else:
-                st.warning("Không tìm thấy dữ liệu hình chữ nhật. Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
+            if not hasDrawnRectangle:
+                st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
         st.markdown(""" 
