@@ -187,3 +187,4 @@ def convert_image_to_base64(image):
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
     run_app1()
+
