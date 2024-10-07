@@ -1,7 +1,7 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-from GrabCutProcessor import GrabCutProcessor
+from grabcut_processor import GrabCutProcessor
 
 def run_app1():
     st.title("GrabCut Application")
