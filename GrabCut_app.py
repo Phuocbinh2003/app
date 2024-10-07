@@ -3,22 +3,32 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
-import json
 from grabcut_processor import GrabCutProcessor
+
+# Xử lý tin nhắn từ JavaScript (với postMessage)
+def handle_js_messages():
+    message = st.experimental_get_query_params()
+    if "rect_data" in message:
+        st.session_state.rect_data = message["rect_data"]
 
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
+    # Thanh bên để tải lên hình ảnh
     uploaded_file = st.sidebar.file_uploader("Chọn hình ảnh", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
+        # Đọc hình ảnh
         image = Image.open(uploaded_file)
         image_np = np.array(image)
 
+        # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
 
+        # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
 
+        # HTML và CSS cho việc vẽ
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -71,50 +81,51 @@ def run_app1():
                 let startX, startY;
                 let hasDrawnRectangle = false; 
 
-                canvas.addEventListener('mousedown', (event) => {{
-                    if (event.button === 0 && !hasDrawnRectangle) {{
+                canvas.addEventListener('mousedown', (event) => {
+                    if (event.button === 0 && !hasDrawnRectangle) {
                         drawing = true;
                         startX = event.offsetX;
                         startY = event.offsetY;
-                    }}
+                    }
                     event.preventDefault();
-                }});
+                });
 
-                canvas.addEventListener('mouseup', (event) => {{
-                    if (drawing) {{
+                canvas.addEventListener('mouseup', (event) => {
+                    if (drawing) {
                         drawing = false;
                         const endX = event.offsetX;
                         const endY = event.offsetY;
+                        const width = Math.abs(startX - endX);
+                        const height = Math.abs(startY - endY);
+                        
+                        const rect = { 
+                            x: Math.min(startX, endX), 
+                            y: Math.min(startY, endY), 
+                            width: width, 
+                            height: height 
+                        };
 
-                        const rectX = Math.min(startX, endX);
-                        const rectY = Math.min(startY, endY);
-                        const rectWidth = Math.abs(startX - endX);
-                        const rectHeight = Math.abs(startY - endY);
-
-                        const x = Math.max(0, Math.min(rectX, canvas.width - 1));
-                        const y = Math.max(0, Math.min(rectY, canvas.height - 1));
-                        const width = Math.min(rectWidth, canvas.width - x);
-                        const height = Math.min(rectHeight, canvas.height - y);
-
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.rect(x, y, width, height);
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                        ctx.rect(rect.x, rect.y, rect.width, rect.height); 
                         ctx.strokeStyle = 'blue';
                         ctx.lineWidth = 2;
                         ctx.stroke();
 
-                        const rect = {{ x: x, y: y, width: width, height: height }};
                         hasDrawnRectangle = true;
-                        // Gửi dữ liệu hình chữ nhật về Streamlit
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
-                        console.log("Rectangle data sent:", rect); // Ghi thông tin hình chữ nhật ra console
-                    }}
-                }});
 
-                canvas.addEventListener('mousemove', (event) => {{
-                    if (drawing) {{
+                        // Gửi thông tin hình chữ nhật về Python
+                        window.parent.postMessage(JSON.stringify({ type: 'rect_data', rect }), '*');
+
+                        // Hiển thị thông tin vị trí hình chữ nhật
+                        alert(`Hình chữ nhật đã được vẽ:\nX: ${rect.x}\nY: ${rect.y}\nWidth: ${rect.width}\nHeight: ${rect.height}`);
+                    }
+                });
+
+                canvas.addEventListener('mousemove', (event) => {
+                    if (drawing) {
                         event.preventDefault();
-                    }}
-                }});
+                    }
+                });
             </script>
         </body>
         </html>
@@ -128,7 +139,10 @@ def run_app1():
             st.session_state.rect_data = None
 
         # Nhận thông điệp từ JavaScript
-        if st.session_state.get("rect_data"):
+        handle_js_messages()
+
+        # Xử lý dữ liệu hình chữ nhật từ JavaScript
+        if st.session_state.rect_data is not None:
             rect_data = st.session_state.rect_data
             x = int(rect_data["x"])
             y = int(rect_data["y"])
@@ -136,17 +150,9 @@ def run_app1():
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
 
-        # Xử lý sự kiện từ JavaScript
-        if "rect_data" in st.session_state:
-            # Kiểm tra xem có dữ liệu hình chữ nhật không
-            rect_data = st.session_state.rect_data
-            if rect_data:
-                st.success(f"Dữ liệu hình chữ nhật: {rect_data}")  # Hiển thị dữ liệu hình chữ nhật trên Streamlit
-                grabcut_processor.rect = (rect_data["x"], rect_data["y"], rect_data["width"], rect_data["height"])
-
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if st.session_state.get("rect_data"):
+            if st.session_state.rect_data:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
@@ -154,7 +160,8 @@ def run_app1():
                 st.warning("Vui lòng vẽ một hình chữ nhật trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
-        st.markdown("""## Hướng dẫn sử dụng
+        st.markdown(""" 
+        ## Hướng dẫn sử dụng
         1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
         2. Nhấn chuột trái để vẽ hình chữ nhật quanh đối tượng bạn muốn cắt.
         3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
