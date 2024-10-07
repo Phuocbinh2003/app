@@ -5,12 +5,15 @@ from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
 
-# Xử lý tin nhắn từ JavaScript (với postMessage)
+# Hàm để xử lý tin nhắn từ JavaScript (với postMessage)
 def handle_js_messages():
     message = st.experimental_get_query_params()
+    st.write("Received message:", message)  # Kiểm tra tin nhắn nhận được từ JavaScript
     if "rect_data" in message:
         st.session_state.rect_data = message["rect_data"]
+        st.write("Updated rect_data in session state:", st.session_state.rect_data)  # Kiểm tra giá trị lưu vào session_state
 
+# Hàm chính để chạy ứng dụng
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
@@ -28,7 +31,7 @@ def run_app1():
         # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
 
-        # HTML và CSS cho việc vẽ
+        # HTML và CSS cho việc vẽ hình chữ nhật
         drawing_html = f"""
         <!DOCTYPE html>
         <html>
@@ -129,11 +132,12 @@ def run_app1():
         if 'rect_data' not in st.session_state:
             st.session_state.rect_data = None
 
-        # Nhận thông điệp từ JavaScript
+        # Nhận thông điệp từ JavaScript và cập nhật session_state
         handle_js_messages()
 
         # Xử lý dữ liệu hình chữ nhật từ JavaScript
         if st.session_state["rect_data"] is not None:
+            st.write("rect_data exists:", st.session_state["rect_data"])  # Kiểm tra dữ liệu có tồn tại
             rect_data = st.session_state["rect_data"]
             x = int(rect_data["x"])
             y = int(rect_data["y"])
@@ -141,8 +145,10 @@ def run_app1():
             height = int(rect_data["height"])
             grabcut_processor.rect = (x, y, width, height)
 
-            # Hiển thị thông tin hình chữ nhật
+            # Hiển thị thông tin về hình chữ nhật
             st.write(f"Tọa độ hình chữ nhật: (x: {x}, y: {y}), kích thước: {width}x{height}")
+        else:
+            st.write("rect_data is None")  # Thông báo nếu không có dữ liệu
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
@@ -167,7 +173,7 @@ def convert_image_to_base64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
-# Bước 8: Chạy ứng dụng
+# Chạy ứng dụng
 if __name__ == "__main__":
     if 'rect_data' not in st.session_state:
         st.session_state.rect_data = None
