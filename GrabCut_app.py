@@ -44,8 +44,8 @@ def run_app1():
                 .canvas-container {{
                     position: relative; 
                     border: 1px solid black; 
-                    max-width: 100%; /* Giới hạn kích thước tối đa */
-                    height: auto; /* Chiều cao tự động điều chỉnh */
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                 }}
                 canvas {{
                     cursor: crosshair;
@@ -58,8 +58,8 @@ def run_app1():
                     z-index: 1; 
                 }}
                 img {{
-                    max-width: 100%; /* Giới hạn chiều rộng tối đa của hình ảnh */
-                    height: auto; /* Chiều cao tự động điều chỉnh */
+                    width: {img_width}px; 
+                    height: {img_height}px; 
                     position: absolute; 
                     top: 0;
                     left: 0;
@@ -151,11 +151,11 @@ def run_app1():
                 st.warning("Vui lòng vẽ một hình vuông trước khi áp dụng GrabCut.")
 
         # Hướng dẫn sử dụng
-        st.markdown(""" 
-        ## Hướng dẫn sử dụng 
-        1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái. 
-        2. Nhấn chuột trái để vẽ hình vuông quanh đối tượng bạn muốn cắt. 
-        3. Nhấn nút "Áp dụng GrabCut" để cắt nền. 
+        st.markdown("""
+        ## Hướng dẫn sử dụng
+        1. Tải lên một hình ảnh bằng cách sử dụng menu ở bên trái.
+        2. Nhấn chuột trái để vẽ hình vuông quanh đối tượng bạn muốn cắt.
+        3. Nhấn nút "Áp dụng GrabCut" để cắt nền.
         """)
 
 # Hàm để mã hóa hình ảnh thành base64
@@ -166,4 +166,7 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
+    if 'rect_data' not in st.session_state:
+        st.session_state.rect_data = None
+
     run_app1()
