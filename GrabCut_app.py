@@ -4,22 +4,15 @@ import numpy as np
 from io import BytesIO
 import base64
 from grabcut_processor import GrabCutProcessor
+from streamlit_js_eval import streamlit_js_eval  # Import thư viện mới
 
-# Hàm xử lý tin nhắn từ JavaScript (với postMessage)
+# Hàm xử lý tin nhắn từ JavaScript
 def handle_js_messages():
-    message = st.experimental_get_query_params()
-    st.write("Received message:", message)  # Kiểm tra tin nhắn nhận từ JavaScript
-    if "rect_data" in message:
-        rect_data_str = message["rect_data"][0]  # Nhận chuỗi JSON từ query param
-        st.write("Raw rect_data string:", rect_data_str)  # Hiển thị chuỗi raw
-        try:
-            rect_data = eval(rect_data_str)  # Chuyển chuỗi JSON thành dict
-            st.session_state.rect_data = rect_data  # Lưu vào session_state
-            st.write("Updated rect_data in session state:", st.session_state.rect_data)  # Kiểm tra giá trị lưu vào session_state
-        except Exception as e:
-            st.error(f"Lỗi khi xử lý rect_data: {e}")
+    if 'rect_data' in st.session_state:
+        st.write("Received rect_data:", st.session_state["rect_data"])  # Kiểm tra tin nhắn nhận từ JS
+    else:
+        st.write("No rect_data yet")
 
-# Hàm chính chạy ứng dụng
 def run_app1():
     st.title("Cắt nền bằng GrabCut")
 
@@ -119,7 +112,8 @@ def run_app1():
                         hasDrawnRectangle = true;
 
                         // Gửi thông điệp tới Streamlit
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+                        const rect_data = JSON.stringify(rect);
+                        streamlitMessage(rect_data);  // Gọi hàm streamlitMessage để gửi dữ liệu
                     }}
                 }});
 
@@ -128,6 +122,11 @@ def run_app1():
                         event.preventDefault();
                     }}
                 }});
+
+                // Hàm gửi dữ liệu đến Streamlit
+                function streamlitMessage(data) {{
+                    window.parent.postMessage({{ type: 'streamlit:message', data }}, '*');
+                }}
             </script>
         </body>
         </html>
@@ -136,16 +135,18 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
-        if 'rect_data' not in st.session_state:
-            st.session_state.rect_data = None
+        # Nhận thông điệp từ JavaScript qua streamlit_js_eval
+        streamlit_js_eval(js_code="""
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'streamlit:message') {
+                    const rectData = JSON.parse(event.data.data);
+                    Streamlit.setComponentValue(rectData);  // Gửi dữ liệu về phía Python
+                }
+            });
+        """, key="rect_data_js", default=None)
 
-        # Nhận thông điệp từ JavaScript và cập nhật session_state
-        handle_js_messages()
-
-        # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state["rect_data"] is not None:
-            st.write("rect_data exists:", st.session_state["rect_data"])  # Kiểm tra dữ liệu có tồn tại
+        # Nhận dữ liệu từ Streamlit và lưu vào session_state
+        if 'rect_data' in st.session_state:
             rect_data = st.session_state["rect_data"]
             x = int(rect_data["x"])
             y = int(rect_data["y"])
@@ -160,7 +161,7 @@ def run_app1():
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if st.session_state.rect_data:
+            if 'rect_data' in st.session_state:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
