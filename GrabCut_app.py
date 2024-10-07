@@ -3,7 +3,6 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
-import re
 from grabcut_processor import GrabCutProcessor
 
 def run_app1():
@@ -19,6 +18,10 @@ def run_app1():
 
         # Khởi tạo bộ xử lý GrabCut
         grabcut_processor = GrabCutProcessor(image_np)
+
+        # Lưu trữ thông tin hình chữ nhật trong biến trạng thái
+        if 'rect' not in st.session_state:
+            st.session_state.rect = None
 
         # Lấy kích thước của hình ảnh
         img_width, img_height = image.size
@@ -124,6 +127,9 @@ def run_app1():
                         }}, Height: ${{
                             rect.height
                         }}`;
+
+                        // Gửi thông tin hình chữ nhật về server
+                        window.parent.document.getElementById('rectData').value = JSON.stringify(rect);
                     }}
                 }});
 
@@ -133,6 +139,7 @@ def run_app1():
                     }}
                 }});
             </script>
+            <input type="hidden" id="rectData" />
         </body>
         </html>
         """
@@ -142,14 +149,17 @@ def run_app1():
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            # Trích xuất thông tin hình chữ nhật từ HTML
-            rect_info = st.components.v1.html(drawing_html, height=img_height + 50)
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                width = int(match.group(3))
-                height = int(match.group(4))
+            # Truy xuất dữ liệu hình chữ nhật từ hidden input
+            rect_data = st.text_input("rectData", "")
+            if rect_data:
+                rect = json.loads(rect_data)  # Chuyển đổi từ chuỗi JSON
+                x = rect['x']
+                y = rect['y']
+                width = rect['width']
+                height = rect['height']
+                st.session_state.rect = (x, y, width, height)
+
+                # Cập nhật cho GrabCut
                 grabcut_processor.rect = (x, y, width, height)
 
                 # Áp dụng GrabCut
