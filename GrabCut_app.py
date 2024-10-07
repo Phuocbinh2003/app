@@ -83,7 +83,7 @@ def run_app1():
                 let drawing = false;
                 let startX, startY;
                 let hasDrawnRectangle = false; 
-                let rectangleData = {};
+                
 
                 canvas.addEventListener('mousedown', (event) => {{
                     if (event.button === 0 && !hasDrawnRectangle) {{
