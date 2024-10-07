@@ -72,16 +72,18 @@ def run_app1():
 
         # Resize the image to keep the aspect ratio
         height, width = image.shape[:2]
-        aspect_ratio = height / width
         target_width = 800
-        target_height = int(target_width * aspect_ratio)
+        
+        # Tính toán chiều cao mới để giữ tỷ lệ khung hình
+        target_height = int(target_width * (height / width))
+        
         resized_image = cv.resize(image, (target_width, target_height), interpolation=cv.INTER_AREA)
 
         # Initialize GrabCutProcessor
         processor = GrabCutProcessor(resized_image)
         
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+        st.components.v1.html(get_image_with_canvas(processor.img_copy, target_width), height=500)
 
         # Listen for rectangle drawn event
         if 'rect_info' not in st.session_state:
