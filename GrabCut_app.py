@@ -75,7 +75,7 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(processor.img_copy, target_height=400), height=500)
 
         # Listen for rectangle drawn event
-        if st.session_state.get('rect_info') is not None:
+        if 'rect_info' in st.session_state:
             rect_info = st.session_state.rect_info
             st.session_state.rect_info = None  # Reset after reading
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
@@ -90,6 +90,7 @@ def run_app1():
                 if st.button("Apply GrabCut"):
                     output_image = processor.apply_grabcut(rect)
                     st.image(output_image, channels="BGR", caption="GrabCut Output")
+                    st.session_state.rect_info = None  # Reset after processing
 
 # Main function to run the application
 if __name__ == "__main__":
