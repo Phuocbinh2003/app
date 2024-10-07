@@ -34,6 +34,7 @@ def get_image_with_canvas(image, target_width=800):
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
         <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: {target_width}px; height: {target_height}px;"></canvas>
+        <input type="hidden" id="rectInfo" value="" /> <!-- Input ẩn để lưu trữ thông tin hình chữ nhật -->
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -65,6 +66,8 @@ def get_image_with_canvas(image, target_width=800):
             const endX = e.offsetX;
             const endY = e.offsetY;
             const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + (endX - startX) + ', Height: ' + (endY - startY);
+            const rectInput = document.getElementById('rectInfo');
+            rectInput.value = rectInfo; // Lưu thông tin hình chữ nhật vào input ẩn
             const streamlit = window.parent.document.querySelector('iframe').contentWindow;
             streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
         }});
@@ -85,8 +88,8 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
         # Kiểm tra thông tin hình chữ nhật từ session_state
-        if 'rectInfo' in st.session_state:
-            rectInfo = st.session_state.rect_info
+        if 'rect_info' in st.session_state:
+            rect_info = st.session_state.rect_info
             if rect_info is not None:
                 match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
                 if match:
