@@ -6,16 +6,16 @@ import re
 
 from grabcut_processor import GrabCutProcessor
 
-def get_image_with_canvas(image, target_width=800):
+def get_image_with_canvas(image, target_height=400):
     """Return HTML for the image with a canvas overlay for drawing."""
     # Encode image as base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Calculate new size
+    # Calculate new width based on target height
     height, width = image.shape[:2]
-    aspect_ratio = height / width
-    target_height = int(target_width * aspect_ratio)
+    aspect_ratio = width / height
+    target_width = int(target_height * aspect_ratio)
 
     # HTML for the canvas
     html = f"""
@@ -72,7 +72,7 @@ def run_app1():
         processor = GrabCutProcessor(image)
         
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+        st.components.v1.html(get_image_with_canvas(processor.img_copy, target_height=400), height=500)
 
         # Listen for rectangle drawn event
         if st.session_state.get('rect_info') is not None:
