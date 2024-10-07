@@ -64,6 +64,10 @@ def run_app1():
                     left: 0;
                     z-index: 0; 
                 }}
+                .rect-info {{
+                    margin-top: 10px; 
+                    font-size: 16px; 
+                }}
             </style>
         </head>
         <body>
@@ -71,10 +75,12 @@ def run_app1():
                 <img id="originalImage" src="data:image/png;base64,{convert_image_to_base64(image)}" />
                 <canvas id="drawingCanvas" width="{img_width}" height="{img_height}"></canvas>
             </div>
+            <div class="rect-info" id="rectInfo"></div>
             <script>
                 const canvas = document.getElementById('drawingCanvas');
                 const ctx = canvas.getContext('2d');
                 const img = document.getElementById('originalImage');
+                const rectInfoDiv = document.getElementById('rectInfo');
 
                 let drawing = false;
                 let startX, startY;
@@ -112,19 +118,22 @@ def run_app1():
 
                         hasDrawnRectangle = true;
 
-                        // Gửi thông tin hình chữ nhật về Python
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+                        // Lưu thông tin hình chữ nhật vào sessionStorage
+                        sessionStorage.setItem('rect_data', JSON.stringify(rect));
 
                         // Hiển thị thông tin vị trí hình chữ nhật
-                        alert(`Hình chữ nhật đã được vẽ:\\nX: ${{
+                        rectInfoDiv.innerHTML = `Hình chữ nhật: X: ${{
                             rect.x
-                        }}\\nY: ${{
+                        }}, Y: ${{
                             rect.y
-                        }}\\nWidth: ${{
+                        }}, Width: ${{
                             rect.width
-                        }}\\nHeight: ${{
+                        }}, Height: ${{
                             rect.height
-                        }}`);
+                        }}`;
+
+                        // Gửi thông tin hình chữ nhật về Python
+                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
                     }}
                 }});
 
