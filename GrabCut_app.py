@@ -7,8 +7,10 @@ from grabcut_processor import GrabCutProcessor
 
 # Hàm xử lý tin nhắn từ JavaScript (với postMessage)
 def handle_js_messages():
-    if 'rect_data' in st.session_state:
-        rect_data = st.session_state['rect_data']
+    message = st.experimental_get_query_params()
+    if "rect_data" in message:
+        # Chuyển đổi dữ liệu từ chuỗi JSON sang dict
+        rect_data = json.loads(message["rect_data"][0])
         return rect_data
     return None
 
@@ -108,8 +110,8 @@ def run_app1():
                         const rect = {{ x: Math.min(startX, endX), y: Math.min(startY, endY), width: width, height: height }};
                         hasDrawnRectangle = true;
 
-                        console.log("Rect data: ", rect); // Kiểm tra xem dữ liệu có đúng không
-                        window.parent.postMessage(JSON.stringify({{ type: 'rect_data', rect }}), '*');
+                        // Gửi dữ liệu về Python qua URL query parameter
+                        window.location.href = window.location.pathname + "?rect_data=" + JSON.stringify(rect);
                     }}
                 }});
 
@@ -126,18 +128,11 @@ def run_app1():
         # Hiển thị canvas và hình ảnh
         st.components.v1.html(drawing_html, height=img_height + 50)
 
-        # Khởi tạo khóa rect_data trong session_state nếu chưa tồn tại
-        if 'rect_data' not in st.session_state:
-            st.session_state.rect_data = None
-
         # Nhận thông điệp từ JavaScript
-        if st.session_state.rect_data is None:
-            # Chờ nhận dữ liệu
-            st.session_state.rect_data = st.empty()
+        rect_data = handle_js_messages()
 
-        # Xử lý dữ liệu hình chữ nhật từ JavaScript
-        if st.session_state.rect_data:
-            rect_data = st.session_state.rect_data
+        # Nếu có dữ liệu hình chữ nhật
+        if rect_data is not None:
             x = int(rect_data["x"])
             y = int(rect_data["y"])
             width = int(rect_data["width"])
@@ -146,7 +141,7 @@ def run_app1():
 
         # Hiển thị nút để áp dụng GrabCut
         if st.button("Áp dụng GrabCut"):
-            if st.session_state.rect_data is not None:
+            if rect_data is not None:
                 grabcut_processor.apply_grabcut()
                 output_image = grabcut_processor.get_output_image()
                 st.image(output_image, caption="Hình ảnh đầu ra", use_column_width=True)
@@ -169,7 +164,4 @@ def convert_image_to_base64(image):
 
 # Bước 8: Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_data' not in st.session_state:
-        st.session_state.rect_data = None
-
     run_app1()
