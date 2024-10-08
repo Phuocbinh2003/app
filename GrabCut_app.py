@@ -7,8 +7,8 @@ from streamlit_js_eval import streamlit_js_eval
 
 from grabcut_processor import GrabCutProcessor
 
-# Hàm lấy ảnh với canvas
 def get_image_with_canvas(image):
+    """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -18,7 +18,8 @@ def get_image_with_canvas(image):
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px;"></div> <!-- Nơi lưu thông tin hình chữ nhật -->
+        <div id="rectInfo" style="margin-top: 10px;"> <!-- Nơi lưu thông tin hình chữ nhật -->
+        </div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -50,12 +51,16 @@ def get_image_with_canvas(image):
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
 
+            // Chỉ lưu thông tin nếu Width và Height > 0
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
+
+                // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Chuyển kết quả cho phần tử HTML
-                window.rect_info = rectInfo;
+                // Dispatch sự kiện cho Streamlit
+                const streamlit = window.parent.document.querySelector('iframe').contentWindow;
+                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -64,7 +69,6 @@ def get_image_with_canvas(image):
     """
     return html
 
-# Hàm chạy ứng dụng
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
@@ -78,10 +82,11 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Đọc dữ liệu từ div 'rectInfo'
+        # Lấy thông tin hình chữ nhật từ JavaScript
         rect_info = streamlit_js_eval(code="document.getElementById('rectInfo').innerHTML", key="rect_info")
+        st.write(f"rect_info từ JavaScript: {rect_info}")
 
-        if rect_info and "Hình chữ nhật" in rect_info:
+        if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
