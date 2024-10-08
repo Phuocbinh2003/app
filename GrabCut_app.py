@@ -58,9 +58,13 @@ def get_image_with_canvas(image):
                 // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông tin hình chữ nhật về phía Streamlit
-                const streamlit = window.parent.document.querySelector('iframe').contentWindow;
-                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: {{ startX, startY, rectWidth, rectHeight }} }}));
+                // Gửi thông tin hình chữ nhật về phía Streamlit qua window.postMessage
+                window.parent.postMessage({{
+                    startX: startX,
+                    startY: startY,
+                    rectWidth: rectWidth,
+                    rectHeight: rectHeight
+                }}, "*");
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -82,12 +86,17 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Lấy thông tin hình chữ nhật từ JavaScript
-        rect_info = streamlit_js_eval(code="window.document.dispatchEvent(new CustomEvent('rectangle-drawn'))", key="rect_info")
+        # Lắng nghe sự kiện từ iframe
+        rect_info = streamlit_js_eval(code="""
+        window.addEventListener('message', function(event) {
+            const { startX, startY, rectWidth, rectHeight } = event.data;
+            return `X: ${startX}, Y: ${startY}, Width: ${rectWidth}, Height: ${rectHeight}`;
+        });
+        """, key="rect_info")
 
         if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'"startX":(\d+),"startY":(\d+),"rectWidth":(\d+),"rectHeight":(\d+)', rect_info)
+            match = re.search(r'X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
                 x = int(match.group(1))
                 y = int(match.group(2))
