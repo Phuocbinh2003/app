@@ -6,22 +6,29 @@ import re
 
 from grabcut_processor import GrabCutProcessor
 
-def get_image_with_canvas(image, target_width=800):
-    """Return HTML for the image with a canvas overlay for drawing."""
+def get_image_with_canvas(image, max_width=800):
+    """Return HTML for the image with a canvas overlay for drawing, keeping aspect ratio."""
     # Encode image as base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
-    # Calculate new dimensions
+    # Get original dimensions
     height, width = image.shape[:2]
-    aspect_ratio = height / width
-    target_height = int(target_width * aspect_ratio)
+    
+    # Calculate new dimensions based on the max_width, keeping the aspect ratio
+    if width > max_width:
+        aspect_ratio = height / width
+        new_width = max_width
+        new_height = int(new_width * aspect_ratio)
+    else:
+        new_width = width
+        new_height = height
 
     # HTML for the canvas
     html = f"""
-    <div style="position: relative;">
-        <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
-        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: {target_width}px; height: {target_height}px;"></canvas>
+    <div style="position: relative; display: inline-block;">
+        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {new_width}px; height: {new_height}px;"/>
+        <canvas id="canvas" width="{new_width}" height="{new_height}" style="position: absolute; top: 0; left: 0;"></canvas>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -38,7 +45,7 @@ def get_image_with_canvas(image, target_width=800):
         canvas.addEventListener('mousemove', function(e) {{
             if (isDrawing) {{
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, {target_width}, {target_height});
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 3;
                 ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
@@ -72,8 +79,8 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
         
-        # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+        # Display image with canvas overlay, keeping the aspect ratio
+        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=600)
 
         # Check for rectangle drawn event
         if 'rectangle-drawn' in st.session_state:
