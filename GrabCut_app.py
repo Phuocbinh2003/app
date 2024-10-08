@@ -54,11 +54,8 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Trả thông tin hình chữ nhật về phía Streamlit
-                window.parent.streamlitMessage({{
-                    type: "RECTANGLE_DRAWN",
-                    rect_info: rectInfo
-                }});
+                // Chuyển kết quả cho phần tử HTML
+                window.rect_info = rectInfo;
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -81,10 +78,10 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Lắng nghe thông tin hình chữ nhật từ JavaScript qua streamlit_js_eval
-        rect_info = streamlit_js_eval(code="window.rect_info", key="rect_info")
+        # Đọc dữ liệu từ div 'rectInfo'
+        rect_info = streamlit_js_eval(code="document.getElementById('rectInfo').innerHTML", key="rect_info")
 
-        if rect_info:
+        if rect_info and "Hình chữ nhật" in rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
