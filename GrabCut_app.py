@@ -3,7 +3,6 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
-from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -72,8 +71,8 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        if st.session_state.get("message"):
-            rect_info = st.session_state.message['rectInfo']
+        if 'rect_info' in st.session_state:
+            rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
