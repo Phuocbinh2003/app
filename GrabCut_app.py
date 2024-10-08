@@ -79,14 +79,16 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
 
-        # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+        # Gọi hàm get_image_with_canvas để lấy mã HTML
+        html_code = get_image_with_canvas(processor.img_copy)
 
-        # Lấy thông tin hình chữ nhật từ `div` bằng streamlit_js_eval
-        rect_info = streamlit_js_eval(code="""
-            const rectInfoDiv = document.getElementById('rectInfo');
-            return rectInfoDiv ? rectInfoDiv.innerText : '';
-        """, key="rect_info")
+        # In mã HTML ra để xem toàn bộ nội dung
+        st.write("HTML được tạo ra:")
+        st.code(html_code, language="html")
+
+        # Render mã HTML trong ứng dụng
+        st.components.v1.html(html_code, height=500)
+
 
         # Hiển thị thông tin hình chữ nhật nếu có
         if rect_info:
