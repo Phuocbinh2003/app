@@ -89,6 +89,7 @@ def run_app1():
 
         # Nhận thông tin từ window.postMessage
         message = st.experimental_get_query_params()
+        st.write(f"{message}")
         if message:
             try:
                 startX = int(message.get("startX")[0])
