@@ -88,7 +88,7 @@ def run_app1():
 
         # Render mã HTML trong ứng dụng
         st.components.v1.html(html_code, height=500)
-
+        rect_info = streamlit_js_eval(code="document.getElementById('rectInfo').innerHTML", key="rect_info")
 
         # Hiển thị thông tin hình chữ nhật nếu có
         if rect_info:
