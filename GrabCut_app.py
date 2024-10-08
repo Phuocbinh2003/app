@@ -1,12 +1,13 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
+import base64
 import re
 
 from grabcut_processor import GrabCutProcessor
 
+# Hàm lấy ảnh với canvas
 def get_image_with_canvas(image):
-    """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -48,16 +49,13 @@ def get_image_with_canvas(image):
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
 
-            // Chỉ lưu thông tin nếu Width và Height > 0
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-
-                // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi dữ liệu tới Streamlit
-                const streamlit = window.parent;
-                streamlit.postMessage({{ type: "rect-drawn", data: rectInfo }}, "*");
+                // Gửi thông tin hình chữ nhật về phía Streamlit
+                const streamlitEvent = new CustomEvent('rect-drawn', {{ detail: rectInfo }});
+                document.dispatchEvent(streamlitEvent);
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -66,10 +64,13 @@ def get_image_with_canvas(image):
     """
     return html
 
-# Đọc thông tin hình chữ nhật
+# Lắng nghe sự kiện từ JavaScript
 def get_rect_from_js():
-    # Lắng nghe sự kiện từ JS
     rect_info = st.experimental_get_query_params().get('rect_info')
+
+    # In thử thông tin hình chữ nhật
+    st.write("rect_info từ JavaScript:", rect_info)
+
     if rect_info:
         st.session_state['rect_info'] = rect_info[0]
         return rect_info[0]
@@ -88,9 +89,10 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Nhận thông tin hình chữ nhật từ JavaScript
+        # Lắng nghe thông tin hình chữ nhật từ JavaScript
         rect_info = get_rect_from_js()
-        if rect_info none:
+
+        if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
