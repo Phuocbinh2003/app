@@ -2,6 +2,8 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
+import re
+from streamlit_js_eval import streamlit_js_eval
 
 from grabcut_processor import GrabCutProcessor
 
@@ -56,13 +58,9 @@ def get_image_with_canvas(image):
                 // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông tin hình chữ nhật về phía Streamlit qua window.postMessage
-                window.parent.postMessage({{
-                    startX: startX,
-                    startY: startY,
-                    rectWidth: rectWidth,
-                    rectHeight: rectHeight
-                }}, "*");
+                // Gửi thông tin hình chữ nhật về phía Streamlit
+                const streamlit = window.parent.document.querySelector('iframe').contentWindow;
+                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: {{ startX, startY, rectWidth, rectHeight }} }}));
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -81,15 +79,27 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
 
-        # Nhận nội dung HTML
-        html_content = get_image_with_canvas(processor.img_copy)
-
-        # Hiển thị nội dung HTML
-        st.write("Nội dung HTML được tạo:")
-        st.code(html_content)
-
         # Hiển thị ảnh với canvas overlay
-        #st.components.v1.html(html_content, height=500)
+        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+
+        # Lấy thông tin hình chữ nhật từ JavaScript
+        rect_info = streamlit_js_eval(code="document.getElementById('rectInfo').innerHTML", key="rect_info")
+
+
+        if rect_info:
+            st.write(f"Thông tin hình chữ nhật: {rect_info}")
+            match = re.search(r'"startX":(\d+),"startY":(\d+),"rectWidth":(\d+),"rectHeight":(\d+)', rect_info)
+            if match:
+                x = int(match.group(1))
+                y = int(match.group(2))
+                w = int(match.group(3))
+                h = int(match.group(4))
+                rect = (x, y, w, h)
+
+                # Nút áp dụng GrabCut
+                if st.button("Áp dụng GrabCut"):
+                    output_image = processor.apply_grabcut(rect)
+                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
