@@ -6,7 +6,7 @@ from streamlit_js_eval import streamlit_js_eval
 import re
 from grabcut_processor import GrabCutProcessor
 
-# Hàm tạo HTML có canvas và phần để vẽ hình chữ nhật
+# Hàm tạo HTML có canvas và phần để vẽ hình chữ nhật trong một `div`
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
@@ -59,7 +59,7 @@ def get_image_with_canvas(image):
                 rectInfoDiv.innerHTML = rectInfo;
 
                 // Dispatch sự kiện cho Streamlit
-                const streamlit = window.parent.document.querySelector('iframe.stIFrame').contentWindow;
+                const streamlit = window.parent;
                 streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
@@ -82,16 +82,10 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Lấy thông tin hình chữ nhật từ iframe có class 'stIFrame' bằng streamlit_js_eval
+        # Lấy thông tin hình chữ nhật từ `div` bằng streamlit_js_eval
         rect_info = streamlit_js_eval(code="""
-            const iframe = document.querySelector('.stIFrame');
-            if (iframe) {
-                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                const rectInfoDiv = iframeDocument.getElementById('rectInfo');
-                return rectInfoDiv ? rectInfoDiv.innerText : '';
-            } else {
-                return '';
-            }
+            const rectInfoDiv = document.getElementById('rectInfo');
+            return rectInfoDiv ? rectInfoDiv.innerText : '';
         """, key="rect_info")
 
         # Hiển thị thông tin hình chữ nhật nếu có
