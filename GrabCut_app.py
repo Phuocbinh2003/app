@@ -84,7 +84,7 @@ def run_app1():
         # Lắng nghe thông tin hình chữ nhật từ JavaScript qua streamlit_js_eval
         rect_info = streamlit_js_eval(code="window.rect_info", key="rect_info")
 
-        if rect_info:
+        if !rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
