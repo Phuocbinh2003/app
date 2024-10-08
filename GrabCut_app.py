@@ -89,7 +89,7 @@ def run_app1():
         st.code(html_content)
 
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(html_content, height=500)
+        #st.components.v1.html(html_content, height=500)
 
 # Chạy ứng dụng
 if __name__ == "__main__":
