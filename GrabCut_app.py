@@ -2,8 +2,6 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-import re
-from streamlit_js_eval import streamlit_js_eval
 
 from grabcut_processor import GrabCutProcessor
 
@@ -83,31 +81,15 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
 
+        # Nhận nội dung HTML
+        html_content = get_image_with_canvas(processor.img_copy)
+
+        # Hiển thị nội dung HTML
+        st.write("Nội dung HTML được tạo:")
+        st.code(html_content)
+
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
-
-        # Lắng nghe sự kiện từ iframe
-        rect_info = streamlit_js_eval(code="""
-        window.addEventListener('message', function(event) {
-            const { startX, startY, rectWidth, rectHeight } = event.data;
-            return `X: ${startX}, Y: ${startY}, Width: ${rectWidth}, Height: ${rectHeight}`;
-        });
-        """, key="rect_info")
-
-        if rect_info:
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
-
-                # Nút áp dụng GrabCut
-                if st.button("Áp dụng GrabCut"):
-                    output_image = processor.apply_grabcut(rect)
-                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
+        st.components.v1.html(html_content, height=500)
 
 # Chạy ứng dụng
 if __name__ == "__main__":
