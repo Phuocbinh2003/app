@@ -1,7 +1,6 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-import base64
 import re
 
 from grabcut_processor import GrabCutProcessor
@@ -56,9 +55,9 @@ def get_image_with_canvas(image):
                 // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Dispatch sự kiện cho Streamlit
-                const streamlit = window.parent.document.querySelector('iframe').contentWindow;
-                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
+                // Gửi dữ liệu tới Streamlit
+                const streamlit = window.parent;
+                streamlit.postMessage({{ type: "rect-drawn", data: rectInfo }}, "*");
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -66,6 +65,15 @@ def get_image_with_canvas(image):
     </script>
     """
     return html
+
+# Đọc thông tin hình chữ nhật
+def get_rect_from_js():
+    # Lắng nghe sự kiện từ JS
+    rect_info = st.experimental_get_query_params().get('rect_info')
+    if rect_info:
+        st.session_state['rect_info'] = rect_info[0]
+        return rect_info[0]
+    return None
 
 def run_app1():
     st.title("Ứng dụng GrabCut")
@@ -80,9 +88,9 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Kiểm tra và nhận thông tin hình chữ nhật từ session_state
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state['rect_info']
+        # Nhận thông tin hình chữ nhật từ JavaScript
+        rect_info = get_rect_from_js()
+        if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
