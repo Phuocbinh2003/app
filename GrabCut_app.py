@@ -2,9 +2,11 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-
+from streamlit_js_eval import streamlit_js_eval
+import re
 from grabcut_processor import GrabCutProcessor
 
+# Hàm tạo HTML có canvas và phần để vẽ hình chữ nhật
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
@@ -56,13 +58,9 @@ def get_image_with_canvas(image):
                 // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông tin hình chữ nhật về phía Streamlit qua window.postMessage
-                window.parent.postMessage({{
-                    startX: startX,
-                    startY: startY,
-                    rectWidth: rectWidth,
-                    rectHeight: rectHeight
-                }}, "*");
+                // Dispatch sự kiện cho Streamlit
+                const streamlit = window.parent.document.querySelector('iframe.stIFrame').contentWindow;
+                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -81,32 +79,38 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
         processor = GrabCutProcessor(image)
 
-        # Nhận nội dung HTML
-        html_content = get_image_with_canvas(processor.img_copy)
-
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(html_content, height=500)
+        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Nhận thông tin từ window.postMessage
-        message = st.experimental_get_query_params()
-        st.write(f"{message}")
-        if message:
-            try:
-                startX = int(message.get("startX")[0])
-                startY = int(message.get("startY")[0])
-                rectWidth = int(message.get("rectWidth")[0])
-                rectHeight = int(message.get("rectHeight")[0])
+        # Lấy thông tin hình chữ nhật từ iframe có class 'stIFrame' bằng streamlit_js_eval
+        rect_info = streamlit_js_eval(code="""
+            const iframe = document.querySelector('.stIFrame');
+            if (iframe) {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const rectInfoDiv = iframeDocument.getElementById('rectInfo');
+                return rectInfoDiv ? rectInfoDiv.innerText : '';
+            } else {
+                return '';
+            }
+        """, key="rect_info")
 
-                st.write(f"Thông tin hình chữ nhật: X: {startX}, Y: {startY}, Width: {rectWidth}, Height: {rectHeight}")
+        # Hiển thị thông tin hình chữ nhật nếu có
+        if rect_info:
+            st.write(f"Thông tin hình chữ nhật: {rect_info}")
+            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+            if match:
+                x = int(match.group(1))
+                y = int(match.group(2))
+                w = int(match.group(3))
+                h = int(match.group(4))
+                rect = (x, y, w, h)
 
                 # Nút áp dụng GrabCut
                 if st.button("Áp dụng GrabCut"):
-                    rect = (startX, startY, rectWidth, rectHeight)
                     output_image = processor.apply_grabcut(rect)
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
-
-            except (TypeError, ValueError):
-                st.write("Chưa có thông tin hình chữ nhật được truyền về.")
+        else:
+            st.write("Chưa có thông tin hình chữ nhật.")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
