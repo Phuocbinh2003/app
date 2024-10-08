@@ -85,7 +85,7 @@ def run_app1():
         # Lấy thông tin hình chữ nhật từ JavaScript
         rect_info = streamlit_js_eval(code="document.getElementById('rectInfo').innerText", key="rect_info")
 
-        st.write(f"rect_info từ JavaScript: {rect_info}")
+        st.write(f"rect_info từ JavaScript: {get_image_with_canvas(processor.img_copy})
 
         if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
