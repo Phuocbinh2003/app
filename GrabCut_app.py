@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
+from streamlit_js_eval import streamlit_js_eval
 
 from grabcut_processor import GrabCutProcessor
 
@@ -53,9 +54,11 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông tin hình chữ nhật về phía Streamlit
-                const streamlitEvent = new CustomEvent('rect-drawn', {{ detail: rectInfo }});
-                document.dispatchEvent(streamlitEvent);
+                // Trả thông tin hình chữ nhật về phía Streamlit
+                window.parent.streamlitMessage({{
+                    type: "RECTANGLE_DRAWN",
+                    rect_info: rectInfo
+                }});
             }} else {{
                 console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
             }}
@@ -64,18 +67,7 @@ def get_image_with_canvas(image):
     """
     return html
 
-# Lắng nghe sự kiện từ JavaScript
-def get_rect_from_js():
-    rect_info = st.experimental_get_query_params().get('rect_info')
-
-    # In thử thông tin hình chữ nhật
-    st.write("rect_info từ JavaScript:", rect_info)
-
-    if rect_info:
-        st.session_state['rect_info'] = rect_info[0]
-        return rect_info[0]
-    return None
-
+# Hàm chạy ứng dụng
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
@@ -89,9 +81,9 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
 
-        # Lắng nghe thông tin hình chữ nhật từ JavaScript
-        rect_info = get_rect_from_js()
-        st.write(f"Thông tin hình chữ nhật: {rect_info}")
+        # Lắng nghe thông tin hình chữ nhật từ JavaScript qua streamlit_js_eval
+        rect_info = streamlit_js_eval(code="window.rect_info", key="rect_info")
+
         if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
