@@ -9,7 +9,7 @@ from grabcut_processor import GrabCutProcessor
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
-    _, img_encoded = cv.imencode('.png', image)
+    _, img_encoded = cv.imencode('.jpg', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
     height, width = image.shape[:2]
