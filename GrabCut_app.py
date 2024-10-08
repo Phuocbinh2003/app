@@ -6,19 +6,17 @@ import re
 
 from grabcut_processor import GrabCutProcessor
 
-def get_image_with_canvas(image, target_width=800):
+def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
     height, width = image.shape[:2]
-    aspect_ratio = height / width
-    target_height = int(target_width * aspect_ratio)
 
     html = f"""
     <div style="position: relative;">
-        <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
-        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: {target_width}px; height: {target_height}px;"></canvas>
+        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
+        <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
         <div id="rectInfo" style="margin-top: 10px;"></div> <!-- Nơi lưu thông tin hình chữ nhật -->
     </div>
     <script>
@@ -52,7 +50,7 @@ def get_image_with_canvas(image, target_width=800):
             const rectHeight = endY - startY;
 
             // Chỉ lưu thông tin nếu Width và Height > 0
-            if (rectWidth > 10 && rectHeight > 10) {{
+            if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
 
                 // Cập nhật thông tin hình chữ nhật vào div
@@ -69,7 +67,7 @@ def get_image_with_canvas(image, target_width=800):
     """
     return html
 
-def run_app1():
+def run_app():
     st.title("Ứng dụng GrabCut")
 
     # Upload ảnh
@@ -101,4 +99,4 @@ def run_app1():
 
 # Chạy ứng dụng
 if __name__ == "__main__":
-    run_app1()
+    run_app()
