@@ -91,7 +91,7 @@ def run_app1():
 
         # Lắng nghe thông tin hình chữ nhật từ JavaScript
         rect_info = get_rect_from_js()
-
+        st.write(f"Thông tin hình chữ nhật: {rect_info}")
         if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
