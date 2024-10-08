@@ -84,20 +84,20 @@ def run_app1():
         # Lắng nghe thông tin hình chữ nhật từ JavaScript qua streamlit_js_eval
         rect_info = streamlit_js_eval(code="window.rect_info", key="rect_info")
 
-        if !rect_info:
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
+        
+        st.write(f"Thông tin hình chữ nhật: {rect_info}")
+        match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+        if match:
+            x = int(match.group(1))
+            y = int(match.group(2))
+            w = int(match.group(3))
+            h = int(match.group(4))
+            rect = (x, y, w, h)
 
-                # Nút áp dụng GrabCut
-                if st.button("Áp dụng GrabCut"):
-                    output_image = processor.apply_grabcut(rect)
-                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
+            # Nút áp dụng GrabCut
+            if st.button("Áp dụng GrabCut"):
+                output_image = processor.apply_grabcut(rect)
+                st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
