@@ -2,7 +2,6 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-import re
 
 def get_image_with_canvas(image):
     """Return HTML with canvas for drawing rectangles."""
@@ -50,37 +49,18 @@ def get_image_with_canvas(image):
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
-                window.parent.postMessage({{ rect_info: rectInfo }}, '*');
+
+                // Gửi thông tin về Streamlit
+                const data = {{ 'rect_info': rectInfo }};
+                window.parent.postMessage(data, '*');
             }}
         }});
     </script>
     """
     return html
 
-def parse_rectangle_info(rect_info):
-    """Extract rectangle coordinates and dimensions from the input string."""
-    match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-    if match:
-        x = int(match.group(1))
-        y = int(match.group(2))
-        w = int(match.group(3))
-        h = int(match.group(4))
-        return (x, y, w, h)
-    return None
-
-def input_text():
-    """Create a text input area for the user to enter text."""
-    text = st.text_area("Nhập đoạn văn bản của bạn:", height=150)
-    return text
-
 def run_app1():
-    st.title("Ứng dụng GrabCut")
-
-    # Nhập văn bản từ người dùng
-    user_text = input_text()
-    if user_text:
-        st.write("Đoạn văn bản bạn đã nhập:")
-        st.write(user_text)
+    st.title("Ứng dụng Canvas trong Streamlit")
 
     # Upload ảnh
     uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
@@ -92,29 +72,11 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state['rect_info']
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
-
-            # Tách thông tin hình chữ nhật
-            rect_values = parse_rectangle_info(rect_info)
-            if rect_values:
-                x, y, w, h = rect_values
-
-                # Nút áp dụng GrabCut
-                if st.button("Áp dụng GrabCut"):
-                    mask = np.zeros(image.shape[:2], np.uint8)
-                    bgd_model = np.zeros((1, 65), np.float64)
-                    fgd_model = np.zeros((1, 65), np.float64)
-                    rect = (x, y, x + w, y + h)
-                    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                    output_image = image * mask2[:, :, np.newaxis]
-                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
+        message = st.text_input("Nhập thông tin hình chữ nhật (nếu có)", "")
+        if message:
+            # Cập nhật thông tin hiển thị
+            st.write(f"Thông tin hình chữ nhật: {message}")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
-    if 'rect_info' not in st.session_state:
-        st.session_state.rect_info = None
-
     run_app1()
