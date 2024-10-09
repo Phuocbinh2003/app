@@ -56,10 +56,9 @@ def get_image_with_canvas(image):
                 console.log('Mouse up event:', rectInfo);
         
                 // Gửi thông điệp qua postMessage
-                window.parent.postMessage({ rectInfo: rectInfo }, '*');
+                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
-  
     </script>
     """
     return html_code
@@ -83,7 +82,7 @@ def run_app1():
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
                     console.log('Mouse up event:', rectInfo);
-                    streamlitWebSocket.send(JSON.stringify(rectInfo));
+                    streamlitWebSocket.send(JSON.stringify({rectInfo: rectInfo}));
                 }
             });
         })();
