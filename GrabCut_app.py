@@ -68,8 +68,19 @@ def parse_rectangle_info(rect_info):
         return (x, y, w, h)
     return None
 
+def input_text():
+    """Create a text input area for the user to enter text."""
+    text = st.text_area("Nhập đoạn văn bản của bạn:", height=150)
+    return text
+
 def run_app1():
     st.title("Ứng dụng GrabCut")
+
+    # Nhập văn bản từ người dùng
+    user_text = input_text()
+    if user_text:
+        st.write("Đoạn văn bản bạn đã nhập:")
+        st.write(user_text)
 
     # Upload ảnh
     uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
