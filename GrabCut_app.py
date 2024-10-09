@@ -52,8 +52,11 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
+                // Ghi thông tin vào console
+                console.log('Mouse up event:', rectInfo);
+        
                 // Gửi thông điệp qua postMessage
-                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
+                window.parent.postMessage({ rectInfo: rectInfo }, '*');
             }}
         }});
 
