@@ -2,8 +2,6 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-import re
-import requests
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -50,24 +48,7 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-                rectInfoDiv.innerHTML = rectInfo;
-                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
-
-                // Gửi thông tin hình chữ nhật về API Flask
-                fetch('http://127.0.0.1:5000/update_rect_info', {{
-                    method: 'POST',
-                    headers: {{
-                        'Content-Type': 'application/json'
-                    }},
-                    body: JSON.stringify({{ rectInfo: rectInfo }})
-                }})
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error('Error:', error));
-
-                // Hiển thị thông tin chữ nhật dưới ảnh
-                const infoDiv = document.getElementById('rectInfo');
-                infoDiv.innerHTML = rectInfo; // Cập nhật thông tin chữ nhật
+                rectInfoDiv.innerHTML = rectInfo; // Hiển thị thông tin chữ nhật
             }}
         }});
     </script>
