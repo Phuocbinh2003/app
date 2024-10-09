@@ -4,7 +4,7 @@ import numpy as np
 import base64
 
 def get_image_with_canvas(image):
-    """Returns HTML with a canvas to draw a rectangle."""
+    """Returns HTML with a canvas to draw a rectangle and the height of the canvas."""
     # Encode the image to base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
@@ -58,7 +58,7 @@ def get_image_with_canvas(image):
         }});
     </script>
     """
-    return html
+    return html, canvas_height  # Return the HTML and the canvas height
 
 def run_app1():
     st.title("Ứng dụng GrabCut")
@@ -70,7 +70,8 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv.IMREAD_COLOR)
 
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=canvas_height)
+        html, canvas_height = get_image_with_canvas(image)  # Get both HTML and canvas height
+        st.components.v1.html(html, height=canvas_height)  # Use canvas height here
 
 # Run the app
 if __name__ == "__main__":
