@@ -2,8 +2,6 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-from streamlit.components.v1 import html
-from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -22,6 +20,7 @@ def get_image_with_canvas(image):
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const img = document.getElementById('image');
+        const rectInfoDiv = document.getElementById('rectInfo');
         let startX, startY, isDrawing = false;
 
         canvas.addEventListener('mousedown', function(e) {{
@@ -49,7 +48,9 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-                // Gửi thông điệp về Streamlit
+                rectInfoDiv.innerHTML = rectInfo;
+
+                // Gửi thông điệp qua postMessage
                 window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
@@ -67,29 +68,27 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị hình ảnh với lớp phủ canvas
-        html(get_image_with_canvas(image), height=500)
+        st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Tạo mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
-        js_code = """
-        (function() {
+        # Mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
+        st.components.v1.html("""
+        <script>
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
                     // Gửi thông tin hình chữ nhật trở lại Streamlit
-                    const streamlitTextArea = document.getElementById('streamlit_rect_info');
-                    if (streamlitTextArea) {
-                        streamlitTextArea.innerText = rectInfo; // Hiển thị thông tin trong textarea
+                    const streamlit = window.parent.streamlit;
+                    if (streamlit) {
+                        streamlit.setComponentValue(rectInfo);
                     }
                 }
             });
-        })();
-        """
+        </script>
+        """)
 
-        # Sử dụng streamlit_js_eval để lắng nghe sự kiện
-        streamlit_js_eval(js_code, key="console_key")
-
-        # Tạo TextArea để hiển thị thông tin hình chữ nhật
-        st.markdown('<textarea id="streamlit_rect_info" style="width: 100%; height: 50px;" readonly></textarea>', unsafe_allow_html=True)
+        # Kiểm tra xem có giá trị nào được thiết lập trong session state cho thông tin hình chữ nhật không
+        if st.session_state.get("rect_info"):
+            st.write(f"Thông tin hình chữ nhật: {st.session_state.rect_info}")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
