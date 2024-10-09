@@ -7,4 +7,4 @@ scikit-learn
 firebase-admin
 python-dotenv
 streamlit-js-eval
-python3-distutils
+
