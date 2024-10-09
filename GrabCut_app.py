@@ -3,9 +3,10 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
+from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
-    """Trả về HTML với canvas để vẽ hình chữ nhật."""
+    """Return HTML with canvas to draw a rectangle."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -51,7 +52,7 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông tin hình chữ nhật về Streamlit
+                // Send rectangle info back to Streamlit
                 window.parent.postMessage({{ rectInfo: rectInfo }}, 'https://appmainpy-khciq5ibzf2uypmupzkhzm.streamlit.app/');
             }}
         }});
@@ -62,19 +63,19 @@ def get_image_with_canvas(image):
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
-    # Upload ảnh
+    # Upload image
     uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
     if uploaded_file is not None:
-        # Đọc ảnh
+        # Read image
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
-        # Hiển thị ảnh với canvas overlay
+        # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        rect_info = st.session_state.get('rect_info', None)
-        st.write(f"Thông tin hình chữ nhật: {rect_info}")
-        if rect_info is not None:
+        rect_info = streamlit_js_eval(js_code="parent.addEventListener('message', (event) => {return event.data.rectInfo;})", key="rect_listener")
+        
+        if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
@@ -84,7 +85,7 @@ def run_app1():
                 h = int(match.group(4))
                 rect = (x, y, w, h)
 
-                # Nút áp dụng GrabCut
+                # Apply GrabCut button
                 if st.button("Áp dụng GrabCut"):
                     mask = np.zeros(image.shape[:2], np.uint8)
                     bgd_model = np.zeros((1, 65), np.float64)
@@ -95,6 +96,6 @@ def run_app1():
                     output_image = image * mask2[:, :, np.newaxis]
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
-# Chạy ứng dụng
+# Run the app
 if __name__ == "__main__":
     run_app1()
