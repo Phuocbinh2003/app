@@ -4,18 +4,19 @@ import numpy as np
 import base64
 
 def get_image_with_canvas(image):
-    """Trả về HTML với canvas để vẽ hình chữ nhật."""
+    """Returns HTML with a canvas to draw a rectangle."""
+    # Encode the image to base64
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
     height, width = image.shape[:2]
 
+    # HTML structure with embedded JavaScript for canvas interaction
     html = f"""
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
         <div id="rectInfo" style="margin-top: 10px; font-size: 16px; color: black; background: rgba(255, 255, 255, 0.8); padding: 10px; border: 1px solid #ccc; border-radius: 5px; position: relative; z-index: 10;"></div>
-
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -49,7 +50,7 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-                rectInfoDiv.innerHTML = rectInfo; // Hiển thị thông tin chữ nhật
+                rectInfoDiv.innerHTML = rectInfo; // Display rectangle information
             }}
         }});
     </script>
@@ -59,15 +60,15 @@ def get_image_with_canvas(image):
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
-    # Upload ảnh
+    # Upload image
     uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
     if uploaded_file is not None:
-        # Đọc ảnh
-        image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
+        # Read image
+        image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv.IMREAD_COLOR)
 
-        # Hiển thị ảnh với canvas overlay
+        # Display image with canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-# Chạy ứng dụng
+# Run the app
 if __name__ == "__main__":
     run_app1()
