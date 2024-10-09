@@ -12,10 +12,10 @@ def get_image_with_canvas(image):
     height, width = image.shape[:2]
 
     html = f"""
-    <div style="position: relative; padding-bottom: 30px;">  <!-- Added padding -->
+    <div style="position: relative; padding-bottom: 30px;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px; position: relative; z-index: 1;"></div>  <!-- Ensured div is on top -->
+        <div id="rectInfo" style="margin-top: 10px; position: relative; z-index: 1;"></div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -57,6 +57,17 @@ def get_image_with_canvas(image):
     """
     return html
 
+def parse_rectangle_info(rect_info):
+    """Extract rectangle coordinates and dimensions from the input string."""
+    match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
+    if match:
+        x = int(match.group(1))
+        y = int(match.group(2))
+        w = int(match.group(3))
+        h = int(match.group(4))
+        return (x, y, w, h)
+    return None
+
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
@@ -67,18 +78,17 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=500+50)
+        st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
         if 'rect_info' in st.session_state:
             rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
+
+            # Tách thông tin hình chữ nhật
+            rect_values = parse_rectangle_info(rect_info)
+            if rect_values:
+                x, y, w, h = rect_values
 
                 # Nút áp dụng GrabCut
                 if st.button("Áp dụng GrabCut"):
@@ -91,15 +101,9 @@ def run_app1():
                     output_image = image * mask2[:, :, np.newaxis]
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
-# Set up the event listener for receiving messages from JavaScript
-def message_listener():
+# Chạy ứng dụng
+if __name__ == "__main__":
     if 'rect_info' not in st.session_state:
         st.session_state.rect_info = None
 
-    if st.session_state.rect_info is None:
-        st.session_state.rect_info = st.experimental_get_query_params().get('rect_info', [None])[0]
-
-# Chạy ứng dụng
-if __name__ == "__main__":
-    message_listener()
     run_app1()
