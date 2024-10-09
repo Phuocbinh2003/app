@@ -49,8 +49,12 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-                rectInfoDiv.innerHTML = rectInfo; // Cập nhật nội dung div
-                window.parent.postMessage({{ rect_info: rectInfo }}, '*'); // Gửi thông tin về Streamlit
+
+                rectInfoDiv.innerHTML = rectInfo;
+
+                // Gửi dữ liệu về Streamlit thông qua session state
+                const message = 'streamlit:rect_info:' + rectInfo;
+                window.parent.postMessage(message, '*');
             }}
         }});
     </script>
@@ -69,16 +73,11 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Xử lý thông điệp từ iframe
-        message = st.experimental_get_query_params().get("rect_info")
-        if message:
-            rect_info = message[0]  # Lấy thông tin hình chữ nhật
-            st.session_state['rect_info'] = rect_info
+        # Lắng nghe thông điệp từ iframe
+        if 'rect_info' in st.session_state:
+            rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
-
-        # Nút áp dụng GrabCut
-        if st.button("Áp dụng GrabCut") and 'rect_info' in st.session_state:
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', st.session_state['rect_info'])
+            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
                 x = int(match.group(1))
                 y = int(match.group(2))
@@ -86,15 +85,16 @@ def run_app1():
                 h = int(match.group(4))
                 rect = (x, y, w, h)
 
-                # Áp dụng GrabCut
-                mask = np.zeros(image.shape[:2], np.uint8)
-                bgd_model = np.zeros((1, 65), np.float64)
-                fgd_model = np.zeros((1, 65), np.float64)
-                rect = (x, y, x + w, y + h)
-                cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-                mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                output_image = image * mask2[:, :, np.newaxis]
-                st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
+                # Nút áp dụng GrabCut
+                if st.button("Áp dụng GrabCut"):
+                    mask = np.zeros(image.shape[:2], np.uint8)
+                    bgd_model = np.zeros((1, 65), np.float64)
+                    fgd_model = np.zeros((1, 65), np.float64)
+                    rect = (x, y, x + w, y + h)
+                    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
+                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                    output_image = image * mask2[:, :, np.newaxis]
+                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
