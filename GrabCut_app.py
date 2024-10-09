@@ -3,22 +3,7 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
-from flask import Flask, request, jsonify
-import threading
-
-# Khởi tạo Flask
-app = Flask(__name__)
-
-@app.route('/update_rect_info', methods=['POST'])
-def update_rect_info():
-    """Nhận thông tin hình chữ nhật từ iframe."""
-    data = request.json
-    st.session_state.rect_info = data.get('rect_info', '')
-    return jsonify(success=True)
-
-def start_flask_app():
-    """Chạy Flask app."""
-    app.run(port=5000, use_reloader=False)
+import requests
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -66,15 +51,19 @@ def get_image_with_canvas(image):
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
+                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
 
-                // Gửi thông tin về Streamlit thông qua API
-                fetch('http://localhost:5000/update_rect_info', {{
+                // Gửi thông tin hình chữ nhật về API Flask
+                fetch('http://127.0.0.1:5000/update_rect_info', {{
                     method: 'POST',
                     headers: {{
                         'Content-Type': 'application/json'
                     }},
-                    body: JSON.stringify({{ rect_info: rectInfo }})
-                }});
+                    body: JSON.stringify({{ rectInfo: rectInfo }})
+                }})
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
             }}
         }});
     </script>
@@ -93,32 +82,6 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Hiển thị thông tin hình chữ nhật
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state['rect_info']
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
-
-                # Nút áp dụng GrabCut
-                if st.button("Áp dụng GrabCut"):
-                    mask = np.zeros(image.shape[:2], np.uint8)
-                    bgd_model = np.zeros((1, 65), np.float64)
-                    fgd_model = np.zeros((1, 65), np.float64)
-                    rect = (x, y, x + w, y + h)
-                    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                    output_image = image * mask2[:, :, np.newaxis]
-                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
-
-# Chạy ứng dụng Flask trong một luồng riêng
-threading.Thread(target=start_flask_app).start()
-
-# Chạy ứng dụng Streamlit
+# Chạy ứng dụng
 if __name__ == "__main__":
     run_app1()
