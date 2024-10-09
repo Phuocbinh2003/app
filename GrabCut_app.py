@@ -47,7 +47,7 @@ def get_image_with_canvas(image):
             const endY = e.offsetY;
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
-
+            console.log('Mouse up event:', startX, startY, rectWidth, rectHeight);
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
