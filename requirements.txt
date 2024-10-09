@@ -7,4 +7,4 @@ scikit-learn==1.0.2
 firebase-admin==6.1.0
 python-dotenv==1.0.0
 streamlit-js-eval==0.1.7  # Kiểm tra phiên bản này có tồn tại không
-distutils
+python3-distutils
