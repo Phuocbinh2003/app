@@ -80,7 +80,7 @@ def run_app1():
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
-                    console.log('Rectangle info received:', rectInfo);
+                    console.log('Mouse up event:', rectInfo);
                     streamlitWebSocket.send(rectInfo);
                 }
             });
