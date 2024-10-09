@@ -6,5 +6,5 @@ streamlit-drawable-canvas
 scikit-learn
 firebase-admin
 python-dotenv
-streamlit-js-eval==0.1.7  
+streamlit-js-eval
 python3-distutils
