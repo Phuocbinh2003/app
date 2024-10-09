@@ -93,6 +93,7 @@ def run_app1():
             });
         })();
         """
+        # Cung cấp label cho streamlit_js_eval
         rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_info_listener")
 
         # Nếu có thông tin từ console
