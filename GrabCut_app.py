@@ -76,7 +76,7 @@ def run_app1():
         rect_info = streamlit_js_eval(js_code="parent.addEventListener('message', (event) => {return event.data.rectInfo;})", key="rect_listener")
         
         if rect_info:
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
+            st.write(f"Thông tin hình chữ nhậtt: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
                 x = int(match.group(1))
