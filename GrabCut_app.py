@@ -14,7 +14,7 @@ def get_image_with_canvas(image):
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px;"></div>
+        <div id="rectInfo" style="margin-top: 10px; font-size: 16px; color: black; background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px;"></div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
