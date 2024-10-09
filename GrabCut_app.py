@@ -4,22 +4,18 @@ import numpy as np
 import base64
 import re
 
-from grabcut_processor import GrabCutProcessor
-
-def get_image_with_canvas(image, target_width=800):
+def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
     height, width = image.shape[:2]
-    aspect_ratio = height / width
-    target_height = int(target_width * aspect_ratio)
 
     html = f"""
     <div style="position: relative;">
-        <img id="image" src="data:image/png;base64,{img_base64}" style="max-width: 100%; height: {target_height}px;"/>
-        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: {target_width}px; height: {target_height}px;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px;"></div> <!-- Nơi lưu thông tin hình chữ nhật -->
+        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
+        <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
+        <div id="rectInfo" style="margin-top: 10px;"></div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -51,18 +47,11 @@ def get_image_with_canvas(image, target_width=800):
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
 
-            // Chỉ lưu thông tin nếu Width và Height > 0
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
 
-                // Cập nhật thông tin hình chữ nhật vào div
                 rectInfoDiv.innerHTML = rectInfo;
-
-                // Dispatch sự kiện cho Streamlit
-                const streamlit = window.parent.document.querySelector('iframe').contentWindow;
-                streamlit.document.dispatchEvent(new CustomEvent('rectangle-drawn', {{ detail: rectInfo }}));
-            }} else {{
-                console.log("Kích thước hình chữ nhật không hợp lệ, bỏ qua.");
+                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
     </script>
@@ -77,12 +66,11 @@ def run_app1():
     if uploaded_file is not None:
         # Đọc ảnh
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
-        processor = GrabCutProcessor(image)
 
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(processor.img_copy), height=500)
+        st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Kiểm tra và nhận thông tin hình chữ nhật từ session_state
+        # Lắng nghe thông điệp từ iframe
         if 'rect_info' in st.session_state:
             rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
@@ -96,7 +84,13 @@ def run_app1():
 
                 # Nút áp dụng GrabCut
                 if st.button("Áp dụng GrabCut"):
-                    output_image = processor.apply_grabcut(rect)
+                    mask = np.zeros(image.shape[:2], np.uint8)
+                    bgd_model = np.zeros((1, 65), np.float64)
+                    fgd_model = np.zeros((1, 65), np.float64)
+                    rect = (x, y, x + w, y + h)
+                    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
+                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                    output_image = image * mask2[:, :, np.newaxis]
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
 # Chạy ứng dụng
