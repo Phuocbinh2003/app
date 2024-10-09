@@ -2,6 +2,7 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
+from streamlit.components.v1 import html
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -68,27 +69,22 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị hình ảnh với lớp phủ canvas
-        st.components.v1.html(get_image_with_canvas(image), height=500)
+        html(get_image_with_canvas(image), height=500)
 
-        # Mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
+        # Thêm mã JavaScript để lắng nghe thông điệp từ iframe khác
         st.components.v1.html("""
         <script>
             window.addEventListener('message', (event) => {
-                if (event.data && event.data.rectInfo) {
+                // Kiểm tra nguồn gốc của thông điệp nếu cần
+                if (event.origin === 'https://appmainpy-khciq5ibzf2uypmupzkhzm.streamlit.app') {
                     const rectInfo = event.data.rectInfo;
-                    // Gửi thông tin hình chữ nhật trở lại Streamlit
-                    const streamlit = window.parent.streamlit;
-                    if (streamlit) {
-                        streamlit.setComponentValue(rectInfo);
-                    }
+                    // Hiển thị thông tin hình chữ nhật
+                    console.log('Mouse up event:', rectInfo);
+                    document.getElementById('rectInfo').innerText = 'Thông tin hình chữ nhật từ iframe khác: ' + rectInfo;
                 }
             });
         </script>
-        """)
-
-        # Kiểm tra xem có giá trị nào được thiết lập trong session state cho thông tin hình chữ nhật không
-        if st.session_state.get("rect_info"):
-            st.write(f"Thông tin hình chữ nhật: {st.session_state.rect_info}")
+        """, height=0)
 
 # Chạy ứng dụng
 if __name__ == "__main__":
