@@ -3,6 +3,22 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
+from flask import Flask, request, jsonify
+import threading
+
+# Khởi tạo Flask
+app = Flask(__name__)
+
+@app.route('/update_rect_info', methods=['POST'])
+def update_rect_info():
+    """Nhận thông tin hình chữ nhật từ iframe."""
+    data = request.json
+    st.session_state.rect_info = data.get('rect_info', '')
+    return jsonify(success=True)
+
+def start_flask_app():
+    """Chạy Flask app."""
+    app.run(port=5000, use_reloader=False)
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -49,12 +65,16 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi dữ liệu về Streamlit thông qua session state
-                const message = 'streamlit:rect_info:' + rectInfo;
-                window.parent.postMessage(message, '*');
+                // Gửi thông tin về Streamlit thông qua API
+                fetch('http://localhost:5000/update_rect_info', {{
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{ rect_info: rectInfo }})
+                }});
             }}
         }});
     </script>
@@ -73,7 +93,7 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Lắng nghe thông điệp từ iframe
+        # Hiển thị thông tin hình chữ nhật
         if 'rect_info' in st.session_state:
             rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
@@ -96,6 +116,9 @@ def run_app1():
                     output_image = image * mask2[:, :, np.newaxis]
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
-# Chạy ứng dụng
+# Chạy ứng dụng Flask trong một luồng riêng
+threading.Thread(target=start_flask_app).start()
+
+# Chạy ứng dụng Streamlit
 if __name__ == "__main__":
     run_app1()
