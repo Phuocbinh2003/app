@@ -2,7 +2,6 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import base64
-import re
 from streamlit.components.v1 import html
 from streamlit_js_eval import streamlit_js_eval
 
@@ -48,7 +47,6 @@ def get_image_with_canvas(image):
             const endY = e.offsetY;
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
-            console.log('Mouse up event:', startX, startY, rectWidth, rectHeight);
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
@@ -56,6 +54,15 @@ def get_image_with_canvas(image):
 
                 // Gửi thông điệp qua postMessage
                 window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
+            }}
+        }});
+
+        // Lắng nghe thông điệp từ postMessage
+        window.addEventListener('message', (event) => {{
+            if (event.data && event.data.rectInfo) {{
+                const rectInfo = event.data.rectInfo;
+                console.log('Rectangle info received:', rectInfo);
+                streamlitWebSocket.send(JSON.stringify(rectInfo));
             }}
         }});
     </script>
@@ -81,14 +88,12 @@ def run_app1():
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
                     console.log('Mouse up event:', rectInfo);
-                    streamlitWebSocket.send(rectInfo);
+                    streamlitWebSocket.send(JSON.stringify(rectInfo));
                 }
             });
         })();
         """
-        
-        # Chạy đoạn mã JavaScript để lắng nghe thông điệp từ postMessage
-        rect_info = streamlit_js_eval(js_code, key="console_key", label="rect_info_listener")
+        rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_info_listener")
 
         # Nếu có thông tin từ console
         if rect_info:
