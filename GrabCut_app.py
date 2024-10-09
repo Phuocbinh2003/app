@@ -79,14 +79,14 @@ def run_app1():
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
                     console.log('Mouse up event:', rectInfo);
-                    streamlitWebSocket.send(JSON.stringify({rectInfo: rectInfo}));
+                    streamlitWebSocket.send(rectInfo);
                 }
             });
         })();
         """
 
         # Sử dụng streamlit_js_eval để lắng nghe sự kiện
-        rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_info_listener")
+        rect_info = streamlit_js_eval(js_code, key="console_key")
 
         # Hiển thị thông tin hình chữ nhật được vẽ
         if rect_info:
