@@ -14,8 +14,8 @@ def get_image_with_canvas(image):
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px;"></div>
-        <textarea id="inputParams" style="width: 100%; height: 50px;" readonly></textarea>
+        <div id="streamlit_rect_info" style="margin-top: 10px;"></div>
+        <textarea id="streamlit_input_params" style="width: 100%; height: 50px;" readonly></textarea>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -48,18 +48,20 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-                document.getElementById('rectInfo').innerText = rectInfo;
 
-                // Cập nhật input với thông số hình chữ nhật
+                // Hiển thị thông tin hình chữ nhật
+                document.getElementById('streamlit_rect_info').innerText = rectInfo;
+
+                // Gửi thông tin để nhập các thông số cho GrabCut
                 const inputParams = `X: ${startX}, Y: ${startY}, Width: ${rectWidth}, Height: ${rectHeight}`;
-                document.getElementById('inputParams').value = inputParams;
+                document.getElementById('streamlit_input_params').value = inputParams;
             }}
         }});
     </script>
     """
     return html_code
 
-def run_app1():
+def run_app():
     st.title("Ứng dụng GrabCut")
 
     # Tải lên hình ảnh
@@ -69,8 +71,8 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị hình ảnh với lớp phủ canvas
-        html(get_image_with_canvas(image), height=500)
+        st.components.v1.html(get_image_with_canvas(image), height=500)
 
 # Chạy ứng dụng
 if __name__ == "__main__":
-    run_app1()
+    run_app()
