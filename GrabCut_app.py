@@ -3,7 +3,6 @@ import cv2 as cv
 import numpy as np
 import base64
 from streamlit.components.v1 import html
-from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
     """Trả về HTML với canvas để vẽ hình chữ nhật."""
@@ -52,7 +51,7 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Gửi thông điệp về Streamlit
+                // Gửi thông điệp qua postMessage
                 window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
@@ -60,7 +59,7 @@ def get_image_with_canvas(image):
     """
     return html_code
 
-def run_app():
+def run_app1():
     st.title("Ứng dụng GrabCut")
 
     # Tải lên hình ảnh
@@ -72,28 +71,21 @@ def run_app():
         # Hiển thị hình ảnh với lớp phủ canvas
         html(get_image_with_canvas(image), height=500)
 
-        # Tạo mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
-        js_code = """
-        (function() {
+        # Thêm mã JavaScript để lắng nghe thông điệp từ iframe khác
+        st.components.v1.html("""
+        <script>
             window.addEventListener('message', (event) => {
-                if (event.data && event.data.rectInfo) {
+                // Kiểm tra nguồn gốc của thông điệp nếu cần
+                if (event.origin === 'https://appmainpy-khciq5ibzf2uypmupzkhzm.streamlit.app') {
                     const rectInfo = event.data.rectInfo;
-                    // Gửi thông tin hình chữ nhật trở lại Streamlit
-                    const streamlitDiv = document.getElementById('rect_info_div'); // Đảm bảo sử dụng đúng ID của div
-                    if (streamlitDiv) {
-                        streamlitDiv.innerText = rectInfo; // Hiển thị thông tin trong div
-                    }
+                    // Hiển thị thông tin hình chữ nhật
+                    console.log('Mouse up event:', rectInfo);
+                    document.getElementById('rectInfo').innerText = 'Thông tin hình chữ nhật từ iframe khác: ' + rectInfo;
                 }
             });
-        })();
-        """
-
-        # Sử dụng streamlit_js_eval để lắng nghe sự kiện
-        streamlit_js_eval(js_code, key="console_key")
-
-        # Tạo div để hiển thị thông tin hình chữ nhật
-        st.markdown('<div id="rect_info_div"></div>', unsafe_allow_html=True)
+        </script>
+        """, height=0)
 
 # Chạy ứng dụng
 if __name__ == "__main__":
-    run_app()
+    run_app1()
