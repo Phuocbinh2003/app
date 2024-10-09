@@ -73,6 +73,7 @@ def run_app1():
 
         # Lắng nghe thông điệp từ iframe
         rect_info = st.session_state.get('rect_info', None)
+        st.write(f"Thông tin hình chữ nhật: {rect_info}")
         if rect_info is not None:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
