@@ -49,8 +49,18 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
+                
+                // Hiển thị thông tin hình chữ nhật
+                document.getElementById('rectInfo').innerText = rectInfo;
+
                 // Gửi thông điệp về Streamlit
-                window.parent.postMessage({{ rectInfo: rectInfo, x: startX, y: startY, width: rectWidth, height: rectHeight }}, '*');
+                window.parent.postMessage({{
+                    rectInfo: rectInfo,
+                    x: startX,
+                    y: startY,
+                    width: rectWidth,
+                    height: rectHeight
+                }}, '*');
             }}
         }});
     </script>
