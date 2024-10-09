@@ -78,6 +78,7 @@ def run_app1():
         js_code = """
         console.log('Listening for console events...');
         """
+        st.write(f"Console log: {js_code}")
         rect_info = streamlit_js_eval(js_code, key="console_key")
 
         # Nếu có thông tin từ console
