@@ -1,10 +1,10 @@
-streamlit==1.39.0
-numpy==1.23.5
-opencv-python-headless==4.6.0.66
-Pillow==9.0.0
-streamlit-drawable-canvas==0.8.0
-scikit-learn==1.0.2
-firebase-admin==6.1.0
-python-dotenv==1.0.0
-streamlit-js-eval==0.1.7  # Kiểm tra phiên bản này có tồn tại không
+streamlit
+numpy
+opencv-python-headless
+Pillow
+streamlit-drawable-canvas
+scikit-learn
+firebase-admin
+python-dotenv
+streamlit-js-eval==0.1.7  
 python3-distutils
