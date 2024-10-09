@@ -88,7 +88,7 @@ def run_app1():
         """
         
         # Chạy đoạn mã JavaScript để lắng nghe thông điệp từ postMessage
-        rect_info = streamlit_js_eval(js_code, key="console_key")
+        rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_listener")
 
         # Nếu có thông tin từ console
         if rect_info:
