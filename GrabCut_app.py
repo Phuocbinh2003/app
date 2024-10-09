@@ -49,12 +49,10 @@ def get_image_with_canvas(image):
             const rectHeight = endY - startY;
 
             if (rectWidth > 0 && rectHeight > 0) {{
+
+                // Đưa thông tin vào div id="rectInfo"
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
-
-                // Gửi thông tin về Streamlit
-                const data = {{ 'rect_info': rectInfo }};
-                window.parent.postMessage(data, '*');
             }}
         }});
     </script>
@@ -82,12 +80,11 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=500)
+        st.components.v1.html(get_image_with_canvas(image), height=500+50)
 
-        # Nhận thông tin từ iframe
-        rect_info = st.session_state.get('rect_info', None)
+        # Nhập thông tin hình chữ nhật từ div (người dùng có thể sao chép hoặc kiểm tra thủ công)
+        rect_info = st.text_input("Nhập thông tin hình chữ nhật (nếu có)", "")
         if rect_info:
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
             rect = parse_rect_info(rect_info)
             if rect:
                 x, y, w, h = rect
