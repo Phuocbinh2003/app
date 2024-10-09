@@ -76,9 +76,18 @@ def run_app1():
 
         # Lắng nghe console log và hiển thị trên Streamlit
         js_code = """
-        console.log('Listening for console events...');
+        (function() {
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.rectInfo) {
+                    const rectInfo = event.data.rectInfo;
+                    console.log('Rectangle info received:', rectInfo);
+                    streamlitWebSocket.send(rectInfo);
+                }
+            });
+        })();
         """
-        st.write(f"Console log: {js_code}")
+        
+        # Chạy đoạn mã JavaScript để lắng nghe thông điệp từ postMessage
         rect_info = streamlit_js_eval(js_code, key="console_key")
 
         # Nếu có thông tin từ console
