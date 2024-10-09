@@ -6,7 +6,7 @@ from streamlit.components.v1 import html
 from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
-    """Return HTML with canvas for drawing rectangle."""
+    """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -49,10 +49,10 @@ def get_image_with_canvas(image):
             const rectHeight = endY - startY;
 
             if (rectWidth > 0 && rectHeight > 0) {{
-                const rectInfo = 'Rectangle: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
+                const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Send message through postMessage
+                // Gửi thông điệp qua postMessage
                 window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
@@ -61,37 +61,37 @@ def get_image_with_canvas(image):
     return html_code
 
 def run_app1():
-    st.title("GrabCut Application")
+    st.title("Ứng dụng GrabCut")
 
-    # Upload image
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png"])
+    # Tải lên hình ảnh
+    uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
     if uploaded_file is not None:
-        # Read image
+        # Đọc hình ảnh
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
-        # Display image with canvas overlay
+        # Hiển thị hình ảnh với lớp phủ canvas
         html(get_image_with_canvas(image), height=500)
 
-        # JavaScript code to listen for postMessage and send data to Streamlit
+        # Mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
         js_code = """
         (function() {
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
-                    // Send rectangle info back to Streamlit
-                    streamlit.setComponentValue(rectInfo);
+                    // Sử dụng API của Streamlit để thiết lập giá trị component
+                    window.parent.streamlit.setComponentValue(rectInfo);
                 }
             });
         })();
         """
 
-        # Use streamlit_js_eval to listen for events
+        # Sử dụng streamlit_js_eval để lắng nghe sự kiện
         streamlit_js_eval(js_code, key="console_key")
 
-        # Display rectangle information drawn
+        # Kiểm tra xem có giá trị nào được thiết lập trong session state cho thông tin hình chữ nhật không
         if st.session_state.get("rect_info"):
-            st.write(f"Rectangle information: {st.session_state.rect_info}")
+            st.write(f"Thông tin hình chữ nhật: {st.session_state.rect_info}")
 
-# Run the application
+# Chạy ứng dụng
 if __name__ == "__main__":
     run_app1()
