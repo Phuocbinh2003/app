@@ -12,10 +12,10 @@ def get_image_with_canvas(image):
     height, width = image.shape[:2]
 
     html = f"""
-    <div style="position: relative;">
+    <div style="position: relative; padding-bottom: 30px;">  <!-- Added padding -->
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: 10px;"></div>
+        <div id="rectInfo" style="margin-top: 10px; position: relative; z-index: 1;"></div>  <!-- Ensured div is on top -->
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -70,7 +70,7 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        if st.session_state.get('rect_info'):
+        if 'rect_info' in st.session_state:
             rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
@@ -93,7 +93,9 @@ def run_app1():
 
 # Set up the event listener for receiving messages from JavaScript
 def message_listener():
-    st.session_state.rect_info = None
+    if 'rect_info' not in st.session_state:
+        st.session_state.rect_info = None
+
     if st.session_state.rect_info is None:
         st.session_state.rect_info = st.experimental_get_query_params().get('rect_info', [None])[0]
 
