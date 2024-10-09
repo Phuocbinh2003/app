@@ -49,7 +49,6 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-
                 rectInfoDiv.innerHTML = rectInfo; // Cập nhật nội dung div
                 window.parent.postMessage({{ rect_info: rectInfo }}, '*'); // Gửi thông tin về Streamlit
             }}
@@ -70,24 +69,15 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Lắng nghe thông điệp từ iframe
-        if 'rect_info' in st.session_state:
-            rect_info = st.session_state['rect_info']
+        # Xử lý thông điệp từ iframe
+        message = st.experimental_get_query_params().get("rect_info")
+        if message:
+            rect_info = message[0]  # Lấy thông tin hình chữ nhật
+            st.session_state['rect_info'] = rect_info
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
 
-        # Lắng nghe các thông điệp từ iframe
-        if st.session_state.get('rect_info') is None:
-            st.session_state['rect_info'] = ""
-
-        # Cập nhật session state từ thông điệp
-        def message_handler():
-            if st.session_state['rect_info']:
-                st.write(f"Thông tin hình chữ nhật: {st.session_state['rect_info']}")
-
-        message_handler()
-
-        # Nếu có thông tin hình chữ nhật
-        if st.button("Áp dụng GrabCut") and st.session_state['rect_info']:
+        # Nút áp dụng GrabCut
+        if st.button("Áp dụng GrabCut") and 'rect_info' in st.session_state:
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', st.session_state['rect_info'])
             if match:
                 x = int(match.group(1))
