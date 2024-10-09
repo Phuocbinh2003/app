@@ -72,21 +72,23 @@ def run_app1():
         # Hiển thị hình ảnh với lớp phủ canvas
         html(get_image_with_canvas(image), height=500)
 
-        # Lắng nghe postMessage và xử lý thông tin trên Streamlit
+        # Tạo mã JavaScript để lắng nghe postMessage và gửi dữ liệu về Streamlit
         js_code = """
         (function() {
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
+                    console.log('Mouse up event:', rectInfo);
                     streamlitWebSocket.send(JSON.stringify({rectInfo: rectInfo}));
                 }
             });
         })();
         """
-        # Sử dụng streamlit_js_eval và cung cấp label hợp lệ
-        rect_info = streamlit_js_eval(js_code, key="console_key", label="rect_listener")
 
-        # Nếu có thông tin từ console
+        # Sử dụng streamlit_js_eval để lắng nghe sự kiện
+        rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_info_listener")
+
+        # Hiển thị thông tin hình chữ nhật được vẽ
         if rect_info:
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
 
