@@ -11,12 +11,15 @@ def get_image_with_canvas(image):
 
     height, width = image.shape[:2]
 
+    # Increase the height of the canvas by 50 pixels
+    canvas_height = height + 50
+
     # HTML structure with embedded JavaScript for canvas interaction
     html = f"""
     <div style="position: relative;">
-        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px; position: relative; z-index: 10;"/>
-        <canvas id="canvas" width="{width}" height="{height + 40}" style="position: absolute; top: 0; left: 0; z-index: 5; border: 1px solid red;"></canvas>
-        <div id="rectInfo" style="margin-top: {height + 10}px; font-size: 16px; color: black; background: rgba(255, 255, 255, 0.8); padding: 10px; border: 1px solid #ccc; border-radius: 5px; position: relative; z-index: 15;"></div>
+        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
+        <canvas id="canvas" width="{width}" height="{canvas_height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
+        <div id="rectInfo" style="margin-top: 10px; font-size: 16px; color: black; background: rgba(255, 255, 255, 0.8); padding: 10px; border: 1px solid #ccc; border-radius: 5px; position: relative; z-index: 10;"></div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
@@ -67,7 +70,7 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv.IMREAD_COLOR)
 
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=image.shape[0] + 70)  # Increase height for the display
+        st.components.v1.html(get_image_with_canvas(image), height=canvas_height)
 
 # Run the app
 if __name__ == "__main__":
