@@ -52,9 +52,6 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Ghi thông tin vào console
-                console.log('Mouse up event:', rectInfo);
-        
                 // Gửi thông điệp qua postMessage
                 window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
@@ -75,24 +72,23 @@ def run_app1():
         # Hiển thị hình ảnh với lớp phủ canvas
         html(get_image_with_canvas(image), height=500)
 
-        # Lắng nghe console log và hiển thị trên Streamlit
+        # Lắng nghe postMessage và xử lý thông tin trên Streamlit
         js_code = """
         (function() {
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
-                    console.log('Mouse up event:', rectInfo);
                     streamlitWebSocket.send(JSON.stringify({rectInfo: rectInfo}));
                 }
             });
         })();
         """
-        # Cung cấp nhãn cho streamlit_js_eval (ví dụ nhãn là "rect_listener")
+        # Sử dụng streamlit_js_eval và cung cấp label hợp lệ
         rect_info = streamlit_js_eval(js_code, key="console_key", label="rect_listener")
 
         # Nếu có thông tin từ console
         if rect_info:
-            st.write(f"Console log: {rect_info}")
+            st.write(f"Thông tin hình chữ nhật: {rect_info}")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
