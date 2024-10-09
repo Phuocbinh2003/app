@@ -64,6 +64,10 @@ def get_image_with_canvas(image):
                 .then(response => response.json())
                 .then(data => console.log(data))
                 .catch(error => console.error('Error:', error));
+
+                // Hiển thị thông tin chữ nhật dưới ảnh
+                const infoDiv = document.getElementById('rectInfo');
+                infoDiv.innerHTML = rectInfo; // Cập nhật thông tin chữ nhật
             }}
         }});
     </script>
