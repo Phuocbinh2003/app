@@ -61,7 +61,7 @@ def get_image_with_canvas(image):
     """
     return html_code
 
-def run_app():
+def run_app1():
     st.title("Ứng dụng GrabCut")
 
     # Tải lên hình ảnh
@@ -75,4 +75,4 @@ def run_app():
 
 # Chạy ứng dụng
 if __name__ == "__main__":
-    run_app()
+    run_app1()
