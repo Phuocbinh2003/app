@@ -8,3 +8,4 @@ firebase-admin
 python-dotenv
 streamlit-js-eval
 streamlit-drawable-canvas
+Flask
