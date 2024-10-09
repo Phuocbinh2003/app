@@ -5,7 +5,7 @@ import base64
 import re
 
 def get_image_with_canvas(image):
-    """Trả về HTML với canvas để vẽ hình chữ nhật."""
+    """Return HTML with canvas for drawing rectangles."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -49,9 +49,8 @@ def get_image_with_canvas(image):
 
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
-
                 rectInfoDiv.innerHTML = rectInfo;
-                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
+                window.parent.postMessage({{ rect_info: rectInfo }}, '*');
             }}
         }});
     </script>
@@ -71,7 +70,7 @@ def run_app1():
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        if 'rect_info' in st.session_state:
+        if st.session_state.get('rect_info'):
             rect_info = st.session_state['rect_info']
             st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
@@ -80,7 +79,6 @@ def run_app1():
                 y = int(match.group(2))
                 w = int(match.group(3))
                 h = int(match.group(4))
-                rect = (x, y, w, h)
 
                 # Nút áp dụng GrabCut
                 if st.button("Áp dụng GrabCut"):
@@ -93,6 +91,13 @@ def run_app1():
                     output_image = image * mask2[:, :, np.newaxis]
                     st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
+# Set up the event listener for receiving messages from JavaScript
+def message_listener():
+    st.session_state.rect_info = None
+    if st.session_state.rect_info is None:
+        st.session_state.rect_info = st.experimental_get_query_params().get('rect_info', [None])[0]
+
 # Chạy ứng dụng
 if __name__ == "__main__":
+    message_listener()
     run_app1()
