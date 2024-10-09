@@ -59,15 +59,7 @@ def get_image_with_canvas(image):
                 window.parent.postMessage({ rectInfo: rectInfo }, '*');
             }}
         }});
-
-        // Lắng nghe thông điệp từ postMessage
-        window.addEventListener('message', (event) => {{
-            if (event.data && event.data.rectInfo) {{
-                const rectInfo = event.data.rectInfo;
-                console.log('Rectangle info received:', rectInfo);
-                streamlitWebSocket.send(JSON.stringify(rectInfo));
-            }}
-        }});
+  
     </script>
     """
     return html_code
