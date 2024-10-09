@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 import base64
 import re
-from streamlit_js_eval import streamlit_js_eval
+from streamlit.components.v1 import html
 
 def get_image_with_canvas(image):
     """Return HTML with canvas to draw a rectangle."""
@@ -52,8 +52,8 @@ def get_image_with_canvas(image):
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
-                // Send rectangle info back to Streamlit
-                window.parent.postMessage({{ rectInfo: rectInfo }}, 'https://appmainpy-khciq5ibzf2uypmupzkhzm.streamlit.app/');
+                // Gửi thông điệp qua postMessage
+                window.parent.postMessage({{ rectInfo: rectInfo }}, '*'); // Thay đổi URL thành '*'
             }}
         }});
     </script>
@@ -70,13 +70,12 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Display image with canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=500)
+        html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe thông điệp từ iframe
-        rect_info = streamlit_js_eval(js_code="parent.addEventListener('message', (event) => {return event.data.rectInfo;})", key="rect_listener")
-        
-        if rect_info:
-            st.write(f"Thông tin hình chữ nhậtt: {rect_info}")
+        if st.session_state.get('rect_info'):
+            rect_info = st.session_state['rect_info']
+            st.write(f"Thông tin hình chữ nhật: {rect_info}")
             match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
             if match:
                 x = int(match.group(1))
