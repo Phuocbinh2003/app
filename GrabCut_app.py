@@ -21,7 +21,7 @@ def get_image_with_canvas(image):
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const img = document.getElementById('image');
-        let startX, startY, isDrawing = false;
+        let startX, startY, endX, endY, isDrawing = false;
 
         canvas.addEventListener('mousedown', function(e) {{
             startX = e.offsetX;
@@ -41,8 +41,8 @@ def get_image_with_canvas(image):
 
         canvas.addEventListener('mouseup', function(e) {{
             isDrawing = false;
-            const endX = e.offsetX;
-            const endY = e.offsetY;
+            endX = e.offsetX;
+            endY = e.offsetY;
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
 
@@ -72,7 +72,7 @@ def run_app1():
 
         # Nhận thông tin hình chữ nhật từ JavaScript
         rect_info = streamlit_js_eval('document.getElementById("streamlit_rect_info").innerText')
-        
+
         if rect_info:
             st.write(f"Tọa độ hình chữ nhật: {rect_info}")
             # Bạn có thể tiếp tục xử lý tọa độ ở đây để áp dụng thuật toán GrabCut
