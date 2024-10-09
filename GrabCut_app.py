@@ -6,7 +6,7 @@ from streamlit.components.v1 import html
 from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
-    """Return HTML with canvas to draw a rectangle."""
+    """Trả về HTML với canvas để vẽ hình chữ nhật."""
     _, img_encoded = cv.imencode('.png', image)
     img_base64 = base64.b64encode(img_encoded).decode()
 
@@ -66,13 +66,13 @@ def get_image_with_canvas(image):
 def run_app1():
     st.title("Ứng dụng GrabCut")
 
-    # Upload image
+    # Tải lên hình ảnh
     uploaded_file = st.file_uploader("Chọn một ảnh...", type=["jpg", "png"])
     if uploaded_file is not None:
-        # Read image
+        # Đọc hình ảnh
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
-        # Display image with canvas overlay
+        # Hiển thị hình ảnh với lớp phủ canvas
         html(get_image_with_canvas(image), height=500)
 
         # Lắng nghe console log và hiển thị trên Streamlit
@@ -87,13 +87,13 @@ def run_app1():
             });
         })();
         """
-        # Cung cấp label cho streamlit_js_eval
-        rect_info = streamlit_js_eval(js_code, key="console_key", label="rectangle_info_listener")
+        # Cung cấp nhãn cho streamlit_js_eval (ví dụ nhãn là "rect_listener")
+        rect_info = streamlit_js_eval(js_code, key="console_key", label="rect_listener")
 
         # Nếu có thông tin từ console
         if rect_info:
             st.write(f"Console log: {rect_info}")
 
-# Run the app
+# Chạy ứng dụng
 if __name__ == "__main__":
     run_app1()
