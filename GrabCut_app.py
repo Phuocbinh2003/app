@@ -1,7 +1,68 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-from streamlit_drawable_canvas import st_canvas
+import base64
+
+def get_image_with_canvas(image):
+    """Trả về HTML với canvas để vẽ hình chữ nhật."""
+    _, img_encoded = cv.imencode('.png', image)
+    img_base64 = base64.b64encode(img_encoded).decode()
+
+    height, width = image.shape[:2]
+
+    html_code = f"""
+    <div style="position: relative;">
+        <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
+        <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
+        <div id="streamlit_rect_info" style="margin-top: 10px;"></div>
+        <textarea id="streamlit_input_params" style="width: 100%; height: 50px;" readonly></textarea>
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('image');
+        let startX, startY, isDrawing = false;
+
+        canvas.addEventListener('mousedown', function(e) {{
+            startX = e.offsetX;
+            startY = e.offsetY;
+            isDrawing = true;
+        }});
+
+        canvas.addEventListener('mousemove', function(e) {{
+            if (isDrawing) {{
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
+            }}
+        }});
+
+        canvas.addEventListener('mouseup', function(e) {{
+            isDrawing = false;
+            const endX = e.offsetX;
+            const endY = e.offsetY;
+            const rectWidth = endX - startX;
+            const rectHeight = endY - startY;
+
+            if (rectWidth > 0 && rectHeight > 0) {{
+                const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
+
+                // Hiển thị thông tin hình chữ nhật
+                document.getElementById('streamlit_rect_info').innerText = rectInfo;
+
+                // Gửi thông tin để nhập các thông số cho GrabCut
+                const inputParams = `X: ${startX}, Y: ${startY}, Width: ${rectWidth}, Height: ${rectHeight}`;
+                document.getElementById('streamlit_input_params').value = inputParams;
+
+                // Lưu dữ liệu vào localStorage để gửi về Streamlit
+                localStorage.setItem('rect_info', inputParams);
+            }}
+        }});
+    </script>
+    """
+    return html_code
 
 def run_app1():
     st.title("Ứng dụng GrabCut")
@@ -12,58 +73,13 @@ def run_app1():
         # Đọc hình ảnh
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
-        # Hiển thị hình ảnh
-        st.image(image, channels="BGR", caption="Ảnh gốc", use_column_width=True)
+        # Hiển thị hình ảnh với lớp phủ canvas
+        st.components.v1.html(get_image_with_canvas(image), height=image.shape[0] + 200)
 
-        # Tạo canvas để vẽ hình chữ nhật
-        canvas_result = st_canvas(
-            fill_color="rgba(0, 0, 0, 0)",  # Transparent fill
-            stroke_width=3,
-            stroke_color="red",
-            background_image=st.image(image, channels="BGR"),
-            update_streamlit=True,
-            width=image.shape[1],
-            height=image.shape[0],
-            drawing_mode="rect",
-            key="canvas",
-        )
-
-        # Lấy tọa độ của hình chữ nhật được vẽ
-        if canvas_result.json_data is not None:
-            for shape in canvas_result.json_data["objects"]:
-                if shape["type"] == "rect":
-                    rect = shape
-                    left = rect["left"]
-                    top = rect["top"]
-                    width = rect["width"]
-                    height = rect["height"]
-
-                    # Hiển thị thông tin tọa độ
-                    st.write(f"Hình chữ nhật: X: {left}, Y: {top}, Width: {width}, Height: {height}")
-
-                    # Ứng dụng thuật toán GrabCut
-                    rect_coords = (int(left), int(top), int(left + width), int(top + height))
-                    segmented_image = apply_grabcut(image, rect_coords)
-                    
-                    # Hiển thị hình ảnh sau khi áp dụng GrabCut
-                    st.image(segmented_image, channels="BGR", caption="Hình ảnh sau khi áp dụng GrabCut", use_column_width=True)
-
-def apply_grabcut(image, rect):
-    # Tạo mặt nạ cho ảnh
-    mask = np.zeros(image.shape[:2], np.uint8)
-    bgd_model = np.zeros((1, 65), np.float64)
-    fgd_model = np.zeros((1, 65), np.float64)
-
-    # Áp dụng GrabCut
-    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-
-    # Tạo mặt nạ nhị phân
-    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype("uint8")
-
-    # Áp dụng mặt nạ lên ảnh gốc
-    result = image * mask2[:, :, np.newaxis]
-
-    return result
+        # Lấy thông tin tọa độ hình chữ nhật từ localStorage
+        rect_info = st.experimental_get_query_params().get('rect_info')
+        if rect_info:
+            st.write(f"Tọa độ hình chữ nhật: {rect_info}")
 
 # Chạy ứng dụng
 if __name__ == "__main__":
