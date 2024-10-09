@@ -4,6 +4,7 @@ import numpy as np
 import base64
 import re
 from streamlit.components.v1 import html
+from streamlit_js_eval import streamlit_js_eval
 
 def get_image_with_canvas(image):
     """Return HTML with canvas to draw a rectangle."""
@@ -12,7 +13,7 @@ def get_image_with_canvas(image):
 
     height, width = image.shape[:2]
 
-    html = f"""
+    html_code = f"""
     <div style="position: relative;">
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
@@ -48,17 +49,18 @@ def get_image_with_canvas(image):
             const rectWidth = endX - startX;
             const rectHeight = endY - startY;
             console.log('Mouse up event:', startX, startY, rectWidth, rectHeight);
+
             if (rectWidth > 0 && rectHeight > 0) {{
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
 
                 // Gửi thông điệp qua postMessage
-                window.parent.postMessage({{ rectInfo: rectInfo }}, '*'); // Thay đổi URL thành '*'
+                window.parent.postMessage({{ rectInfo: rectInfo }}, '*');
             }}
         }});
     </script>
     """
-    return html
+    return html_code
 
 def run_app1():
     st.title("Ứng dụng GrabCut")
@@ -72,28 +74,15 @@ def run_app1():
         # Display image with canvas overlay
         html(get_image_with_canvas(image), height=500)
 
-        # Lắng nghe thông điệp từ iframe
-        if st.session_state.get('rect_info'):
-            rect_info = st.session_state['rect_info']
-            st.write(f"Thông tin hình chữ nhật: {rect_info}")
-            match = re.search(r'Hình chữ nhật: X: (\d+), Y: (\d+), Width: (\d+), Height: (\d+)', rect_info)
-            if match:
-                x = int(match.group(1))
-                y = int(match.group(2))
-                w = int(match.group(3))
-                h = int(match.group(4))
-                rect = (x, y, w, h)
+        # Lắng nghe console log và hiển thị trên Streamlit
+        js_code = """
+        console.log('Listening for console events...');
+        """
+        rect_info = streamlit_js_eval(js_code, key="console_key")
 
-                # Apply GrabCut button
-                if st.button("Áp dụng GrabCut"):
-                    mask = np.zeros(image.shape[:2], np.uint8)
-                    bgd_model = np.zeros((1, 65), np.float64)
-                    fgd_model = np.zeros((1, 65), np.float64)
-                    rect = (x, y, x + w, y + h)
-                    cv.grabCut(image, mask, rect, bgd_model, fgd_model, 5, cv.GC_INIT_WITH_RECT)
-                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                    output_image = image * mask2[:, :, np.newaxis]
-                    st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
+        # Nếu có thông tin từ console
+        if rect_info:
+            st.write(f"Console log: {rect_info}")
 
 # Run the app
 if __name__ == "__main__":
