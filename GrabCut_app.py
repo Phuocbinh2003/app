@@ -78,7 +78,7 @@ def run_app1():
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
-                    // Sử dụng API của Streamlit để thiết lập giá trị component
+                    // Gửi thông tin hình chữ nhật trở lại Streamlit
                     window.parent.streamlit.setComponentValue(rectInfo);
                 }
             });
