@@ -79,7 +79,7 @@ def run_app1():
                 if (event.data && event.data.rectInfo) {
                     const rectInfo = event.data.rectInfo;
                     // Gửi thông tin hình chữ nhật trở lại Streamlit
-                    window.parent.streamlit.setComponentValue(rectInfo);
+                    streamlit.setComponentValue(rectInfo);
                 }
             });
         })();
