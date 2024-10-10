@@ -9,3 +9,4 @@ python-dotenv
 streamlit-js-eval
 streamlit-drawable-canvas
 Flask
+matplotlib
