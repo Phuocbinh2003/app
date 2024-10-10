@@ -7,7 +7,7 @@ from app_update_firebase import run_app4
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'App2','Face_Verification','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCu', 'App2','Face_Verification','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
