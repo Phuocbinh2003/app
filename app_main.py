@@ -1,20 +1,19 @@
 import streamlit as st
 from GrabCut_app import run_app1
-from Watershed_Segmentation import run_app2  # Đã sửa tên module không có khoảng trắng
+
 from app_face_detection import run_app3
 from app_update_firebase import run_app4
 
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut','App2','Face_Verification','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut','Face_Verification','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
 if option == 'GrabCut':
     run_app1()  # Gọi hàm chạy ứng dụng 1
-elif option == 'App2':
-    run_app2()  # Gọi hàm chạy ứng dụng 2
+
 elif option == 'Face_Verification':
     run_app3()  # Gọi hàm chạy ứng dụng 3
 elif option == 'Update_firebase':
