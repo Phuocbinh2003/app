@@ -129,3 +129,5 @@ def run_app2():
 
             st.pyplot(fig)
 
+if __name__ == "__main__":
+    run_app2()
