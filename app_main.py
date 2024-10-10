@@ -11,7 +11,7 @@ option = st.sidebar.selectbox(
 )
 
 # Hiển thị ứng dụng tương ứng
-if option == 'GrabCut':
+if option == 'GrabCu':
     run_app1()  # Gọi hàm chạy ứng dụng 1
 elif option == 'App2':
     run_app2()  # Gọi hàm chạy ứng dụng 2
