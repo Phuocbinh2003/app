@@ -42,13 +42,13 @@ def run_app2():
 
     # Danh sách các URL hoặc đường dẫn tới các hình ảnh train và test
     train_image_urls = [
-        "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata349.jpg",
-        "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata235.jpg"
+        "my_folder/Buoc_test1.png",
+        "my_folder/Buoc_test2.png"
     ]
     
     test_image_urls = [
-        "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata360.jpg",
-        "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata407.jpg"
+        "my_folder/KQ_test1.png",
+        "my_folder/KQ_test2.png.jpg"
     ]
 
     # Hiển thị lần lượt ảnh train và kết quả
