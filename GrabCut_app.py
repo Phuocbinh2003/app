@@ -17,14 +17,17 @@ def get_image_with_canvas(image):
         <img id="image" src="data:image/png;base64,{img_base64}" style="width: {width}px; height: {height}px;"/>
         <canvas id="canvas" width="{width}" height="{height}" style="position: absolute; top: 0; left: 0; border: 1px solid red;"></canvas>
         <div id="rectInfo" style="margin-top: 10px; position: relative; z-index: 1;"></div>
+        <button id="copyButton">Copy to Text Input</button>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const img = document.getElementById('image');
         const rectInfoDiv = document.getElementById('rectInfo');
+        const copyButton = document.getElementById('copyButton');
         let startX, startY, isDrawing = false;
 
+        // Event để vẽ hình chữ nhật
         canvas.addEventListener('mousedown', function(e) {{
             startX = e.offsetX;
             startY = e.offsetY;
@@ -49,10 +52,18 @@ def get_image_with_canvas(image):
             const rectHeight = endY - startY;
 
             if (rectWidth > 0 && rectHeight > 0) {{
-
-                // Đưa thông tin vào div id="rectInfo"
                 const rectInfo = 'Hình chữ nhật: X: ' + startX + ', Y: ' + startY + ', Width: ' + rectWidth + ', Height: ' + rectHeight;
                 rectInfoDiv.innerHTML = rectInfo;
+            }}
+        }});
+
+        // Sao chép đoạn text khi bấm nút
+        copyButton.addEventListener('click', function() {{
+            const rectInfo = rectInfoDiv.innerText;
+            if (rectInfo) {{
+                // Gửi đoạn text lên Streamlit
+                const data = {{ 'rect_info': rectInfo }};
+                window.parent.postMessage(data, '*');
             }}
         }});
     </script>
@@ -82,8 +93,10 @@ def run_app1():
         # Hiển thị ảnh với canvas overlay
         st.components.v1.html(get_image_with_canvas(image), height=500)
 
-        # Nhập thông tin hình chữ nhật từ div (người dùng có thể sao chép hoặc kiểm tra thủ công)
-        rect_info = st.text_input("Nhập thông tin hình chữ nhật (nếu có)", "")
+        # Nhận thông tin hình chữ nhật từ div (qua postMessage từ JavaScript)
+        rect_info = st.text_input("Thông tin hình chữ nhật sẽ xuất hiện tại đây")
+        
+        # Nếu người dùng đã nhập hoặc nhận được thông tin hình chữ nhật
         if rect_info:
             rect = parse_rect_info(rect_info)
             if rect:
