@@ -11,8 +11,8 @@ def run_app2():
     train_image_urls = [
         "my_folder/Buoc_test1.png",
         "my_folder/Buoc_test2.png",
-        "my_folder/Buoc_test3.png",
-        "my_folder/Buoc_test4.png"
+        "my_folder/KQ_test1.png",
+        "my_folder/KQ_test2.png"
     ]
 
     # Hiển thị lần lượt 4 ảnh train
