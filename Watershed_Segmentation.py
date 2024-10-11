@@ -9,7 +9,55 @@ def resize_image(image, target_height):
     new_width = int(w * scaling_factor)
     resized_image = cv.resize(image, (new_width, target_height))
     return resized_image
+def apply_watershed(img):
+    kernel_size = 3
+    distance_thresh_factor = 0.3
+    dilation_iterations = 3
 
+    # Resize ảnh về 500x400
+    img = cv.resize(img, (500, 400))
+
+    # Chuyển sang ảnh xám và nhị phân Otsu
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
+
+    # Bước 1: Áp dụng phép mở rộng (Dilation)
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    dilated = cv.dilate(binary, kernel, iterations=dilation_iterations)
+
+    # Bước 2: Distance transform
+    dist_transform = cv.distanceTransform(dilated, cv.DIST_L2, 5)
+
+    # Bước 3: Ngưỡng hóa ảnh distance transform với hệ số distance_thresh_factor
+    _, sure_fg = cv.threshold(dist_transform, distance_thresh_factor * dist_transform.max(), 255, 0)
+    sure_fg = np.uint8(sure_fg)
+
+    # Bước 4: Tạo background bằng phép giãn nở (dilation)
+    sure_bg = cv.dilate(sure_fg, kernel, iterations=5)
+
+    # Bước 5: Tìm vùng chưa biết (unknown region)
+    unknown = cv.subtract(sure_bg, sure_fg)
+
+    # Bước 6: Tạo markers cho watershed
+    _, markers = cv.connectedComponents(sure_fg)
+    markers = markers + 1
+    markers[unknown == 255] = 0
+
+    # Bước 7: Áp dụng thuật toán Watershed
+    img_markers = img.copy()
+    cv.watershed(img_markers, markers)
+    img_markers[markers == -1] = [0, 0, 255]  # Đánh dấu biên với màu đỏ
+
+    # Hiển thị kết quả các ký tự màu trắng trên nền đen
+    result_img = np.zeros_like(binary)
+    contours, _ = cv.findContours(dilated, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+    for contour in contours:
+        x, y, w, h = cv.boundingRect(contour)
+        if h > 40 and w > 30 and h < 500 and w < 400:
+            result_img[y:y+h, x:x+w] = binary[y:y+h, x:x+w]
+
+    return result_img
 # Hàm cho ứng dụng
 def run_app2():
     st.title('✨ Ứng dụng phân đoạn ký tự biển số ✨')
@@ -81,6 +129,19 @@ def run_app2():
             st.image(img_result_3_resized, caption='', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {result_image_path_3}")
+st.header("3. Tải ảnh lên và phân đoạn ký tự")
 
+    uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
+    
+    if uploaded_image is not None:
+        # Đọc ảnh từ người dùng tải lên
+        img = np.array(Image.open(uploaded_image))
+        st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
+
+        # Áp dụng thuật toán Watershed
+        result = apply_watershed(img)
+
+        # Hiển thị kết quả
+        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
 if __name__ == "__main__":
     run_app2()
