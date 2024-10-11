@@ -9,8 +9,9 @@ def run_app2():
     # Danh sách các đường dẫn tới các hình ảnh train
     train_image_paths = [
         "my_folder/Buoc_test1.png",
-        "my_folder/Buoc_test2.png",
         "my_folder/KQ_test1.png",
+        "my_folder/Buoc_test2.png",
+       
         "my_folder/KQ_test2.png"
     ]
 
