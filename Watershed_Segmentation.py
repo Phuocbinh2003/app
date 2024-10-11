@@ -22,13 +22,13 @@ def run_app2():
     result_image_path_2 = "my_folder/KQ_test2.png"
 
     # Phần 1: Hiển thị cho 2 cặp ảnh đầu tiên (theo hàng dọc)
-    st.header("1. Ảnh Train và Kết quả - Phần 1")
+    st.header("1. Ảnh Train và Kết quả")
 
-    st.write("### Bước thực hành 1")
+    st.write("### Ảnh train 1")
     if os.path.exists(step_image_path_1):
         img_step_1 = cv.imread(step_image_path_1)
         if img_step_1 is not None:
-            st.image(img_step_1, caption='Bước thực hành', use_column_width=True)
+            st.image(img_step_1, caption='Các bước Watershed', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {step_image_path_1}")
 
@@ -41,11 +41,11 @@ def run_app2():
     else:
         st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
 
-    st.write("### Bước thực hành 2")
+    st.write("### Ảnh train 1")
     if os.path.exists(step_image_path_2):
         img_step_2 = cv.imread(step_image_path_2)
         if img_step_2 is not None:
-            st.image(img_step_2, caption='Bước thực hành', use_column_width=True)
+            st.image(img_step_2, caption='Các bước Watershed', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {step_image_path_2}")
 
@@ -63,9 +63,9 @@ def run_app2():
     result_image_path_3 = "my_folder/KQ2.png"
 
     # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
-    st.header("2. Ảnh Train và Kết quả - Phần 2")
+    st.header("2. Ảnh Test và Kết quả ")
 
-    st.write("### Bước thực hành 3")
+    st.write("### Kết quả 1")
     if os.path.exists(step_image_path_3):
         img_step_3 = cv.imread(step_image_path_3)
         if img_step_3 is not None:
@@ -73,7 +73,7 @@ def run_app2():
     else:
         st.error(f"Không tìm thấy ảnh: {step_image_path_3}")
 
-    st.write("### Kết quả 3")
+    st.write("### Kết quả 2")
     if os.path.exists(result_image_path_3):
         img_result_3 = cv.imread(result_image_path_3)
         if img_step_3 is not None and img_result_3 is not None:
