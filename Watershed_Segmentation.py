@@ -21,49 +21,41 @@ def run_app2():
     step_image_path_2 = "my_folder/Buoc_test2.png"
     result_image_path_2 = "my_folder/KQ_test2.png"
 
-    # Hiển thị cho cặp ảnh thứ nhất
+    # Hiển thị cho cặp ảnh thứ nhất (theo hàng dọc)
     st.write("### Bước thực hành 1")
-    col1, col2 = st.columns([1, 1])
+    if os.path.exists(step_image_path_1):
+        img_step_1 = cv.imread(step_image_path_1)
+        if img_step_1 is not None:
+            st.image(img_step_1, caption='Bước thực hành', use_column_width=True)
+    else:
+        st.error(f"Không tìm thấy ảnh: {step_image_path_1}")
 
-    with col1:
-        if os.path.exists(step_image_path_1):
-            img_step_1 = cv.imread(step_image_path_1)
-            if img_step_1 is not None:
-                st.image(img_step_1, caption='Bước thực hành', use_column_width=True)
-        else:
-            st.error(f"Không tìm thấy ảnh: {step_image_path_1}")
+    st.write("### Kết quả 1")
+    if os.path.exists(result_image_path_1):
+        img_result_1 = cv.imread(result_image_path_1)
+        if img_step_1 is not None and img_result_1 is not None:
+            img_result_1_resized = resize_image(img_result_1, img_step_1.shape[0])
+            st.image(img_result_1_resized, caption='Kết quả', use_column_width=True)
+    else:
+        st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
 
-    with col2:
-        st.write("### Kết quả 1")
-        if os.path.exists(result_image_path_1):
-            img_result_1 = cv.imread(result_image_path_1)
-            if img_step_1 is not None and img_result_1 is not None:
-                img_result_1_resized = resize_image(img_result_1, img_step_1.shape[0])
-                st.image(img_result_1_resized, caption='Kết quả', use_column_width=True)
-        else:
-            st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
-
-    # Hiển thị cho cặp ảnh thứ hai
+    # Hiển thị cho cặp ảnh thứ hai (theo hàng dọc)
     st.write("### Bước thực hành 2")
-    col3, col4 = st.columns([1, 1])
+    if os.path.exists(step_image_path_2):
+        img_step_2 = cv.imread(step_image_path_2)
+        if img_step_2 is not None:
+            st.image(img_step_2, caption='Bước thực hành', use_column_width=True)
+    else:
+        st.error(f"Không tìm thấy ảnh: {step_image_path_2}")
 
-    with col3:
-        if os.path.exists(step_image_path_2):
-            img_step_2 = cv.imread(step_image_path_2)
-            if img_step_2 is not None:
-                st.image(img_step_2, caption='Bước thực hành', use_column_width=True)
-        else:
-            st.error(f"Không tìm thấy ảnh: {step_image_path_2}")
-
-    with col4:
-        st.write("### Kết quả 2")
-        if os.path.exists(result_image_path_2):
-            img_result_2 = cv.imread(result_image_path_2)
-            if img_step_2 is not None and img_result_2 is not None:
-                img_result_2_resized = resize_image(img_result_2, img_step_2.shape[0])
-                st.image(img_result_2_resized, caption='Kết quả', use_column_width=True)
-        else:
-            st.error(f"Không tìm thấy ảnh: {result_image_path_2}")
+    st.write("### Kết quả 2")
+    if os.path.exists(result_image_path_2):
+        img_result_2 = cv.imread(result_image_path_2)
+        if img_step_2 is not None and img_result_2 is not None:
+            img_result_2_resized = resize_image(img_result_2, img_step_2.shape[0])
+            st.image(img_result_2_resized, caption='Kết quả', use_column_width=True)
+    else:
+        st.error(f"Không tìm thấy ảnh: {result_image_path_2}")
 
 if __name__ == "__main__":
     run_app2()
