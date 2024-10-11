@@ -129,19 +129,19 @@ def run_app2():
             st.image(img_result_3_resized, caption='', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {result_image_path_3}")
-st.header("3. Tải ảnh lên và phân đoạn ký tự")
-
-    uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
+    st.header("3. Tải ảnh lên và phân đoạn ký tự")
     
-    if uploaded_image is not None:
-        # Đọc ảnh từ người dùng tải lên
-        img = np.array(Image.open(uploaded_image))
-        st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
-
-        # Áp dụng thuật toán Watershed
-        result = apply_watershed(img)
-
-        # Hiển thị kết quả
-        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
+        uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
+        
+        if uploaded_image is not None:
+            # Đọc ảnh từ người dùng tải lên
+            img = np.array(Image.open(uploaded_image))
+            st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
+    
+            # Áp dụng thuật toán Watershed
+            result = apply_watershed(img)
+    
+            # Hiển thị kết quả
+            st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
 if __name__ == "__main__":
     run_app2()
