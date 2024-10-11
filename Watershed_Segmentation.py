@@ -1,7 +1,8 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-import requests
+from PIL import Image
+import matplotlib.pyplot as plt
 
 # Hàm cho ứng dụng thứ 2
 def run_app2():
