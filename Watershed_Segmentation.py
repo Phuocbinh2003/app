@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-
+import requests
 # Hàm cho ứng dụng thứ 2
 def run_app2():
     st.title('✨ Ứng dụng phân đoạn ký tự biển số ✨')
