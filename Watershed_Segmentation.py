@@ -1,5 +1,7 @@
 import streamlit as st
 import cv2 as cv
+import numpy as np
+from PIL import Image
 import os
 
 # Hàm để resize ảnh sao cho chiều cao của chúng bằng nhau
@@ -9,6 +11,8 @@ def resize_image(image, target_height):
     new_width = int(w * scaling_factor)
     resized_image = cv.resize(image, (new_width, target_height))
     return resized_image
+
+# Hàm để áp dụng Watershed
 def apply_watershed(img):
     kernel_size = 3
     distance_thresh_factor = 0.3
@@ -58,6 +62,7 @@ def apply_watershed(img):
             result_img[y:y+h, x:x+w] = binary[y:y+h, x:x+w]
 
     return result_img
+
 # Hàm cho ứng dụng
 def run_app2():
     st.title('✨ Ứng dụng phân đoạn ký tự biển số ✨')
@@ -83,13 +88,13 @@ def run_app2():
     st.write("### Kết quả 1")
     if os.path.exists(result_image_path_1):
         img_result_1 = cv.imread(result_image_path_1)
-        if img_step_1 is not None and img_result_1 is not None:
+        if img_result_1 is not None and img_step_1 is not None:
             img_result_1_resized = resize_image(img_result_1, img_step_1.shape[0])
             st.image(img_result_1_resized, caption='', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
 
-    st.write("### Các bước Watershed',")
+    st.write("### Các bước Watershed")
     if os.path.exists(step_image_path_2):
         img_step_2 = cv.imread(step_image_path_2)
         if img_step_2 is not None:
@@ -100,7 +105,7 @@ def run_app2():
     st.write("### Kết quả 2")
     if os.path.exists(result_image_path_2):
         img_result_2 = cv.imread(result_image_path_2)
-        if img_step_2 is not None and img_result_2 is not None:
+        if img_result_2 is not None and img_step_2 is not None:
             img_result_2_resized = resize_image(img_result_2, img_step_2.shape[0])
             st.image(img_result_2_resized, caption='Kết quả', use_column_width=True)
     else:
@@ -111,7 +116,7 @@ def run_app2():
     result_image_path_3 = "my_folder/KQ2.png"
 
     # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
-    st.header("2. Ảnh Test và Kết quả ")
+    st.header("2. Ảnh Test và Kết quả")
 
     st.write("### Kết quả 1")
     if os.path.exists(step_image_path_3):
@@ -124,24 +129,27 @@ def run_app2():
     st.write("### Kết quả 2")
     if os.path.exists(result_image_path_3):
         img_result_3 = cv.imread(result_image_path_3)
-        if img_step_3 is not None and img_result_3 is not None:
+        if img_result_3 is not None and img_step_3 is not None:
             img_result_3_resized = resize_image(img_result_3, img_step_3.shape[0])
             st.image(img_result_3_resized, caption='', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {result_image_path_3}")
+
+    # Phần 3: Tải ảnh lên và phân đoạn ký tự
     st.header("3. Tải ảnh lên và phân đoạn ký tự")
     
-        uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
-        
-        if uploaded_image is not None:
-            # Đọc ảnh từ người dùng tải lên
-            img = np.array(Image.open(uploaded_image))
-            st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
+    uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
     
-            # Áp dụng thuật toán Watershed
-            result = apply_watershed(img)
-    
-            # Hiển thị kết quả
-            st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
+    if uploaded_image is not None:
+        # Đọc ảnh từ người dùng tải lên
+        img = np.array(Image.open(uploaded_image))
+        st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
+
+        # Áp dụng thuật toán Watershed
+        result = apply_watershed(img)
+
+        # Hiển thị kết quả
+        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
+
 if __name__ == "__main__":
     run_app2()
