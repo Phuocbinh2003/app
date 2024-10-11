@@ -69,7 +69,7 @@ def run_app2():
     if os.path.exists(step_image_path_3):
         img_step_3 = cv.imread(step_image_path_3)
         if img_step_3 is not None:
-            st.image(img_step_3, caption='Bước thực hành', use_column_width=True)
+            st.image(img_step_3, caption='Kết quả', use_column_width=True)
     else:
         st.error(f"Không tìm thấy ảnh: {step_image_path_3}")
 
