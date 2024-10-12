@@ -7,7 +7,7 @@ from app_update_firebase import run_app4
 # Tạo thanh điều hướng
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'App2','Face_Verification','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut', 'App2','Face_detection','Update_firebase')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
@@ -15,7 +15,7 @@ if option == 'GrabCut':
     run_app1()  # Gọi hàm chạy ứng dụng 1
 elif option == 'App2':
     run_app2()  # Gọi hàm chạy ứng dụng 2
-elif option == 'Face_Verification':
+elif option == 'Face_detection':
     run_app3()  # Gọi hàm chạy ứng dụng 3
 elif option == 'Update_firebase':
     run_app4()  # Gọi hàm chạy ứng dụng 4
