@@ -50,8 +50,7 @@ def run_app3():
     st.image(result_image, caption="Detection Result", use_column_width=True)
 
 # Main app where you can call run_app3()
-def main_app():
-    run_app3()
+
 
 if __name__ == "__main__":
-    main_app()
+    run_app3()
