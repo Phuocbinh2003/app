@@ -1,125 +1,57 @@
-import cv2
-import numpy as np
 import streamlit as st
+import matplotlib.pyplot as plt
 from PIL import Image
-import joblib  # Thư viện để tải mô hình đã lưu
 
 def run_app3():
-    st.title("Ứng dụng phát hiện khuôn mặt")
-
-    # Thay thế đường dẫn đến mô hình đã lưu
-    knn_model_path = 'knn_model.joblib'  # Đặt đường dẫn chính xác tới file
-    knn_model = joblib.load(knn_model_path)  # Tải mô hình kNN đã lưu
-
-    # Tải lên ảnh
-    uploaded_image = st.file_uploader("Tải lên một ảnh", type=["jpg", "jpeg", "png"])
-
-    if uploaded_image is not None:
-        # Đọc ảnh tải lên
-        image = Image.open(uploaded_image)
-        image = np.array(image.convert("L"))  # Chuyển đổi ảnh sang dạng grayscale
-
-        # Giảm kích thước ảnh
-        target_size = 240  # Kích thước mục tiêu (chiều dài hoặc chiều rộng)
-        image = resize_image_aspect_ratio(image, target_size)
-
-        # Hiển thị ảnh đã tải lên
-        st.image(image, caption="Ảnh đã tải lên", use_column_width=True)
-
-        # Gọi hàm phát hiện khuôn mặt
-        boxes = sliding_window_detect(image, knn_model)  # Sử dụng mô hình đã tải
-
-        # Chọn box tốt nhất
-        selected_boxes = non_max_suppression(boxes, overlap_threshold=0.3)
-
-        # Vẽ các box lên ảnh
-        result_img = draw_boxes(image.copy(), selected_boxes)
-
-        # Hiển thị kết quả
-        st.image(result_img, caption="Kết quả phát hiện khuôn mặt", use_column_width=True)
-
-def sliding_window_detect(img, model, step_size=5, window_size=(100, 100)):
-    boxes = []
-    height, width = img.shape
-
-    window_width = window_size[0]
-    window_height = window_size[1]
-
-    for y in range(0, height - window_height + 1, step_size):
-        for x in range(0, width - window_width + 1, step_size):
-            window = img[y:y + window_height, x:x + window_width]
-            if window.shape[0] != window_height or window.shape[1] != window_width:
-                continue
-            
-            pred = detect_face(window, model)
-            if pred == 1:  # Nếu dự đoán là khuôn mặt
-                boxes.append((x, y, window_width, window_height))  # (x, y, width, height)
+    # Part 1: Display face and non-face images
+    st.title("Face and Non-face Data")
     
-    return boxes
+    st.subheader("Face Images")
+    face_image_paths = [
+        'path_to_face_image_1.jpg', 
+        'path_to_face_image_2.jpg'
+    ]  # Add your actual image paths here
+    for img_path in face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
 
-# Bước 4: Phát hiện khuôn mặt
-def detect_face(img, model):
-    img_resized = cv2.resize(img, (24, 24)).flatten()  # Resize ảnh về 24x24
-    pred = model.predict([img_resized])  # Dự đoán
-    return pred[0]  # Trả về nhãn
+    st.subheader("Non-Face Images")
+    non_face_image_paths = [
+        'path_to_non_face_image_1.jpg', 
+        'path_to_non_face_image_2.jpg'
+    ]  # Add your actual image paths here
+    for img_path in non_face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
-# Bước 5: Vẽ các box phát hiện
-def draw_boxes(img, boxes):
-    for (x, y, w, h) in boxes:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Vẽ hình chữ nhật màu xanh lá cây
-    return img
+    # Part 2: Display training results and vector image
+    st.title("Training Results")
+    st.subheader("Training Accuracy for Different `n_neighbors`")
+    n_neighbors = range(1, 11)
+    accuracy = [0.85, 0.87, 0.89, 0.90, 0.88, 0.86, 0.91, 0.93, 0.92, 0.94]  # Example accuracies
 
-# Bước 6: Thay đổi kích thước ảnh giữ nguyên cấu trúc
-def resize_image_aspect_ratio(image, target_size):
-    height, width = image.shape
-    aspect_ratio = width / height
+    plt.figure(figsize=(10, 5))
+    plt.plot(n_neighbors, accuracy, marker='o', linestyle='-', color='b')
+    plt.title('KNN Accuracy vs n_neighbors')
+    plt.xlabel('n_neighbors')
+    plt.ylabel('Accuracy')
+    plt.grid(True)
+    st.pyplot(plt)
 
-    if aspect_ratio > 1:  # Nếu chiều rộng lớn hơn chiều cao
-        new_width = target_size
-        new_height = int(target_size / aspect_ratio)
-    else:  # Nếu chiều cao lớn hơn hoặc bằng chiều rộng
-        new_height = target_size
-        new_width = int(target_size * aspect_ratio)
+    st.subheader("Vector Representation Image")
+    vector_image_path = 'path_to_vector_image.jpg'  # Add your actual image path here
+    vector_image = Image.open(vector_image_path)
+    st.image(vector_image, caption="Vector Representation", use_column_width=True)
 
-    resized_image = cv2.resize(image, (new_width, new_height))
-    return resized_image
+    # Part 3: Display final result
+    st.title("Final Result")
+    result_image_path = 'path_to_final_result_image.jpg'  # Add your actual image path here
+    result_image = Image.open(result_image_path)
+    st.image(result_image, caption="Detection Result", use_column_width=True)
 
-# Bước 7: Non-Maximum Suppression để chọn box tốt nhất
-def non_max_suppression(boxes, overlap_threshold=0.3):
-    if len(boxes) == 0:
-        return []
-
-    boxes = np.array(boxes)
-    x1 = boxes[:, 0]
-    y1 = boxes[:, 1]
-    x2 = boxes[:, 0] + boxes[:, 2]
-    y2 = boxes[:, 1] + boxes[:, 3]
-
-    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
-    order = np.argsort(y2)  # Sắp xếp theo tọa độ y của box dưới cùng
-
-    picked_boxes = []
-
-    while len(order) > 0:
-        i = order[-1]  # Box có y dưới cùng
-        picked_boxes.append(boxes[i])
-
-        # Tính toán overlap với box đã chọn
-        xx1 = np.maximum(x1[i], x1[order[:-1]])
-        yy1 = np.maximum(y1[i], y1[order[:-1]])
-        xx2 = np.minimum(x2[i], x2[order[:-1]])
-        yy2 = np.minimum(y2[i], y2[order[:-1]])
-
-        w = np.maximum(0, xx2 - xx1 + 1)
-        h = np.maximum(0, yy2 - yy1 + 1)
-
-        overlap = (w * h) / areas[order[:-1]]
-
-        # Chọn các box không có overlap vượt quá ngưỡng
-        order = order[np.where(overlap <= overlap_threshold)[0]]
-
-    return picked_boxes
-
-# Bước 8: Chạy ứng dụng
-if __name__ == "__main__":
+# Main app where you can call run_app3()
+def main_app():
     run_app3()
+
+if __name__ == "__main__":
+    main_app()
