@@ -27,7 +27,7 @@ def run_app3():
     st.title("Training Results")
     st.subheader("Train")
     non_face_image_paths = [
-        'Face_Detection_folder/bieu_do.png'
+        'Face_Detection_folder/vecto.png'
     ]  # Add your actual image paths here
     for img_path in non_face_image_paths:
         img = Image.open(img_path)
@@ -35,7 +35,7 @@ def run_app3():
 
     st.subheader("Train")
     non_face_image_paths = [
-        'Face_Detection_folder/vecto.png'
+        'Face_Detection_folder/bieu_do.png'
     ]  # Add your actual image paths here
     for img_path in non_face_image_paths:
         img = Image.open(img_path)
@@ -44,7 +44,7 @@ def run_app3():
     
     # Part 3: Display final result
     st.title("Final Result")
-    result_image_path = 'path_to_final_result_image.jpg'  # Add your actual image path here
+    result_image_path = 'Face_Detection_folder/kq_face.png'  # Add your actual image path here
     result_image = Image.open(result_image_path)
     st.image(result_image, caption="Detection Result", use_column_width=True)
 
