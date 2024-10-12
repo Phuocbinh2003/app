@@ -8,8 +8,8 @@ def run_app3():
     
     st.subheader("Face Images")
     face_image_paths = [
-        'path_to_face_image_1.jpg', 
-        'path_to_face_image_2.jpg'
+        'Face_Detection_folder/faces_24x24.png', 
+        'Face_Detection_folder/non_faces_24x24.png'
     ]  # Add your actual image paths here
     for img_path in face_image_paths:
         img = Image.open(img_path)
