@@ -219,6 +219,11 @@ def compare_faces(image1, image2):
     face_detector.setInputSize([image2.shape[1], image2.shape[0]])
     faces2 = face_detector.infer(image2)
 
+    # Check if faces are detected and unpack properly
+    if len(faces1) == 0 or len(faces2) == 0:
+        st.warning("No faces detected.")
+        return None
+
     # Draw bounding boxes on the images based on the detected faces
     image1_with_boxes = draw_bounding_boxes(image1, faces1)
     image2_with_boxes = draw_bounding_boxes(image2, faces2)
@@ -230,10 +235,13 @@ def compare_faces(image1, image2):
     # Calculate and return the similarity score
     score = calculate_similarity(faces1, faces2)
     return score
+
 def draw_bounding_boxes(image, faces):
-    for (x, y, w, h) in faces:
-        # Draw a rectangle around the detected face
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    for face in faces:
+        # Adjust based on the number of values returned per face
+        if len(face) >= 4:
+            x, y, w, h = face[:4]  # Use only the first 4 values
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
     return image
 
 
@@ -287,8 +295,12 @@ def run_app5():
             st.success(f"Similarity Score: {score:.2f}")
 
             # Visualize the matches on the images
-            faces1 = face_detector.infer(image1_resize)
-            faces2 = face_detector.infer(image2_resize)
+            faces1 = face_detector.infer(image1)
+            faces2 = face_detector.infer(image2)
+            
+            st.write(f"faces1: {faces1}")
+            st.write(f"faces2: {faces2}")
+
 
             # Visualize matches only if faces are detected
             if faces1.shape[0] > 0 and faces2.shape[0] > 0:
