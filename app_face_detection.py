@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import joblib
 import streamlit as st
-from google.colab.patches import cv2_imshow
+
 
 # Hàm tính toán đặc trưng Haar
 def haar_features(img):
