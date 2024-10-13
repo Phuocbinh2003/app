@@ -109,20 +109,7 @@ def find_similar_faces(uploaded_image, folder_path):
                 result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
                 results.append((filename, result[0], result[1]))
 
-    # Draw bounding boxes on the original image
-    for bbox in face_bboxes:
-        # Convert coordinates back to original image size
-        original_bbox = (
-            int(bbox[0] * (image1.shape[1] / new_w)),
-            int(bbox[1] * (image1.shape[0] / new_h)),
-            int(bbox[2] * (image1.shape[1] / new_w)),
-            int(bbox[3] * (image1.shape[0] / new_h))
-        )
-        cv2.rectangle(image1, (original_bbox[0], original_bbox[1]), 
-                      (original_bbox[0] + original_bbox[2], original_bbox[1] + original_bbox[3]), 
-                      (0, 255, 0), 2)  # Draw bounding box on original image
-
-    return results, image1  # Return detected faces image in original size
+    return results, image1_with_faces  # Return image with detected faces
 
 def run_app5():
     """Runs the Streamlit app."""
@@ -142,15 +129,16 @@ def run_app5():
 
         results, image_with_faces = find_similar_faces(uploaded_image, folder_path)
 
-        # Display image with visualized faces
+        # Display image with visualized faces only
         st.image(image_with_faces, channels="BGR", caption="Detected Faces", use_column_width=True)
 
         if results:
-            st.subheader("Similar Faces Found:")
-            for filename, score, _ in results:
-                st.write(f"File: {filename}, Similarity Score: {score:.2f}")
-                student_info = read_student_info(filename, folder_path)
-                st.write(f"Student Information: {student_info}")
+            # Find the result with the highest score
+            best_match = max(results, key=lambda x: x[1])
+            st.subheader("Best Match Found:")
+            st.write(f"File: {best_match[0]}, Similarity Score: {best_match[1]:.2f}")
+            student_info = read_student_info(best_match[0], folder_path)
+            st.write(f"Student Information: {student_info}")
         else:
             st.warning("No similar faces found.")
 
