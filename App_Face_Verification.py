@@ -216,10 +216,10 @@ def compare_faces(image1, image2):
     # Assume face_recognizer is already defined and loaded with the necessary model
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
-
+    st.image(cv2.cvtColor(faces1, cv2.COLOR_BGR2RGB), caption="Matched Image", use_column_width=True)
     face_detector.setInputSize([image2.shape[1], image2.shape[0]])
     faces2 = face_detector.infer(image2)
-
+    st.image(cv2.cvtColor(faces2, cv2.COLOR_BGR2RGB), caption="Matched Image", use_column_width=True)
     if faces1.shape[0] == 0 or faces2.shape[0] == 0:
         return None  # Return None if no faces are detected
 
@@ -265,18 +265,18 @@ def run_app5():
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
         # Resize images
-        image1_box = extract_face(image1)
-        image2_box = extract_face(image2)
+        image1_resize = resize_image(image1)
+        image2_resize = resize_image(image2)
 
         # Compare faces and get the score
-        score = compare_faces(image1_box, image2_box)
+        score = compare_faces(image1_resize, image2_resize)
 
         if score is not None:
             st.success(f"Similarity Score: {score:.2f}")
 
             # Visualize the matches on the images
-            faces1 = face_detector.infer(image1_box)
-            faces2 = face_detector.infer(image2_box)
+            faces1 = face_detector.infer(image1_resize)
+            faces2 = face_detector.infer(image2_resize)
 
             # Visualize matches only if faces are detected
             if faces1.shape[0] > 0 and faces2.shape[0] > 0:
