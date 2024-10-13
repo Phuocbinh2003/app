@@ -180,6 +180,7 @@ def read_student_info(filename, folder_path):
         student_info = txt_file.read()
     return student_info
 
+
 def run_app5():
     """Run Streamlit Face Recognition app."""
     
@@ -192,8 +193,9 @@ def run_app5():
             st.write(f"Finding similar faces in the folder: {folder_path}")
             results, processed_image = find_similar_faces(uploaded_image, folder_path)
 
-            # Display processed image with only detected faces
-            st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
+            # Display only the processed image with detected faces
+            if processed_image is not None:
+                st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
 
             if results:
                 st.write("### Similar Faces Found:")
@@ -208,7 +210,6 @@ def run_app5():
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
 
-
     # Part 2: Compare portrait and ID photo
     st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
@@ -232,30 +233,6 @@ def run_app5():
         else:
             st.warning("The images do not belong to the same person.")
 
-
-
-    # Part 2: Compare portrait and ID photo
-    st.header("Compare Portrait and ID Photo")
-    uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
-    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
-
-    if uploaded_image1 and uploaded_image2:
-        image1 = Image.open(uploaded_image1).convert("RGB")
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-
-        image2 = Image.open(uploaded_image2).convert("RGB")
-        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-
-        image1 = resize_image(image1)
-        image2 = resize_image(image2)
-
-        score = compare_faces(image1, image2)
-        st.success(f"Similarity Score: {score:.2f}")
-
-        if score > 0.5:
-            st.success("The images belong to the same person.")
-        else:
-            st.warning("The images do not belong to the same person.")
 
 if __name__ == "__main__":
     run_app5()
