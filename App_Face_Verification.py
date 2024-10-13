@@ -239,7 +239,7 @@ def run_app5():
             best_match_filename, best_score, processed_image = find_similar_faces(uploaded_image, folder_path)
 
             # Hiển thị hình ảnh đã xử lý với khuôn mặt được phát hiện
-            st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
+           # st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
             if best_match_filename is not None:
                 st.write(f"### Best Match Found:")
