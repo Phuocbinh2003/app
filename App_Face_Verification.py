@@ -89,20 +89,33 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
 def find_similar_faces(uploaded_image, folder_path):
     """Finds similar faces in a folder based on the uploaded image."""
     results = []
+    
+    # Open the uploaded image and convert to RGB
     image1 = Image.open(uploaded_image).convert("RGB")
-    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    image1_resized = resize_image(image1)  # Resize uploaded image
+    image1_np = np.array(image1)  # Convert to NumPy array
+    image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
+    # Display the original image in RGB and its dimensions
+    st.image(image1_np, caption=f"Original RGB Image (Size: {image1_np.shape[1]}x{image1_np.shape[0]})", use_column_width=True)
+
+    # Resize the uploaded image for detection
+    image1_resized = resize_image(image1_bgr)  # Resize uploaded image
     face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
+    
+    # Detect faces in the resized image
     faces1 = face_detector.infer(image1_resized)
 
     if faces1.shape[0] == 0:
         st.warning("No face detected in the uploaded image.")
-        return [], image1  # Return original image
+        return [], image1  # Return original image if no faces detected
 
-    # Visualize faces detected in the uploaded image
+    # Visualize the detected faces on the resized image
     image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
+    
+    # Display the resized image with detected faces
+    st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
+    # Now compare this image with others in the folder
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
