@@ -227,7 +227,7 @@ def compare_faces(image1, image2):
     return result[1]  # Return the similarity score
 
 def run_app5():
-    """Run Streamlit Face Recognition app."""
+    """Phan 1."""
     
     st.title("Face Recognition - Find Similar Faces in a Folder")
 
@@ -253,6 +253,8 @@ def run_app5():
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
 
+
+    """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
     st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
@@ -282,11 +284,12 @@ def run_app5():
             if faces1.shape[0] > 0 and faces2.shape[0] > 0:
                 matches = [1]  # Assuming a match for visualization, adjust logic as needed
                 scores = [score]  # Using the score for visualization
-                matched_image = visualize_matches(image1_resized, faces1, image2_resized, faces2, matches, scores)
+                matched_image = visualize_matches(image1_resize, faces1, image2_resize, faces2, matches, scores)
 
                 # Display the matched image
                 st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
         else:
             st.warning("Could not compare the images, no faces detected.")
+
 if __name__ == "__main__":
     run_app5()
