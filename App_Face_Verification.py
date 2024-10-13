@@ -5,6 +5,7 @@ import os
 from PIL import Image
 from Face_Verification.yunet import YuNet
 from Face_Verification.sface import SFace
+import gdown
 
 # Valid combinations of backends and targets
 backend_target_pairs = [
@@ -23,11 +24,19 @@ face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.
                       backendId=backend_id,
                       targetId=target_id)
 
+# Đường dẫn Google Drive đến mô hình SFace
+sface_model_url = 'https://drive.google.com/file/d/1fe4KJPheCwkDtbnT7DPF6jjRuWFBLvl8/view?usp=drive_link'
+sface_model_path = 'Face_Verification/face_recognition_sface_2021dec.onnx'
+
+# Tải mô hình SFace nếu chưa tồn tại
+if not os.path.exists(sface_model_path):
+    gdown.download(sface_model_url, sface_model_path, quiet=False)
+
 # Instantiate SFace for face recognition
-face_recognizer = SFace(modelPath="https://drive.google.com/file/d/1fe4KJPheCwkDtbnT7DPF6jjRuWFBLvl8/view?usp=drive_link",
-                    disType=0,  # cosine
-                    backendId=backend_id,
-                    targetId=target_id)
+face_recognizer = SFace(modelPath=sface_model_path,
+                         disType=0,  # cosine
+                         backendId=backend_id,
+                         targetId=target_id)
 
 def find_similar_faces(uploaded_image, folder_path):
     results = []
@@ -42,12 +51,13 @@ def find_similar_faces(uploaded_image, folder_path):
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
-        face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-        faces2 = face_detector.infer(image2)
+        if image2 is not None:  # Kiểm tra nếu ảnh được đọc thành công
+            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
+            faces2 = face_detector.infer(image2)
 
-        if faces2.shape[0] > 0:
-            result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-            results.append((filename, result[0], result[1]))
+            if faces2.shape[0] > 0:
+                result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
+                results.append((filename, result[0], result[1]))
 
     return results
 
