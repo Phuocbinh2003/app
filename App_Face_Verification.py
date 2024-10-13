@@ -168,7 +168,7 @@ def read_student_info(filename, folder_path):
         student_info = txt_file.read().strip()
     return student_info
 
-def main():
+def run_app5():
     st.title("Face Verification Application")
 
     uploaded_image = st.file_uploader("Upload an image for verification", type=["jpg", "jpeg", "png"])
@@ -188,4 +188,4 @@ def main():
             st.warning("No matches found.")
 
 if __name__ == "__main__":
-    main()
+    run_app5()
