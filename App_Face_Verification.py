@@ -112,14 +112,9 @@ def find_similar_faces(uploaded_image, folder_path):
 
             if faces2.shape[0] > 0:
                 result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-                # Update unpacking based on actual return values
-                if len(result) == 3:  # Assuming it returns (similarity_score, some_value, another_value)
-                    results.append((filename, result[0], result[1], faces2))
-                else:
-                    st.warning("Unexpected result format from face matching.")
+                results.append((filename, result[0], result[1]))
 
     return results
-
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     output = image.copy()
@@ -198,23 +193,28 @@ def run_app5():
         results = find_similar_faces(uploaded_image, folder_path)
 
         if results:
-            # Find the highest score match
-            best_match = max(results, key=lambda x: x[1])
-            best_filename, best_score, _, faces = best_match
+            # Find the result with the highest score
+            best_match = max(results, key=lambda x: x[1])  # (filename, score, _)
+            best_filename, best_score, _ = best_match
+            
+            # Read and visualize the best match image
+            best_image_path = os.path.join(folder_path, best_filename)
+            best_image = cv2.imread(best_image_path)
+            best_image = resize_image(best_image)  # Resize for visualization
+
+            # Draw bounding boxes on the best match image
+            detected_faces = face_detector.infer(best_image)
+            visualized_image = visualize_faces(best_image, detected_faces)
+
+            # Display the results
+            st.subheader("Best Matching Result:")
+            st.image(visualized_image, caption="Best Match with Detected Faces", use_column_width=True)
             student_info = read_student_info(best_filename, folder_path)
-
-            # Visualize the best match with boxes
-            original_image = cv2.cvtColor(np.array(Image.open(uploaded_image).convert("RGB")), cv2.COLOR_RGB2BGR)
-            output_image = visualize_faces(original_image, faces)
-
-            # Display results
-            st.image(output_image, caption="Best Match Visualization", use_column_width=True)
             st.write(f"**Matched File:** {best_filename}")
             st.write(f"**Score:** {best_score:.2f}")
             st.write(f"**Student Info:** {student_info}")
         else:
             st.warning("No matches found.")
-
 
     # Part 2: Compare portrait and ID photo
     st.header("Compare Portrait and ID Photo")
@@ -246,4 +246,3 @@ def run_app5():
 
 if __name__ == "__main__":
     run_app5()
-
