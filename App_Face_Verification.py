@@ -227,7 +227,7 @@ def run_app5():
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
 
-  st.header("Compare Portrait and ID Photo")
+    st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
