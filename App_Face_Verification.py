@@ -92,7 +92,20 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output
 
-def resize_image(image, target_size=(320, 239)):
+def resize_image(image, target_size=320):
+    """Resizes the image while maintaining the aspect ratio."""
+    h, w, _ = image.shape
+    if w > h:
+        new_w = target_size
+        new_h = int(h * (target_size / w))  # Calculate new height based on width
+    else:
+        new_h = target_size
+        new_w = int(w * (target_size / h))  # Calculate new width based on height
+
+    resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+    return resized_image
+
+def resize_image2(image, target_size=(320, 239)):
     """Resizes the image to the specified target size."""
     return cv2.resize(image, target_size, interpolation=cv2.INTER_LINEAR)
 
@@ -109,7 +122,7 @@ def find_similar_faces(uploaded_image, folder_path):
     results = []
     image1 = Image.open(uploaded_image).convert("RGB")
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    image1 = resize_image(image1)
+    image1 = resize_image(image1)  # Use resize_image for the first image
 
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
@@ -122,7 +135,7 @@ def find_similar_faces(uploaded_image, folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:
-            image2 = resize_image(image2)
+            image2 = resize_image2(image2)  # Use resize_image2 for the comparison images
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
 
@@ -162,26 +175,13 @@ def run_app5():
         results = find_similar_faces(uploaded_image, folder_path)
 
         if results:
-            st.subheader("Matched Faces:")
+            st.subheader("Similar Faces Found:")
             for filename, score, _ in results:
-                st.write(f"Image: {filename} - Score: {score:.4f}")
+                st.write(f"File: {filename}, Similarity Score: {score:.2f}")
                 student_info = read_student_info(filename, folder_path)
                 st.write(f"Student Information: {student_info}")
         else:
             st.warning("No similar faces found.")
-
-    # Part 2: Upload another image for comparison
-    st.header("Upload Another Image for Comparison")
-    uploaded_image2 = st.file_uploader("Upload Image for Comparison...", type=["jpg", "jpeg", "png"], key="image2")
-
-    if uploaded_image2 is not None:
-        image2 = Image.open(uploaded_image2).convert("RGB")
-        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-        st.image(image2, channels="BGR", caption="Comparison Image", use_column_width=True)
-
-        if uploaded_image is not None:
-            score = compare_faces(image1, image2)
-            st.write(f"Similarity Score: {score:.4f}")
 
 if __name__ == "__main__":
     run_app5()
