@@ -5,6 +5,22 @@ import base64
 import re
 from grabcut_processor import GrabCutProcessor  # Nhập lớp GrabCutProcessor
 
+def resize_image(image, target_size=320):
+    h, w, _ = image.shape
+    # Kiểm tra xem chiều nào lớn hơn
+    if w > h:
+        # Tính toán kích thước mới
+        new_w = target_size
+        new_h = int(h * (target_size / w))  # Tính tỉ lệ dựa trên chiều rộng
+    else:
+        new_h = target_size
+        new_w = int(w * (target_size / h))  # Tính tỉ lệ dựa trên chiều cao
+
+    # Thay đổi kích thước ảnh theo tỷ lệ
+    resized_image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_LINEAR)
+
+    return resized_image
+
 def get_image_with_canvas(image):
     """Return HTML with canvas for drawing rectangles."""
     _, img_encoded = cv.imencode('.png', image)
@@ -79,8 +95,11 @@ def run_app1():
         # Đọc ảnh
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
+        # Resize ảnh để đảm bảo kích thước cố định
+        resized_image = resize_image(image)
+
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=500+50)
+        st.components.v1.html(get_image_with_canvas(resized_image), height=500+50)
 
         # Nhập thông tin hình chữ nhật từ div (người dùng có thể sao chép hoặc kiểm tra thủ công)
         rect_info = st.text_input("Nhập thông tin hình chữ nhật (nếu có)", "")
@@ -91,7 +110,7 @@ def run_app1():
                 rect_coordinates = (x, y, x + w, y + h)
 
                 # Khởi tạo và áp dụng GrabCut
-                processor = GrabCutProcessor(image)
+                processor = GrabCutProcessor(resized_image)
                 output_image = processor.apply_grabcut(rect=rect_coordinates)
                 st.image(output_image, channels="BGR", caption="Kết quả GrabCut")
 
