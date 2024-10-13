@@ -1,85 +1,55 @@
-import os
-import cv2
-import numpy as np
-import joblib  # Library for loading the model
 import streamlit as st
+import matplotlib.pyplot as plt
 from PIL import Image
 
-# Load the KNN model
-def load_model(model_path):
-    return joblib.load(model_path)
-
-# Function to extract Haar features
-def haar_features(img):
-    integral_img = cv2.integral(img)
-    haar_features = []
-
-    # Vertical pattern
-    for i in range(0, img.shape[0] - 1):
-        for j in range(0, img.shape[1] - 1):
-            haar_value = (integral_img[i + 1, j + 1] - integral_img[i, j + 1] -
-                          integral_img[i + 1, j] + integral_img[i, j])
-            haar_features.append(haar_value)
-
-    # Horizontal pattern
-    for i in range(0, img.shape[0] - 1):
-        for j in range(0, img.shape[1] - 1):
-            haar_value = (integral_img[i, j + 1] - integral_img[i + 1, j + 1] -
-                          integral_img[i, j] + integral_img[i + 1, j])
-            haar_features.append(haar_value)
-
-    return np.array(haar_features)
-
-# Sliding window Haar detection
-def sliding_window_haar_detect(img, model, window_size=(24, 24)):
-    height, width = img.shape
-    boxes = []
-    step = 1  # Step size for sliding window
-
-    for y in range(0, height - window_size[1] + 1, step):
-        for x in range(0, width - window_size[0] + 1, step):
-            window = img[y:y + window_size[1], x:x + window_size[0]]
-            if window.shape[0] == window_size[1] and window.shape[1] == window_size[0]:
-                haar_feat = haar_features(window)
-                pred = model.predict([haar_feat])  # Predict using KNN
-                if pred == 1:  # If face detected
-                    boxes.append((x, y, window_size[0], window_size[1]))
-
-    return boxes
-
-# Main application function
 def run_app3():
-    st.title("Face Detection with KNN")
+    # Part 1: Display face and non-face images
+    st.title("Face and Non-face Data")
+    
+    st.subheader("Face Images")
+    face_image_paths = [
+        'Face_Detection_folder/faces_24x24.png', 
+        
+    ]  # Add your actual image paths here
+    for img_path in face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
 
-    # Load the KNN model
-    model_path = "knn_model.joblib"  # Update with your model path
-    try:
-        model = load_model(model_path)
-    except Exception as e:
-        st.error(f"Error loading model: {str(e)}")
-        return
+    st.subheader("Non-Face Images")
+    non_face_image_paths = [
+        'Face_Detection_folder/non_faces_24x24.png'
+    ]  # Add your actual image paths here
+    for img_path in non_face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
-    # Image upload
-    uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
+    # Part 2: Display training results and vector image
+    st.title("Training Results")
+    st.subheader("Train")
+    non_face_image_paths = [
+        'Face_Detection_folder/vecto.png'
+    ]  # Add your actual image paths here
+    for img_path in non_face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
-    if uploaded_file is not None:
-        # Open the uploaded image
-        image = Image.open(uploaded_file)
-        img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    st.subheader("Train")
+    non_face_image_paths = [
+        'Face_Detection_folder/bieu_do.png'
+    ]  # Add your actual image paths here
+    for img_path in non_face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
-        # Resize image for processing
-        img = cv2.resize(img, (100, int(img.shape[0] * (100 / img.shape[1]))))
+    
+    # Part 3: Display final result
+    st.title("Final Result")
+    result_image_path = 'Face_Detection_folder/kq_face.png'  # Add your actual image path here
+    result_image = Image.open(result_image_path)
+    st.image(result_image, caption="Detection Result", use_column_width=True)
 
-        # Perform sliding window detection
-        boxes = sliding_window_haar_detect(img, model)
+# Main app where you can call run_app3()
 
-        # Draw boxes on the image
-        for (x, y, w, h) in boxes:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
-
-        # Convert the result image to display
-        result_image = Image.fromarray(img)
-        st.image(result_image, caption="Detection Result", use_column_width=True)
 
 if __name__ == "__main__":
     run_app3()
