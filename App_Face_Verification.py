@@ -24,7 +24,7 @@ face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.
                       targetId=target_id)
 
 # Instantiate SFace for face recognition
-face_recognizer = SFace(modelPath="https://drive.google.com/uc?id=17XLFcW8RuUXP7ACj5z4SPLGXx8FudWhq",
+face_recognizer = SFace(modelPath="https://drive.google.com/file/d/1fe4KJPheCwkDtbnT7DPF6jjRuWFBLvl8/view?usp=drive_link",
                     disType=0,  # cosine
                     backendId=backend_id,
                     targetId=target_id)
