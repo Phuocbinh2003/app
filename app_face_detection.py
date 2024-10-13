@@ -53,7 +53,11 @@ def run_app3():
 
     # Load the KNN model
     model_path = "knn_model.joblib"  # Update with your model path
-    model = load_model(model_path)
+    try:
+        model = load_model(model_path)
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        return
 
     # Image upload
     uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
