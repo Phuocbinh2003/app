@@ -143,7 +143,7 @@ def compare_faces(image1, image2):
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
     return result[0]  # Return similarity score
 
-def run_app():
+def run_app5():
     """Runs the Streamlit app."""
     st.title("Face Recognition App")
 
@@ -184,4 +184,4 @@ def run_app():
             st.write(f"Similarity Score: {score:.4f}")
 
 if __name__ == "__main__":
-    run_app()
+    run_app5()
