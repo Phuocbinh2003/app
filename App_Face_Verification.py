@@ -1,18 +1,14 @@
 import streamlit as st
 import cv2
 import numpy as np
-from Face_Verification/yunet import YuNet
-from Face_Verification/sface import SFace
-import matplotlib.pyplot as plt
+import os
 from PIL import Image
+from Face_Verification.yunet import YuNet
+from Face_Verification.sface import SFace
 
 # Valid combinations of backends and targets
 backend_target_pairs = [
     [cv2.dnn.DNN_BACKEND_OPENCV, cv2.dnn.DNN_TARGET_CPU],
-    [cv2.dnn.DNN_BACKEND_CUDA,   cv2.dnn.DNN_TARGET_CUDA],
-    [cv2.dnn.DNN_BACKEND_CUDA,   cv2.dnn.DNN_TARGET_CUDA_FP16],
-    [cv2.dnn.DNN_BACKEND_TIMVX,  cv2.dnn.DNN_TARGET_NPU],
-    [cv2.dnn.DNN_BACKEND_CANN,   cv2.dnn.DNN_TARGET_NPU]
 ]
 
 backend_id = backend_target_pairs[0][0]
@@ -20,18 +16,18 @@ target_id = backend_target_pairs[0][1]
 
 # Instantiate YuNet
 face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
-                inputSize=[320, 320],
-                confThreshold=0.5,
-                nmsThreshold=0.3,
-                topK=5000,
-                backendId=backend_id,
-                targetId=target_id)
+                      inputSize=[320, 320],
+                      confThreshold=0.5,
+                      nmsThreshold=0.3,
+                      topK=5000,
+                      backendId=backend_id,
+                      targetId=target_id)
 
 # Instantiate SFace for face recognition
-face_recognizer = SFace(modelPath="https://drive.google.com/uc?id=17XLFcW8RuUXP7ACj5z4SPLGXx8FudWhq",
-                    disType=0,  # cosine
-                    backendId=backend_id,
-                    targetId=target_id)
+face_recognizer = SFace(modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
+                        disType=0,  # cosine
+                        backendId=backend_id,
+                        targetId=target_id)
 
 def find_similar_faces(uploaded_image, folder_path):
     results = []
@@ -56,7 +52,7 @@ def find_similar_faces(uploaded_image, folder_path):
     return results
 
 # Streamlit UI
-def run_app5():
+def run_app():
     st.title("Face Recognition Application")
     uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
     
@@ -71,5 +67,6 @@ def run_app5():
                 st.write(f"File: {filename}, Score: {score:.4f}, Match: {'Yes' if match else 'No'}")
         else:
             st.write("No similar faces found.")
+
 if __name__ == "__main__":
-    run_app5()
+    run_app()
