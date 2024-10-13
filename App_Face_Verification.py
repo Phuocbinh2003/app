@@ -45,7 +45,7 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
     ratio1 = min(target_size[0] / out1.shape[0], target_size[1] / out1.shape[1])
     new_h1 = int(h1 * ratio1)
     new_w1 = int(w1 * ratio1)
-    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR)
+    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR).astype(np.float32)
     top = max(0, target_size[0] - new_h1) // 2
     bottom = top + new_h1
     left = max(0, target_size[1] - new_w1) // 2
@@ -63,7 +63,7 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
     ratio2 = min(target_size[0] / out2.shape[0], target_size[1] / out2.shape[1])
     new_h2 = int(h2 * ratio2)
     new_w2 = int(w2 * ratio2)
-    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR)
+    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR).astype(np.float32)
     top = max(0, target_size[0] - new_h2) // 2
     bottom = top + new_h2
     left = max(0, target_size[1] - new_w2) // 2
@@ -91,9 +91,6 @@ def find_similar_faces(uploaded_image, folder_path):
     image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
 
-    # Resize image before processing
-    image1 = resize_image(image1)
-
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
 
@@ -105,8 +102,6 @@ def find_similar_faces(uploaded_image, folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:  # Check if image was read successfully
-            # Resize image before processing
-            image2 = resize_image(image2)
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
 
@@ -164,7 +159,6 @@ def read_student_info(filename, folder_path):
             return f.read()
     else:
         return "No student information found."
-
 def compare_faces(image1, image2):
     # Detect faces in both images
     faces1 = face_detector.infer(image1)
@@ -175,47 +169,75 @@ def compare_faces(image1, image2):
 
     # Compare the first detected face from each image
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-    return result[0]
-
+    score = result[0]  # Assuming the score is returned as the first element
+    return score
+# Streamlit UI
 def run_app5():
-    st.title("Face Recognition App")
-    uploaded_image = st.file_uploader("Upload an image...", type=["jpg", "jpeg", "png"])
-    folder_path = "data/test"
+    st.title("Face Recognition Application")
+    uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
 
-    if uploaded_image is not None:
-        # Read uploaded image
-        image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
-        st.image(image1, caption="Uploaded Image", use_column_width=True)
+    if uploaded_file is not None:
+        # Convert uploaded image to NumPy array
+        image1 = Image.open(uploaded_file).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
 
-        # Resize image
+        # Resize uploaded image
         image1 = resize_image(image1)
 
-        # Process the uploaded image
+        # In kích thước của ảnh sau khi resize
+        st.write(f"Resized image shape: {image1.shape}")
+
+        # Detect faces in the uploaded image
+        face_detector.setInputSize([image1.shape[1], image1.shape[0]])
         faces1 = face_detector.infer(image1)
-        if faces1.shape[0] > 0:
-            # If a face is detected, display the image with detected faces
-            output_image = visualize_faces(image1, faces1)
-            st.image(output_image, caption="Detected Faces", use_column_width=True)
 
-            # Find similar faces in the folder
-            results = find_similar_faces(uploaded_image, folder_path)
-            if results:
-                best_match = max(results, key=lambda x: x[1])  # Get the best match
-                st.success(f"Best match: {best_match[0]} with score {best_match[1]:.2f}")
-                student_info = read_student_info(best_match[0], folder_path)
-                st.text_area("Student Information", student_info, height=200)
-
-                # Display the best match image
-                match_image_path = os.path.join(folder_path, best_match[0])
-                image2 = cv2.imread(match_image_path)
-                image2 = resize_image(image2)  # Resize the matched image
-                output_image = visualize_matches(image1, faces1, image2, face_detector.infer(image2), [True], [best_match[1]])
-                st.image(output_image, caption="Match Found", use_column_width=True)
-            else:
-                st.warning("No similar faces found in the folder.")
-        else:
+        if faces1.shape[0] == 0:
             st.warning("No face detected in the uploaded image.")
+            return
+
+        # Visualize faces with boxes drawn
+        output_image = visualize_faces(image1, faces1)
+
+        # Display the output image with boxes
+        st.image(output_image, caption="Detected Faces", use_column_width=True)
+
+        # Find similar faces
+        folder_path = 'Face_Verification/image'  # Adjust to your folder path
+        similar_faces = []
+
+        for filename in os.listdir(folder_path):
+            if filename.endswith(('.jpg', '.jpeg', '.png')):
+                # Load and resize each image in the folder
+                img_path = os.path.join(folder_path, filename)
+                img = Image.open(img_path).convert("RGB")
+                img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
+                
+                # In kích thước của ảnh đã resize trong thư mục
+                st.write(f"Resized {filename} shape: {img_resized.shape}")
+
+                # Find similar faces using the compare_faces function
+                score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
+                similar_faces.append((filename, score))
+
+        if similar_faces:
+            # Find the file with the highest accuracy
+            best_match = max(similar_faces, key=lambda x: x[1])  # x[1] is the accuracy
+            st.write(f"Best match: {best_match[0]} with score: {best_match[1]:.4f}")
+
+            # Display results for all similar faces
+            for filename, score in similar_faces:
+                st.write(f"{filename}: Score: {score:.4f}")
+
+            # Display the best match
+            img_best_match = Image.open(os.path.join(folder_path, best_match[0]))
+            st.image(img_best_match, caption="Best Match Image", use_column_width=True)
+
+            # Read student info
+            student_info = read_student_info(best_match[0], folder_path)
+            st.write("Student Information:")
+            st.write(student_info)
+        else:
+            st.write("No similar faces found.")
 
 if __name__ == "__main__":
     run_app5()
