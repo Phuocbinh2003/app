@@ -61,7 +61,7 @@ uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "pn
 
 if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-    folder_path = 'images/'  # Adjust to your folder path
+    folder_path = 'Face_Verification/image'  # Adjust to your folder path
     similar_faces = find_similar_faces(uploaded_file, folder_path)
 
     if similar_faces:
