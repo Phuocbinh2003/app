@@ -187,13 +187,12 @@ def run_app5():
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
-        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
         folder_path = "Face_Verification/image"  # Define folder path
         if os.path.isdir(folder_path):
             st.write(f"Finding similar faces in the folder: {folder_path}")
             results, processed_image = find_similar_faces(uploaded_image, folder_path)
 
-            # Display processed image with detected faces
+            # Display processed image with only detected faces
             st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
 
             if results:
@@ -208,6 +207,31 @@ def run_app5():
                 st.warning("No matching faces found.")
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
+
+
+    # Part 2: Compare portrait and ID photo
+    st.header("Compare Portrait and ID Photo")
+    uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
+    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+
+    if uploaded_image1 and uploaded_image2:
+        image1 = Image.open(uploaded_image1).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+
+        image2 = Image.open(uploaded_image2).convert("RGB")
+        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+
+        image1 = resize_image(image1)
+        image2 = resize_image(image2)
+
+        score = compare_faces(image1, image2)
+        st.success(f"Similarity Score: {score:.2f}")
+
+        if score > 0.5:
+            st.success("The images belong to the same person.")
+        else:
+            st.warning("The images do not belong to the same person.")
+
 
 
     # Part 2: Compare portrait and ID photo
