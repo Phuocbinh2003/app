@@ -227,32 +227,31 @@ def compare_faces(image1, image2):
     return result[1]  # Return the similarity score
 
 def run_app5():
-    """Phan 1."""
+    """Phần 1: Tìm khuôn mặt giống nhất trong thư mục."""
     
     st.title("Face Recognition - Find Similar Faces in a Folder")
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
-        folder_path = "Face_Verification/image"  # Define folder path
+        folder_path = "Face_Verification/image"  # Đường dẫn thư mục
         if os.path.isdir(folder_path):
             st.write(f"Finding similar faces in the folder: {folder_path}")
             best_match_filename, best_score, processed_image = find_similar_faces(uploaded_image, folder_path)
 
-            # Display processed image with detected faces
-            # st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
+            # Hiển thị hình ảnh đã xử lý với khuôn mặt được phát hiện
+            st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
             if best_match_filename is not None:
                 st.write(f"### Best Match Found:")
                 st.write(f"- {best_match_filename} | Score: {best_score:.2f}")
 
-                # Show the matching student's information
+                # Hiển thị thông tin của học sinh
                 student_info = read_student_info(best_match_filename, folder_path)
-                st.write(f"**Student Information:** {student_info}")
+                st.write(f"**Thông tin học sinh:** {student_info}")
             else:
                 st.warning("No matching faces found.")
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
-
 
     """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
     st.header("Compare Portrait and ID Photo")
