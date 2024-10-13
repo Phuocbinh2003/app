@@ -168,6 +168,7 @@ def compare_faces(image1, image2):
     return result[0]  # Return similarity score
 
 def run_app5():
+    """Runs the Streamlit app."""
     st.title("Face Recognition App")
 
     # Part 1: Find student information from image
@@ -175,18 +176,25 @@ def run_app5():
     uploaded_image = st.file_uploader("Upload Image...", type=["jpg", "jpeg", "png"], key="image")
 
     if uploaded_image is not None:
-        folder_path = "Face_Verification/image"  # Update with your folder path
-        st.image(uploaded_image, caption='Uploaded Image', use_column_width=True)
+        folder_path = "Face_Verification/image"  # Path to the folder containing student images
 
-        results = find_similar_faces(uploaded_image, folder_path)
+        # Display uploaded image
+        image1 = Image.open(uploaded_image).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+        st.image(image1, channels="BGR", caption="Uploaded Image", use_column_width=True)
+
+        results, image_with_faces = find_similar_faces(uploaded_image, folder_path)
+
+        # Display image with visualized faces only
+        st.image(image_with_faces, channels="BGR", caption="Detected Faces", use_column_width=True)
+
         if results:
-            st.subheader("Matched Faces:")
-            best_match = max(results, key=lambda x: x[1])  # Get the best match based on score
-            filename, score, _ = best_match
-            st.write(f"Found similar face in {filename} with score: {score:.2f}")
-            student_info = read_student_info(filename, folder_path)
-            st.write(student_info)
-
+            # Find the result with the highest score
+            best_match = max(results, key=lambda x: x[1])
+            st.subheader("Best Match Found:")
+            st.write(f"File: {best_match[0]}, Similarity Score: {best_match[1]:.2f}")
+            student_info = read_student_info(best_match[0], folder_path)
+            st.write(f"Student Information: {student_info}")
         else:
             st.warning("No similar faces found.")
 
