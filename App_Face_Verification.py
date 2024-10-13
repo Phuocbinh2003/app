@@ -193,12 +193,26 @@ def run_app5():
         results = find_similar_faces(uploaded_image, folder_path)
 
         if results:
-            st.subheader("Matching Results:")
-            for filename, score, _ in results:
-                student_info = read_student_info(filename, folder_path)
-                st.write(f"**Matched File:** {filename}")
-                st.write(f"**Score:** {score:.2f}")
-                st.write(f"**Student Info:** {student_info}")
+            # Find the result with the highest score
+            best_match = max(results, key=lambda x: x[1])  # (filename, score, _)
+            best_filename, best_score, _ = best_match
+            
+            # Read and visualize the best match image
+            best_image_path = os.path.join(folder_path, best_filename)
+            best_image = cv2.imread(best_image_path)
+            best_image = resize_image(best_image)  # Resize for visualization
+
+            # Draw bounding boxes on the best match image
+            detected_faces = face_detector.infer(best_image)
+            visualized_image = visualize_faces(best_image, detected_faces)
+
+            # Display the results
+            st.subheader("Best Matching Result:")
+            st.image(visualized_image, caption="Best Match with Detected Faces", use_column_width=True)
+            student_info = read_student_info(best_filename, folder_path)
+            st.write(f"**Matched File:** {best_filename}")
+            st.write(f"**Score:** {best_score:.2f}")
+            st.write(f"**Student Info:** {student_info}")
         else:
             st.warning("No matches found.")
 
@@ -232,3 +246,4 @@ def run_app5():
 
 if __name__ == "__main__":
     run_app5()
+
