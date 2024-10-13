@@ -177,7 +177,7 @@ def compare_faces(image1, image2):
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
     return result[0]  # Return similarity score
 
-def run_app():
+def run_app5():
     st.title("Face Recognition App")
 
     # Part 1: Find student information from image
@@ -227,4 +227,4 @@ def run_app():
             st.warning("The images do not belong to the same person.")
 
 if __name__ == "__main__":
-    run_app()
+    run_app5()
