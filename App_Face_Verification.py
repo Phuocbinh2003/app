@@ -41,6 +41,9 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
     if fps is not None:
         cv2.putText(output, 'FPS: {:.2f}'.format(fps), (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color)
 
+    # Store detected face coordinates for later use
+    face_bboxes = []
+    
     for det in results:
         bbox = det[0:4].astype(np.int32)
         cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
@@ -50,8 +53,11 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
         landmarks = det[4:14].astype(np.int32).reshape((5, 2))
         for idx, landmark in enumerate(landmarks):
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
+        
+        # Append the bounding box to the list
+        face_bboxes.append(bbox)
 
-    return output
+    return output, face_bboxes
 
 def resize_image(image, target_size=320):
     """Resizes the image while maintaining the aspect ratio."""
@@ -64,7 +70,7 @@ def resize_image(image, target_size=320):
         new_w = int(w * (target_size / h))  # Calculate new width based on height
 
     resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-    return resized_image
+    return resized_image, new_w, new_h  # Return resized image and new dimensions
 
 def read_student_info(filename, folder_path):
     """Reads student information from a text file associated with the image."""
@@ -79,7 +85,7 @@ def find_similar_faces(uploaded_image, folder_path):
     results = []
     image1 = Image.open(uploaded_image).convert("RGB")
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    image1_resized = resize_image(image1)  # Resize uploaded image
+    image1_resized, new_w, new_h = resize_image(image1)  # Resize uploaded image
 
     face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
     faces1 = face_detector.infer(image1_resized)
@@ -89,13 +95,13 @@ def find_similar_faces(uploaded_image, folder_path):
         return [], image1  # Return original image
 
     # Visualize faces detected in the uploaded image
-    image1_with_faces = visualize_faces(image1_resized, faces1)
+    image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
 
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:
-            image2_resized = resize_image(image2)  # Resize comparison image
+            image2_resized, _, _ = resize_image(image2)  # Resize comparison image
             face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
             faces2 = face_detector.infer(image2_resized)
 
@@ -103,7 +109,20 @@ def find_similar_faces(uploaded_image, folder_path):
                 result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
                 results.append((filename, result[0], result[1]))
 
-    return results, image1_with_faces  # Return detected faces image
+    # Draw bounding boxes on the original image
+    for bbox in face_bboxes:
+        # Convert coordinates back to original image size
+        original_bbox = (
+            int(bbox[0] * (image1.shape[1] / new_w)),
+            int(bbox[1] * (image1.shape[0] / new_h)),
+            int(bbox[2] * (image1.shape[1] / new_w)),
+            int(bbox[3] * (image1.shape[0] / new_h))
+        )
+        cv2.rectangle(image1, (original_bbox[0], original_bbox[1]), 
+                      (original_bbox[0] + original_bbox[2], original_bbox[1] + original_bbox[3]), 
+                      (0, 255, 0), 2)  # Draw bounding box on original image
+
+    return results, image1  # Return detected faces image in original size
 
 def run_app5():
     """Runs the Streamlit app."""
