@@ -58,7 +58,7 @@ def apply_watershed(img):
 
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if h > 40 and w > 30 and h < 500 and w < 400:
+        if h > 40 and w > 30 :#and h < 500 and w < 400
             result_img[y:y+h, x:x+w] = binary[y:y+h, x:x+w]
 
     return result_img
@@ -114,7 +114,7 @@ def run_app2():
     # Đường dẫn tới các hình ảnh phần 2 (chỉ 2 ảnh)
     step_image_path_3 = "my_folder/KQ1.png"
     result_image_path_3 = "my_folder/KQ2.png"
-
+    st.text("This is a plain text without any formatting.")
     # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
     st.header("2. Ảnh Test và Kết quả")
 
