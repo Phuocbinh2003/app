@@ -156,11 +156,24 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output, face_bboxes
 
-def resize_image(image, width=320, height=239):
-    # Resize the image to the specified width and height
-    resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
-    return resized_image
+# def resize_image(image, width=320, height=239):
+#     # Resize the image to the specified width and height
+#     resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
+#     return resized_image
+def resize_image(image, target_size=320):
+    h, w, _ = image.shape
+    # Check which dimension is larger
+    if w > h:
+        new_w = target_size
+        new_h = int(h * (target_size / w))  # Calculate height based on width
+    else:
+        new_h = target_size
+        new_w = int(w * (target_size / h))  # Calculate width based on height
 
+    # Resize image while keeping aspect ratio
+    resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+
+    return resized_image
 def read_student_info(filename, folder_path):
     txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
     with open(txt_file_path, "r", encoding="utf-8") as txt_file:
