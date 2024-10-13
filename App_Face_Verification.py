@@ -198,8 +198,8 @@ def run_app5():
                 img = Image.open(img_path).convert("RGB")
                 img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
                 
-                # Find similar faces (Assuming you have a function for that)
-                score = compare_faces(image1, img_resized)  # Replace with your comparison function
+                # Find similar faces using the compare_faces function
+                score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
                 similar_faces.append((filename, score))
 
         if similar_faces:
@@ -221,10 +221,6 @@ def run_app5():
             st.write(student_info)
         else:
             st.write("No similar faces found.")
-
-if __name__ == "__main__":
-    run_app5()
-
 
 if __name__ == "__main__":
     run_app5()
