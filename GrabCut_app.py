@@ -5,7 +5,7 @@ import base64
 import re
 from grabcut_processor import GrabCutProcessor  # Nhập lớp GrabCutProcessor
 
-def resize_image(image, target_size=320):
+def resize_image(image, target_size=500):
     h, w, _ = image.shape
     # Kiểm tra xem chiều nào lớn hơn
     if w > h:
