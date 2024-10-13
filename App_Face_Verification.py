@@ -168,7 +168,7 @@ def run_app5():
     st.title("Face Verification Application")
 
     uploaded_image = st.file_uploader("Upload an image for verification", type=["jpg", "jpeg", "png"])
-    folder_path = "path/to/your/folder"  # Update with your folder path
+    folder_path = "Face_Verification/image"  # Update with your folder path
 
     if uploaded_image is not None:
         results, processed_image = find_similar_faces(uploaded_image, folder_path)
