@@ -33,44 +33,44 @@ face_recognizer = SFace(
     targetId=target_id
 )
 
-def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):  # target_size: (h, w)
+def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
     out1 = img1.copy()
     out2 = img2.copy()
     matched_box_color = (0, 255, 0)  # BGR
     mismatched_box_color = (0, 0, 255)  # BGR
 
-    # Resize to target size
+    # Resize to target size for image 1
     padded_out1 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h1, w1, _ = out1.shape
     ratio1 = min(target_size[0] / out1.shape[0], target_size[1] / out1.shape[1])
     new_h1 = int(h1 * ratio1)
     new_w1 = int(w1 * ratio1)
-    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR).astype(np.float32)
+    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR)
     top = max(0, target_size[0] - new_h1) // 2
     bottom = top + new_h1
     left = max(0, target_size[1] - new_w1) // 2
     right = left + new_w1
     padded_out1[top:bottom, left:right] = resized_out1
 
-    # Draw bbox
+    # Draw bbox for image 1
     bbox1 = faces1[0][:4] * ratio1
     x, y, w, h = bbox1.astype(np.int32)
     cv2.rectangle(padded_out1, (x + left, y + top), (x + left + w, y + top + h), matched_box_color, 2)
 
-    # Resize to target size
+    # Resize to target size for image 2
     padded_out2 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h2, w2, _ = out2.shape
     ratio2 = min(target_size[0] / out2.shape[0], target_size[1] / out2.shape[1])
     new_h2 = int(h2 * ratio2)
     new_w2 = int(w2 * ratio2)
-    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR).astype(np.float32)
+    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR)
     top = max(0, target_size[0] - new_h2) // 2
     bottom = top + new_h2
     left = max(0, target_size[1] - new_w2) // 2
     right = left + new_w2
     padded_out2[top:bottom, left:right] = resized_out2
 
-    # Draw bbox
+    # Draw bbox for image 2
     assert faces2.shape[0] == len(matches), "number of faces2 needs to match matches"
     assert len(matches) == len(scores), "number of matches needs to match number of scores"
     for index, match in enumerate(matches):
@@ -91,6 +91,9 @@ def find_similar_faces(uploaded_image, folder_path):
     image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
 
+    # Resize image before processing
+    image1 = resize_image(image1)
+
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
 
@@ -102,6 +105,8 @@ def find_similar_faces(uploaded_image, folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:  # Check if image was read successfully
+            # Resize image before processing
+            image2 = resize_image(image2)
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
 
@@ -159,6 +164,7 @@ def read_student_info(filename, folder_path):
             return f.read()
     else:
         return "No student information found."
+
 def compare_faces(image1, image2):
     # Detect faces in both images
     faces1 = face_detector.infer(image1)
@@ -169,75 +175,56 @@ def compare_faces(image1, image2):
 
     # Compare the first detected face from each image
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-    score = result[0]  # Assuming the score is returned as the first element
-    return score
-# Streamlit UI
-def run_app5():
-    st.title("Face Recognition Application")
-    uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
+    return result[0]  # Return similarity score
 
-    if uploaded_file is not None:
-        # Convert uploaded image to NumPy array
-        image1 = Image.open(uploaded_file).convert("RGB")
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+def run_app():
+    st.title("Face Recognition App")
 
-        # Resize uploaded image
-        image1 = resize_image(image1)
+    # Part 1: Find student information from image
+    st.header("Find Student Information from Image")
+    uploaded_image = st.file_uploader("Upload Image...", type=["jpg", "jpeg", "png"], key="image")
 
-        # In kích thước của ảnh sau khi resize
-        st.write(f"Resized image shape: {image1.shape}")
+    if uploaded_image is not None:
+        folder_path = "Face_Verification/image"  # Update with your student image folder path
+        results = find_similar_faces(uploaded_image, folder_path)
 
-        # Detect faces in the uploaded image
-        face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-        faces1 = face_detector.infer(image1)
-
-        if faces1.shape[0] == 0:
-            st.warning("No face detected in the uploaded image.")
-            return
-
-        # Visualize faces with boxes drawn
-        output_image = visualize_faces(image1, faces1)
-
-        # Display the output image with boxes
-        st.image(output_image, caption="Detected Faces", use_column_width=True)
-
-        # Find similar faces
-        folder_path = 'Face_Verification/image'  # Adjust to your folder path
-        similar_faces = []
-
-        for filename in os.listdir(folder_path):
-            if filename.endswith(('.jpg', '.jpeg', '.png')):
-                # Load and resize each image in the folder
-                img_path = os.path.join(folder_path, filename)
-                img = Image.open(img_path).convert("RGB")
-                img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
-                
-                # In kích thước của ảnh đã resize trong thư mục
-                st.write(f"Resized {filename} shape: {img_resized.shape}")
-
-                # Find similar faces using the compare_faces function
-                score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
-                similar_faces.append((filename, score))
-
-        if similar_faces:
-            # Find the file with the highest accuracy
-            best_match = max(similar_faces, key=lambda x: x[1])  # x[1] is the accuracy
-            st.write(f"Best match: {best_match[0]} with score: {best_match[1]:.4f}")
-
-            # Display results for all similar faces
-            for filename, score in similar_faces:
-                st.write(f"{filename}: Score: {score:.4f}")
-
-            # Display the best match
-            img_best_match = Image.open(os.path.join(folder_path, best_match[0]))
-            st.image(img_best_match, caption="Best Match Image", use_column_width=True)
-
-            # Read student info
-            student_info = read_student_info(best_match[0], folder_path)
-            st.write("Student Information:")
-            st.write(student_info)
+        if results:
+            st.subheader("Matching Results:")
+            for filename, score, _ in results:
+                student_info = read_student_info(filename, folder_path)
+                st.write(f"**Matched File:** {filename}")
+                st.write(f"**Score:** {score:.2f}")
+                st.write(f"**Student Info:** {student_info}")
         else:
-            st.write("No similar faces found.")
+            st.warning("No matches found.")
+
+    # Part 2: Compare portrait and ID photo
+    st.header("Compare Portrait and ID Photo")
+    uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
+    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+
+    if uploaded_image1 is not None and uploaded_image2 is not None:
+        # Read uploaded images
+        image1 = Image.open(uploaded_image1).convert("RGB")  # Convert to RGB
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
+        st.image(image1, caption="Uploaded Portrait Image", use_column_width=True)
+
+        image2 = Image.open(uploaded_image2).convert("RGB")  # Convert to RGB
+        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)  # Convert to BGR
+        st.image(image2, caption="Uploaded ID Image", use_column_width=True)
+
+        # Resize images
+        image1 = resize_image(image1)
+        image2 = resize_image(image2)
+
+        # Compare the two images
+        score = compare_faces(image1, image2)
+        st.success(f"Similarity Score: {score:.2f}")
+
+        if score > 0.5:  # Adjust the threshold as needed
+            st.success("The images belong to the same person.")
+        else:
+            st.warning("The images do not belong to the same person.")
 
 if __name__ == "__main__":
-    run_app5()
+    run_app()
