@@ -25,18 +25,11 @@ face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.
                       targetId=target_id)
 
 # Đường dẫn Google Drive đến mô hình SFace
-sface_model_url = 'https://drive.google.com/file/d/1fe4KJPheCwkDtbnT7DPF6jjRuWFBLvl8/view?usp=drive_link'
-sface_model_path = 'Face_Verification/face_recognition_sface_2021dec.onnx'
+face_recognizer = SFace(modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
+                        disType=0,  # cosine
+                        backendId=backend_id,
+                        targetId=target_id)
 
-# Tải mô hình SFace nếu chưa tồn tại
-if not os.path.exists(sface_model_path):
-    gdown.download(sface_model_url, sface_model_path, quiet=False)
-
-# Instantiate SFace for face recognition
-face_recognizer = SFace(modelPath=sface_model_path,
-                         disType=0,  # cosine
-                         backendId=backend_id,
-                         targetId=target_id)
 
 def find_similar_faces(uploaded_image, folder_path):
     results = []
