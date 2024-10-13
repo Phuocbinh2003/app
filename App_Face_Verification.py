@@ -162,10 +162,10 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output, face_bboxes
 
-# def resize_image(image, width=320, height=239):
-#     # Resize the image to the specified width and height
-#     resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
-#     return resized_image
+def resize_image24(image, width=320, height=240):
+    """Resize image to the specified width and height."""
+    return cv2.resize(image, (width, height))
+    
 def resize_image(image, target_size=320):
     h, w, _ = image.shape
     # Check which dimension is larger
@@ -227,9 +227,7 @@ def run_app5():
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
 
-    # Part 2: Compare portrait and ID photo
-  # Part 2: Compare portrait and ID photo
-    st.header("Compare Portrait and ID Photo")
+  st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
@@ -240,6 +238,7 @@ def run_app5():
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
+        # Resize images
         image1_resized = resize_image(image1)
         image2_resized = resize_image(image2)
 
@@ -263,6 +262,5 @@ def run_app5():
                 st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
         else:
             st.warning("Could not compare the images, no faces detected.")
-
 if __name__ == "__main__":
     run_app5()
