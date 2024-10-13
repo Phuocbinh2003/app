@@ -66,7 +66,7 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
     return output
 
 # Streamlit UI
-def run_app():
+def run_app5():
     st.title("Face Recognition Application")
     uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
 
@@ -83,4 +83,4 @@ def run_app():
             st.write("No similar faces found.")
 
 if __name__ == "__main__":
-    run_app()
+    run_app5()
