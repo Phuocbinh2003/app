@@ -105,10 +105,6 @@ def resize_image(image, target_size=320):
     resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
     return resized_image
 
-def resize_image2(image, target_size=(320, 239)):
-    """Resizes the image to the specified target size."""
-    return cv2.resize(image, target_size, interpolation=cv2.INTER_LINEAR)
-
 def read_student_info(filename, folder_path):
     """Reads student information from a text file associated with the image."""
     txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
@@ -122,7 +118,7 @@ def find_similar_faces(uploaded_image, folder_path):
     results = []
     image1 = Image.open(uploaded_image).convert("RGB")
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    image1 = resize_image(image1)  # Use resize_image for the first image
+    image1 = resize_image(image1)  # Use resize_image for the uploaded image
 
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
@@ -135,7 +131,7 @@ def find_similar_faces(uploaded_image, folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:
-            image2 = resize_image2(image2)  # Use resize_image2 for the comparison images
+            image2 = resize_image(image2)  # Use resize_image for the comparison images
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
 
