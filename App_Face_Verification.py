@@ -91,6 +91,9 @@ def find_similar_faces(uploaded_image, folder_path):
     image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
 
+    # Resize image before processing
+    image1 = resize_image(image1)
+
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
 
@@ -102,6 +105,8 @@ def find_similar_faces(uploaded_image, folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:  # Check if image was read successfully
+            # Resize image before processing
+            image2 = resize_image(image2)
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
 
@@ -170,10 +175,8 @@ def compare_faces(image1, image2):
 
     # Compare the first detected face from each image
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-    score = result[0]  # Assuming the score is returned as the first element
-    return score
+    return result[0]
 
-# Streamlit UI
 def run_app5():
     st.title("Face Recognition App")
     uploaded_image = st.file_uploader("Upload an image...", type=["jpg", "jpeg", "png"])
@@ -184,6 +187,9 @@ def run_app5():
         image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
         st.image(image1, caption="Uploaded Image", use_column_width=True)
+
+        # Resize image
+        image1 = resize_image(image1)
 
         # Process the uploaded image
         faces1 = face_detector.infer(image1)
@@ -203,6 +209,7 @@ def run_app5():
                 # Display the best match image
                 match_image_path = os.path.join(folder_path, best_match[0])
                 image2 = cv2.imread(match_image_path)
+                image2 = resize_image(image2)  # Resize the matched image
                 output_image = visualize_matches(image1, faces1, image2, face_detector.infer(image2), [True], [best_match[1]])
                 st.image(output_image, caption="Match Found", use_column_width=True)
             else:
