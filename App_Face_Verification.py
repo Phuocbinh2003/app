@@ -113,7 +113,7 @@ def find_similar_faces(uploaded_image, folder_path):
     image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
     
     # Display the resized image with detected faces
-    # st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
+    st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
     # Now compare this image with others in the folder
     for filename in os.listdir(folder_path):
@@ -187,14 +187,14 @@ def run_app5():
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
-        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
+        # st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
         folder_path = "Face_Verification/image"  # Define folder path
         if os.path.isdir(folder_path):
             st.write(f"Finding similar faces in the folder: {folder_path}")
             results, processed_image = find_similar_faces(uploaded_image, folder_path)
 
             # Display processed image with detected faces
-            st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
+            # st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
 
             if results:
                 st.write("### Similar Faces Found:")
