@@ -159,7 +159,18 @@ def read_student_info(filename, folder_path):
             return f.read()
     else:
         return "No student information found."
+def compare_faces(image1, image2):
+    # Detect faces in both images
+    faces1 = face_detector.infer(image1)
+    faces2 = face_detector.infer(image2)
 
+    if faces1.shape[0] == 0 or faces2.shape[0] == 0:
+        return 0.0  # No faces found, return score of 0
+
+    # Compare the first detected face from each image
+    result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
+    score = result[0]  # Assuming the score is returned as the first element
+    return score
 # Streamlit UI
 def run_app5():
     st.title("Face Recognition Application")
