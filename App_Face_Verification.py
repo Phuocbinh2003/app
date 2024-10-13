@@ -56,17 +56,20 @@ def find_similar_faces(uploaded_image, folder_path):
     return results
 
 # Streamlit UI
-st.title("Face Recognition Application")
-uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
-
-if uploaded_file is not None:
-    st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-    folder_path = 'Face_Verification/image'  # Adjust to your folder path
-    similar_faces = find_similar_faces(uploaded_file, folder_path)
-
-    if similar_faces:
-        st.write("Similar Faces:")
-        for filename, score, match in similar_faces:
-            st.write(f"File: {filename}, Score: {score:.4f}, Match: {'Yes' if match else 'No'}")
-    else:
-        st.write("No similar faces found.")
+def run_app5():
+    st.title("Face Recognition Application")
+    uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
+    
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+        folder_path = 'Face_Verification/image'  # Adjust to your folder path
+        similar_faces = find_similar_faces(uploaded_file, folder_path)
+    
+        if similar_faces:
+            st.write("Similar Faces:")
+            for filename, score, match in similar_faces:
+                st.write(f"File: {filename}, Score: {score:.4f}, Match: {'Yes' if match else 'No'}")
+        else:
+            st.write("No similar faces found.")
+if __name__ == "__main__":
+    run_app5()
