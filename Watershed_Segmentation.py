@@ -156,7 +156,7 @@ def run_app2():
         result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
 
         # Hiển thị kết quả
-        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True
+        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
 
 if __name__ == "__main__":
     run_app2()
