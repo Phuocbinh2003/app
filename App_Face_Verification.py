@@ -129,9 +129,13 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
     if fps is not None:
         cv2.putText(output, 'FPS: {:.2f}'.format(fps), (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color)
 
+    bboxes = []  # List to store bounding boxes
     for det in results:
         bbox = det[0:4].astype(np.int32)
         cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), box_color, 2)
+
+        # Save the bounding box position
+        bboxes.append(bbox)
 
         conf = det[-1]
         cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1]+12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
@@ -140,7 +144,7 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
         for idx, landmark in enumerate(landmarks):
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
 
-    return output
+    return output, bboxes  # Return both the output and bboxes
 
 # def resize_image(image, target_size=320):
 #     h, w, _ = image.shape
