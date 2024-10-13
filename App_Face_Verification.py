@@ -5,6 +5,7 @@ import os
 from PIL import Image
 from Face_Verification.yunet import YuNet
 from Face_Verification.sface import SFace
+import gdown
 
 # Valid combinations of backends and targets
 backend_target_pairs = [
@@ -15,23 +16,20 @@ backend_id = backend_target_pairs[0][0]
 target_id = backend_target_pairs[0][1]
 
 # Instantiate YuNet
-face_detector = YuNet(
-    modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
-    inputSize=[320, 320],
-    confThreshold=0.5,
-    nmsThreshold=0.3,
-    topK=5000,
-    backendId=backend_id,
-    targetId=target_id
-)
+face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
+                      inputSize=[320, 320],
+                      confThreshold=0.5,
+                      nmsThreshold=0.3,
+                      topK=5000,
+                      backendId=backend_id,
+                      targetId=target_id)
 
-# Instantiate SFace
-face_recognizer = SFace(
-    modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
-    disType=0,  # cosine
-    backendId=backend_id,
-    targetId=target_id
-)
+# Đường dẫn Google Drive đến mô hình SFac
+face_recognizer = SFace(modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
+                        disType=0,  # cosine
+                        backendId=backend_id,
+                        targetId=target_id)
+
 
 def find_similar_faces(uploaded_image, folder_path):
     results = []
@@ -59,30 +57,33 @@ def find_similar_faces(uploaded_image, folder_path):
 
     return results
 
-
-def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255)):
-    output = image.copy()
-    for det in results:
-        bbox = det[0:4].astype(np.int32)
-        cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
-        conf = det[-1]
-        cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1] + 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
-    return output
+def save_highest_accuracy_file(results):
+    if results:
+        # Tìm file có độ chính xác cao nhất
+        best_match = max(results, key=lambda x: x[1])  # x[1] là độ chính xác
+        filename = best_match[0]
+        # Lưu tên file vào .txt
+        with open("highest_accuracy_file.txt", "w") as f:
+            f.write(f"File with highest accuracy: {filename}\nScore: {best_match[1]:.4f}\nMatch: {'Yes' if best_match[2] else 'No'}")
+        st.success(f"Saved the best match to 'highest_accuracy_file.txt': {filename}")
 
 # Streamlit UI
 def run_app5():
     st.title("Face Recognition Application")
     uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
-
+    
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
         folder_path = 'Face_Verification/image'  # Adjust to your folder path
         similar_faces = find_similar_faces(uploaded_file, folder_path)
-
+    
         if similar_faces:
             st.write("Similar Faces:")
             for filename, score, match in similar_faces:
                 st.write(f"File: {filename}, Score: {score:.4f}, Match: {'Yes' if match else 'No'}")
+            
+            # Lưu tên file có độ chính xác cao nhất
+            save_highest_accuracy_file(similar_faces)
         else:
             st.write("No similar faces found.")
 
