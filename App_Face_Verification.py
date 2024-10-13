@@ -228,6 +228,7 @@ def run_app5():
             st.error(f"Folder '{folder_path}' does not exist.")
 
     # Part 2: Compare portrait and ID photo
+  # Part 2: Compare portrait and ID photo
     st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
@@ -239,16 +240,29 @@ def run_app5():
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
-        image1 = resize_image(image1)
-        image2 = resize_image(image2)
+        image1_resized = resize_image(image1)
+        image2_resized = resize_image(image2)
 
-        score = compare_faces(image1, image2)
-        st.success(f"Similarity Score: {score:.2f}")
+        # Compare faces and get the score
+        score = compare_faces(image1_resized, image2_resized)
 
-        if score > 0.5:
-            st.success("The images belong to the same person.")
+        if score is not None:
+            st.success(f"Similarity Score: {score:.2f}")
+
+            # Visualize the matches on the images
+            faces1 = face_detector.infer(image1_resized)
+            faces2 = face_detector.infer(image2_resized)
+
+            # Visualize matches only if faces are detected
+            if faces1.shape[0] > 0 and faces2.shape[0] > 0:
+                matches = [1]  # Assuming a match for visualization, adjust logic as needed
+                scores = [score]  # Using the score for visualization
+                matched_image = visualize_matches(image1_resized, faces1, image2_resized, faces2, matches, scores)
+
+                # Display the matched image
+                st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
         else:
-            st.warning("The images do not belong to the same person.")
+            st.warning("Could not compare the images, no faces detected.")
 
 if __name__ == "__main__":
     run_app5()
