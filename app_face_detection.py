@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import joblib
 import streamlit as st
-from PIL import Image  # Importing Image for handling image loading
+from PIL import Image
 
 # Function to compute Haar features
 def haar_features(img):
@@ -71,9 +71,9 @@ def sliding_window_haar_detect(img, model, window_size=(24, 24)):
     return boxes
 
 def run_app3():
-    # Part 1: Display face and non-face images
     st.title("Face and Non-Face Data")
     
+    # Part 1: Display face and non-face images
     st.subheader("Face Images")
     face_image_paths = [
         'Face_Detection_folder/faces_24x24.png', 
@@ -132,9 +132,19 @@ def run_app3():
         resized_img, new_w, new_h = resize_image(gray_image)
         boxes = sliding_window_haar_detect(resized_img, knn_model)
 
-        # Draw detection boxes on the original image
+        # Tính tỷ lệ giữa ảnh gốc và ảnh đã resize
+        scale_x = gray_image.shape[1] / new_w
+        scale_y = gray_image.shape[0] / new_h
+
+        # Vẽ box trên ảnh gốc với kích thước tương ứng
         for (x, y, w, h) in boxes:
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            # Điều chỉnh tọa độ và kích thước box
+            x_original = int(x * scale_x)
+            y_original = int(y * scale_y)
+            w_original = int(w * scale_x)
+            h_original = int(h * scale_y)
+
+            cv2.rectangle(image, (x_original, y_original), (x_original + w_original, y_original + h_original), (0, 255, 0), 2)
 
         # Display image with detection boxes
         st.image(image, channels="BGR", caption="Detected Faces")
@@ -142,4 +152,3 @@ def run_app3():
 # Main app where you can call run_app3()
 if __name__ == "__main__":
     run_app3()
-    
