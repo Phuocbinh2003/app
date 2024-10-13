@@ -212,19 +212,30 @@ def read_student_info(filename, folder_path):
         student_info = txt_file.read()
     return student_info
 def compare_faces(image1, image2):
-    """Compare two images to check if they are of the same person."""
-    # Assume face_recognizer is already defined and loaded with the necessary model
+    # Assuming face_detector is already defined and loaded
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
-    st.image(cv2.cvtColor(faces1, cv2.COLOR_BGR2RGB), caption="Matched Image", use_column_width=True)
+
     face_detector.setInputSize([image2.shape[1], image2.shape[0]])
     faces2 = face_detector.infer(image2)
-    st.image(cv2.cvtColor(faces2, cv2.COLOR_BGR2RGB), caption="Matched Image", use_column_width=True)
-    if faces1.shape[0] == 0 or faces2.shape[0] == 0:
-        return None  # Return None if no faces are detected
 
-    result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-    return result[1]  # Return the similarity score
+    # Draw bounding boxes on the images based on the detected faces
+    image1_with_boxes = draw_bounding_boxes(image1, faces1)
+    image2_with_boxes = draw_bounding_boxes(image2, faces2)
+
+    # Display the images with bounding boxes
+    st.image(image1_with_boxes / 255.0, caption="Image 1 with Detected Faces", use_column_width=True)
+    st.image(image2_with_boxes / 255.0, caption="Image 2 with Detected Faces", use_column_width=True)
+
+    # Calculate and return the similarity score
+    score = calculate_similarity(faces1, faces2)
+    return score
+def draw_bounding_boxes(image, faces):
+    for (x, y, w, h) in faces:
+        # Draw a rectangle around the detected face
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    return image
+
 
 def run_app5():
     """Phần 1: Tìm khuôn mặt giống nhất trong thư mục."""
