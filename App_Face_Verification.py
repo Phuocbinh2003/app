@@ -24,7 +24,7 @@ face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.
                       backendId=backend_id,
                       targetId=target_id)
 
-# Đường dẫn Google Drive đến mô hình SFace
+# Đường dẫn Google Drive đến mô hình SFac
 face_recognizer = SFace(modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
                         disType=0,  # cosine
                         backendId=backend_id,
