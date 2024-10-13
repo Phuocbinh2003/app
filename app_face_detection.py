@@ -69,7 +69,7 @@ def sliding_window_haar_detect(img, model, window_size=(24, 24)):
     return boxes
 
 # Streamlit application
-def main():
+def run_app3():
     st.title("Face Detection Application")
     st.write("Upload an image to detect faces.")
 
@@ -96,4 +96,4 @@ def main():
         st.image(image, channels="BGR", caption="Detected Faces")
 
 if __name__ == "__main__":
-    main()
+    run_app3()
