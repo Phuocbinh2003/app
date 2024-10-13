@@ -6,7 +6,7 @@ from PIL import Image
 from Face_Verification.yunet import YuNet
 from Face_Verification.sface import SFace
 
-# Valid combinations of backends and target
+# Define valid combinations of backends and targets
 backend_target_pairs = [
     [cv2.dnn.DNN_BACKEND_OPENCV, cv2.dnn.DNN_TARGET_CPU],
 ]
@@ -14,7 +14,7 @@ backend_target_pairs = [
 backend_id = backend_target_pairs[0][0]
 target_id = backend_target_pairs[0][1]
 
-# Instantiate YuNet
+# Instantiate YuNet for face detection
 face_detector = YuNet(
     modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
     inputSize=[320, 320],
@@ -25,7 +25,7 @@ face_detector = YuNet(
     targetId=target_id
 )
 
-# Instantiate SFace
+# Instantiate SFace for face recognition
 face_recognizer = SFace(
     modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
     disType=0,  # cosine
@@ -34,107 +34,81 @@ face_recognizer = SFace(
 )
 
 def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
-    out1 = img1.copy()
-    out2 = img2.copy()
-    matched_box_color = (0, 255, 0)  # BGR
-    mismatched_box_color = (0, 0, 255)  # BGR
+    """Visualizes matches between two images."""
+    out1, out2 = img1.copy(), img2.copy()
+    matched_box_color, mismatched_box_color = (0, 255, 0), (0, 0, 255)
 
-    # Resize to target size for image 1
-    padded_out1 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
-    h1, w1, _ = out1.shape
-    ratio1 = min(target_size[0] / h1, target_size[1] / w1)
-    new_h1 = int(h1 * ratio1)
-    new_w1 = int(w1 * ratio1)
-    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR)
-    top = (target_size[0] - new_h1) // 2
-    bottom = top + new_h1
-    left = (target_size[1] - new_w1) // 2
-    right = left + new_w1
-    padded_out1[top:bottom, left:right] = resized_out1
+    # Resize and pad the first image
+    padded_out1 = resize_and_pad(out1, target_size)
+    draw_bounding_boxes(padded_out1, faces1, matches, matched_box_color, mismatched_box_color)
 
-    # Draw bbox for image 1
-    bbox1 = faces1[0][:4] * ratio1
-    x, y, w, h = bbox1.astype(np.int32)
-    cv2.rectangle(padded_out1, (x + left, y + top), (x + left + w, y + top + h), matched_box_color, 2)
-
-    # Resize to target size for image 2
-    padded_out2 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
-    h2, w2, _ = out2.shape
-    ratio2 = min(target_size[0] / h2, target_size[1] / w2)
-    new_h2 = int(h2 * ratio2)
-    new_w2 = int(w2 * ratio2)
-    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR)
-    top = (target_size[0] - new_h2) // 2
-    bottom = top + new_h2
-    left = (target_size[1] - new_w2) // 2
-    right = left + new_w2
-    padded_out2[top:bottom, left:right] = resized_out2
-
-    # Draw bbox for image 2
-    assert faces2.shape[0] == len(matches), "Number of faces2 needs to match matches"
-    assert len(matches) == len(scores), "Number of matches needs to match number of scores"
-    for index, match in enumerate(matches):
-        bbox2 = faces2[index][:4] * ratio2
-        x, y, w, h = bbox2.astype(np.int32)
-        box_color = matched_box_color if match else mismatched_box_color
-        cv2.rectangle(padded_out2, (x + left, y + top), (x + left + w, y + top + h), box_color, 2)
-
-        score = scores[index]
-        text_color = matched_box_color if match else mismatched_box_color
-        cv2.putText(padded_out2, "{:.2f}".format(score), (x + left, y + top - 5), cv2.FONT_HERSHEY_DUPLEX, 0.4, text_color)
+    # Resize and pad the second image
+    padded_out2 = resize_and_pad(out2, target_size)
+    draw_bounding_boxes(padded_out2, faces2, matches, matched_box_color, mismatched_box_color, scores)
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
 
+def resize_and_pad(image, target_size):
+    """Resizes and pads an image to the target size."""
+    padded_out = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
+    h, w, _ = image.shape
+    ratio = min(target_size[0] / h, target_size[1] / w)
+    new_h, new_w = int(h * ratio), int(w * ratio)
+    resized_out = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+    top, bottom = (target_size[0] - new_h) // 2, (target_size[0] - new_h) // 2 + new_h
+    left, right = (target_size[1] - new_w) // 2, (target_size[1] - new_w) // 2 + new_w
+    padded_out[top:bottom, left:right] = resized_out
+    return padded_out
+
+def draw_bounding_boxes(image, faces, matches, matched_box_color, mismatched_box_color, scores=None):
+    """Draws bounding boxes on the given image."""
+    for index, match in enumerate(matches):
+        bbox = faces[index][:4].astype(np.int32)
+        box_color = matched_box_color if match else mismatched_box_color
+        cv2.rectangle(image, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
+
+        if scores is not None:
+            score = scores[index]
+            text_color = matched_box_color if match else mismatched_box_color
+            cv2.putText(image, "{:.2f}".format(score), (bbox[0], bbox[1] - 5), cv2.FONT_HERSHEY_DUPLEX, 0.4, text_color)
+
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
+    """Visualizes faces detected in an image."""
     output = image.copy()
-    landmark_color = [
-        (255, 0, 0),   # right eye
-        (0, 0, 255),   # left eye
-        (0, 255, 0),   # nose tip
-        (255, 0, 255), # right mouth corner
-        (0, 255, 255)  # left mouth corner
-    ]
+    landmark_color = [(255, 0, 0), (0, 0, 255), (0, 255, 0), (255, 0, 255), (0, 255, 255)]
 
     if fps is not None:
         cv2.putText(output, 'FPS: {:.2f}'.format(fps), (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color)
 
-    bboxes = []  # List to store bounding boxes
     for det in results:
         bbox = det[0:4].astype(np.int32)
-        cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), box_color, 2)
-
-        # Save the bounding box position
-        bboxes.append(bbox)
-
+        cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
         conf = det[-1]
-        cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1]+12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
+        cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1] + 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
 
         landmarks = det[4:14].astype(np.int32).reshape((5, 2))
         for idx, landmark in enumerate(landmarks):
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
 
-    return output, bboxes  # Return both the output and bboxes
+    return output
 
 def resize_image(image, target_size=(320, 239)):
-    # Resize the image to the specified target size
-    resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_LINEAR)
-    return resized_image
+    """Resizes the image to the specified target size."""
+    return cv2.resize(image, target_size, interpolation=cv2.INTER_LINEAR)
 
 def read_student_info(filename, folder_path):
+    """Reads student information from a text file associated with the image."""
     txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
     if os.path.exists(txt_file_path):
         with open(txt_file_path, "r") as f:
             return f.read()
-    else:
-        return "No student information found."
+    return "No student information found."
 
 def find_similar_faces(uploaded_image, folder_path):
+    """Finds similar faces in a folder based on the uploaded image."""
     results = []
-    # Convert uploaded image to NumPy array
-    image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
-    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
-
-    # Resize image before processing
+    image1 = Image.open(uploaded_image).convert("RGB")
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
     image1 = resize_image(image1)
 
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
@@ -147,8 +121,7 @@ def find_similar_faces(uploaded_image, folder_path):
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
-        if image2 is not None:  # Check if image was read successfully
-            # Resize image before processing
+        if image2 is not None:
             image2 = resize_image(image2)
             face_detector.setInputSize([image2.shape[1], image2.shape[0]])
             faces2 = face_detector.infer(image2)
@@ -160,18 +133,18 @@ def find_similar_faces(uploaded_image, folder_path):
     return results
 
 def compare_faces(image1, image2):
-    # Detect faces in both images
+    """Compares two images and returns a similarity score."""
     faces1 = face_detector.infer(image1)
     faces2 = face_detector.infer(image2)
 
     if faces1.shape[0] == 0 or faces2.shape[0] == 0:
         return 0.0  # No faces found, return score of 0
 
-    # Compare the first detected face from each image
     result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
     return result[0]  # Return similarity score
 
-def run_app5():
+def run_app():
+    """Runs the Streamlit app."""
     st.title("Face Recognition App")
 
     # Part 1: Find student information from image
@@ -204,23 +177,11 @@ def run_app5():
     if uploaded_image2 is not None:
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+        st.image(image2, channels="BGR", caption="Comparison Image", use_column_width=True)
 
-        # Compare uploaded images
         if uploaded_image is not None:
             score = compare_faces(image1, image2)
-
-            st.image(image2, channels="BGR", caption="Comparison Image", use_column_width=True)
             st.write(f"Similarity Score: {score:.4f}")
 
-            # Visualize matches
-            vis_image, faces1 = visualize_faces(image1, face_detector.infer(image1))
-            vis_image2, faces2 = visualize_faces(image2, face_detector.infer(image2))
-
-            # Display images side by side
-            comparison_result = visualize_matches(vis_image, faces1, vis_image2, faces2, [score > 0.5], [score])
-            st.image(comparison_result, channels="BGR", caption="Comparison Result", use_column_width=True)
-        else:
-            st.warning("Please upload the first image for comparison.")
-
 if __name__ == "__main__":
-    run_app5()
+    run_app()
