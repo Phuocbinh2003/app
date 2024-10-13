@@ -96,30 +96,32 @@ def find_similar_faces(uploaded_image, folder_path):
     image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
     # Resize the uploaded image for detection
-    image1_resized = resize_image(image1_bgr)  # Resize uploaded image
-    face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
+    face_detector.setInputSize([image1_bgr.shape[1], image1_bgr.shape[0]])
     
-    # Detect faces in the resized image
-    faces1 = face_detector.infer(image1_resized)
+    # Detect faces in the uploaded image
+    faces1 = face_detector.infer(image1_bgr)
 
     if faces1.shape[0] == 0:
         st.warning("No face detected in the uploaded image.")
-        return [], image1  # Return original image if no faces detected
+        return [], image1_bgr  # Return original image if no faces detected
+
+    # Visualize faces in the uploaded image
+    image1_with_faces = visualize_faces(image1_bgr, faces1)
 
     # Now compare this image with others in the folder
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:
-            image2_resized = resize_image(image2)  # Resize comparison image
-            face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
-            faces2 = face_detector.infer(image2_resized)
+            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
+            faces2 = face_detector.infer(image2)
 
             if faces2.shape[0] > 0:
-                result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
+                result = face_recognizer.match(image1_bgr, faces1[0][:-1], image2, faces2[0][:-1])
                 results.append((filename, result[0], result[1]))
 
-    return results, None  # Return None for the processed image since it's not needed
+    return results, image1_with_faces  # Return the image with faces drawn
+
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     """Visualizes faces detected in an image."""
@@ -129,9 +131,6 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
     if fps is not None:
         cv2.putText(output, 'FPS: {:.2f}'.format(fps), (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color)
 
-    # Store detected face coordinates for later use
-    face_bboxes = []
-    
     for det in results:
         bbox = det[0:4].astype(np.int32)
         cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
@@ -141,11 +140,8 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
         landmarks = det[4:14].astype(np.int32).reshape((5, 2))
         for idx, landmark in enumerate(landmarks):
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
-        
-        # Append the bounding box to the list
-        face_bboxes.append(bbox)
 
-    return output, face_bboxes
+    return output
 
 def resize_image(image, target_size=320):
     h, w, _ = image.shape
@@ -172,10 +168,13 @@ def run_app5():
     st.title("Face Verification Application")
 
     uploaded_image = st.file_uploader("Upload an image for verification", type=["jpg", "jpeg", "png"])
-    folder_path = "Face_Verification/image"  # Update with your folder path
+    folder_path = "path/to/your/folder"  # Update with your folder path
 
     if uploaded_image is not None:
         results, processed_image = find_similar_faces(uploaded_image, folder_path)
+
+        # Show the image with visualized faces
+        st.image(processed_image, caption="Image with Detected Faces", use_column_width=True)
 
         if results:
             for filename, score, is_match in results:
