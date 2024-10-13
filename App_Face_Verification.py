@@ -112,9 +112,14 @@ def find_similar_faces(uploaded_image, folder_path):
 
             if faces2.shape[0] > 0:
                 result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-                results.append((filename, result[0], result[1]))
+                # Update unpacking based on actual return values
+                if len(result) == 3:  # Assuming it returns (similarity_score, some_value, another_value)
+                    results.append((filename, result[0], result[1], faces2))
+                else:
+                    st.warning("Unexpected result format from face matching.")
 
     return results
+
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     output = image.copy()
