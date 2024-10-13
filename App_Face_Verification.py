@@ -24,10 +24,11 @@ face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.
                       targetId=target_id)
 
 # Instantiate SFace for face recognition
-face_recognizer = SFace(modelPath="https://drive.google.com/uc?id=17XLFcW8RuUXP7ACj5z4SPLGXx8FudWhq",
-                    disType=0,  # cosine
-                    backendId=backend_id,
-                    targetId=target_id)
+face_recognizer = SFace(modelPath="Face_Verification/face_recognition_sface_2021dec.onnx",
+                        disType=0,  # cosine
+                        backendId=backend_id,
+                        targetId=target_id)
+
 def find_similar_faces(uploaded_image, folder_path):
     results = []
     image1 = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
