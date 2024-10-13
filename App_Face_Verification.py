@@ -236,12 +236,33 @@ def compare_faces(image1, image2):
     score = calculate_similarity(faces1, faces2)
     return score
 
+import cv2
+import numpy as np
+import streamlit as st
+
 def draw_bounding_boxes(image, faces):
+    """
+    Vẽ hình chữ nhật bao quanh các khuôn mặt phát hiện được trong hình ảnh.
+
+    Args:
+        image: Hình ảnh đầu vào.
+        faces: Danh sách các tọa độ khuôn mặt, mỗi tọa độ là một danh sách chứa (x, y, w, h).
+
+    Returns:
+        Hình ảnh với các hình chữ nhật bao quanh khuôn mặt.
+    """
+    # Duyệt qua từng khuôn mặt trong danh sách faces
     for face in faces:
-        # Adjust based on the number of values returned per face
+        # Kiểm tra xem face có đủ số lượng giá trị
         if len(face) >= 4:
-            x, y, w, h = face[:4]  # Use only the first 4 values
+            # Ép kiểu tọa độ thành số nguyên
+            x, y, w, h = map(int, face[:4])
+            
+            # Vẽ hình chữ nhật quanh khuôn mặt
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        else:
+            st.warning("Không đủ thông tin để vẽ hình chữ nhật cho khuôn mặt.")
+
     return image
 
 
