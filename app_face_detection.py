@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 
 
-# Hàm trích xuất đặc trưng Haar
+# Hàm trích xuất đặc trưng Haa
 def haar_features(img):
     integral_img = cv2.integral(img)
     haar_features = []
