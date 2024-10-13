@@ -96,7 +96,7 @@ def find_similar_faces(uploaded_image, folder_path):
     image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
     # Display the original image in RGB and its dimensions
-    st.image(image1_np, caption=f"Original RGB Image (Size: {image1_np.shape[1]}x{image1_np.shape[0]})", use_column_width=True)
+    # st.image(image1_np, caption=f"Original RGB Image (Size: {image1_np.shape[1]}x{image1_np.shape[0]})", use_column_width=True)
 
     # Resize the uploaded image for detection
     image1_resized = resize_image(image1_bgr)  # Resize uploaded image
