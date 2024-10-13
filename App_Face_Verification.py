@@ -169,6 +169,9 @@ def run_app5():
         # Convert uploaded image to NumPy array
         image1 = Image.open(uploaded_file).convert("RGB")
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+        
+        # Resize uploaded image
+        image1 = resize_image(image1)
 
         # Detect faces in the uploaded image
         face_detector.setInputSize([image1.shape[1], image1.shape[0]])
@@ -186,7 +189,18 @@ def run_app5():
 
         # Find similar faces
         folder_path = 'Face_Verification/image'  # Adjust to your folder path
-        similar_faces = find_similar_faces(uploaded_file, folder_path)
+        similar_faces = []
+
+        for filename in os.listdir(folder_path):
+            if filename.endswith(('.jpg', '.jpeg', '.png')):
+                # Load and resize each image in the folder
+                img_path = os.path.join(folder_path, filename)
+                img = Image.open(img_path).convert("RGB")
+                img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
+                
+                # Find similar faces (Assuming you have a function for that)
+                score = compare_faces(image1, img_resized)  # Replace with your comparison function
+                similar_faces.append((filename, score))
 
         if similar_faces:
             # Find the file with the highest accuracy
@@ -194,7 +208,7 @@ def run_app5():
             st.write(f"Best match: {best_match[0]} with score: {best_match[1]:.4f}")
 
             # Display results for all similar faces
-            for filename, score, _ in similar_faces:
+            for filename, score in similar_faces:
                 st.write(f"{filename}: Score: {score:.4f}")
 
             # Display the best match
