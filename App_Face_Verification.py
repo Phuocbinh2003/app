@@ -42,13 +42,13 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
     # Resize to target size for image 1
     padded_out1 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h1, w1, _ = out1.shape
-    ratio1 = min(target_size[0] / out1.shape[0], target_size[1] / out1.shape[1])
+    ratio1 = min(target_size[0] / h1, target_size[1] / w1)
     new_h1 = int(h1 * ratio1)
     new_w1 = int(w1 * ratio1)
     resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR)
-    top = max(0, target_size[0] - new_h1) // 2
+    top = (target_size[0] - new_h1) // 2
     bottom = top + new_h1
-    left = max(0, target_size[1] - new_w1) // 2
+    left = (target_size[1] - new_w1) // 2
     right = left + new_w1
     padded_out1[top:bottom, left:right] = resized_out1
 
@@ -60,19 +60,19 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
     # Resize to target size for image 2
     padded_out2 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h2, w2, _ = out2.shape
-    ratio2 = min(target_size[0] / out2.shape[0], target_size[1] / out2.shape[1])
+    ratio2 = min(target_size[0] / h2, target_size[1] / w2)
     new_h2 = int(h2 * ratio2)
     new_w2 = int(w2 * ratio2)
     resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR)
-    top = max(0, target_size[0] - new_h2) // 2
+    top = (target_size[0] - new_h2) // 2
     bottom = top + new_h2
-    left = max(0, target_size[1] - new_w2) // 2
+    left = (target_size[1] - new_w2) // 2
     right = left + new_w2
     padded_out2[top:bottom, left:right] = resized_out2
 
     # Draw bbox for image 2
-    assert faces2.shape[0] == len(matches), "number of faces2 needs to match matches"
-    assert len(matches) == len(scores), "number of matches needs to match number of scores"
+    assert faces2.shape[0] == len(matches), "Number of faces2 needs to match matches"
+    assert len(matches) == len(scores), "Number of matches needs to match number of scores"
     for index, match in enumerate(matches):
         bbox2 = faces2[index][:4] * ratio2
         x, y, w, h = bbox2.astype(np.int32)
@@ -146,23 +146,9 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output, bboxes  # Return both the output and bboxes
 
-# def resize_image(image, target_size=320):
-#     h, w, _ = image.shape
-#     # Check which dimension is larger
-#     if w > h:
-#         new_w = target_size
-#         new_h = int(h * (target_size / w))  # Calculate height based on width
-#     else:
-#         new_h = target_size
-#         new_w = int(w * (target_size / h))  # Calculate width based on height
-
-#     # Resize image while keeping aspect ratio
-#     resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-
-#     return resized_image
-def resize_image(image, width=320, height=239):
-    # Resize the image to the specified width and height
-    resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
+def resize_image(image, target_size=(320, 239)):
+    # Resize the image to the specified target size
+    resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_LINEAR)
     return resized_image
 
 def read_student_info(filename, folder_path):
@@ -193,60 +179,44 @@ def run_app5():
     uploaded_image = st.file_uploader("Upload Image...", type=["jpg", "jpeg", "png"], key="image")
 
     if uploaded_image is not None:
-        folder_path = "Face_Verification/image"  # Update with your student image folder path
+        folder_path = "Face_Verification/image"  # Update with your folder path
+
+        # Display uploaded image
+        image1 = Image.open(uploaded_image).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+        st.image(image1, channels="BGR", caption="Uploaded Image", use_column_width=True)
+
         results = find_similar_faces(uploaded_image, folder_path)
 
         if results:
-            # Find the result with the highest score
-            best_match = max(results, key=lambda x: x[1])  # (filename, score, _)
-            best_filename, best_score, _ = best_match
-            
-            # Read and visualize the best match image
-            best_image_path = os.path.join(folder_path, best_filename)
-            best_image = cv2.imread(best_image_path)
-            best_image = resize_image(best_image)  # Resize for visualization
-
-            # Draw bounding boxes on the best match image
-            detected_faces = face_detector.infer(best_image)
-            visualized_image = visualize_faces(best_image, detected_faces)
-
-            # Display the results
-            st.subheader("Best Matching Result:")
-            st.image(visualized_image, caption="Best Match with Detected Faces", use_column_width=True)
-            student_info = read_student_info(best_filename, folder_path)
-            st.write(f"**Matched File:** {best_filename}")
-            st.write(f"**Score:** {best_score:.2f}")
-            st.write(f"**Student Info:** {student_info}")
+            st.subheader("Matched Faces:")
+            for filename, score, _ in results:
+                st.write(f"Image: {filename} - Score: {score:.4f}")
+                student_info = read_student_info(filename, folder_path)
+                st.write(f"Student Information: {student_info}")
         else:
-            st.warning("No matches found.")
+            st.warning("No similar faces found.")
 
-    # Part 2: Compare portrait and ID photo
-    st.header("Compare Portrait and ID Photo")
-    uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
-    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+    # Part 2: Upload another image for comparison
+    st.header("Upload Another Image for Comparison")
+    uploaded_image2 = st.file_uploader("Upload Image for Comparison...", type=["jpg", "jpeg", "png"], key="image2")
 
-    if uploaded_image1 is not None and uploaded_image2 is not None:
-        # Read uploaded images
-        image1 = Image.open(uploaded_image1).convert("RGB")  # Convert to RGB
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
-        st.image(image1, caption="Uploaded Portrait Image", use_column_width=True)
+    if uploaded_image2 is not None:
+        image2 = Image.open(uploaded_image2).convert("RGB")
+        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
-        image2 = Image.open(uploaded_image2).convert("RGB")  # Convert to RGB
-        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)  # Convert to BGR
-        st.image(image2, caption="Uploaded ID Image", use_column_width=True)
+        # Compare uploaded images
+        if uploaded_image is not None:
+            score = compare_faces(image1, image2)
 
-        # Resize images
-        image1 = resize_image(image1)
-        image2 = resize_image(image2)
+            st.image(image2, channels="BGR", caption="Comparison Image", use_column_width=True)
+            st.write(f"Similarity Score: {score:.4f}")
 
-        # Compare the two images
-        score = compare_faces(image1, image2)
-        st.success(f"Similarity Score: {score:.2f}")
-
-        if score > 0.5:  # Adjust the threshold as needed
-            st.success("The images belong to the same person.")
+            # Display images side by side with bounding boxes
+            vis_image = visualize_matches(image1, faces1, image2, faces2, [score > 0.5], [score])
+            st.image(vis_image, channels="BGR", caption="Comparison Result", use_column_width=True)
         else:
-            st.warning("The images do not belong to the same person.")
+            st.warning("Please upload the first image for comparison.")
 
 if __name__ == "__main__":
     run_app5()
