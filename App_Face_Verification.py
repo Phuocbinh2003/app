@@ -181,10 +181,11 @@ def run_app5():
         results = find_similar_faces(uploaded_image, folder_path)
         if results:
             st.subheader("Matched Faces:")
-            for filename, score, _ in results:
-                st.write(f"Found similar face in {filename} with score: {score:.2f}")
-                student_info = read_student_info(filename, folder_path)
-                st.write(student_info)
+            best_match = max(results, key=lambda x: x[1])  # Get the best match based on score
+            filename, score, _ = best_match
+            st.write(f"Found similar face in {filename} with score: {score:.2f}")
+            student_info = read_student_info(filename, folder_path)
+            st.write(student_info)
 
         else:
             st.warning("No similar faces found.")
