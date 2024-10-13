@@ -112,7 +112,7 @@ def resize_image(image, target_size=320):
         new_w = int(w * (target_size / h))
     return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
-def run_app():
+def run_app5():
     """Run Streamlit Face Recognition app."""
     st.title("Face Recognition - Find Similar Faces in a Folder")
     
@@ -157,4 +157,4 @@ def run_app():
 
 # Run the Streamlit application
 if __name__ == "__main__":
-    run_app()
+    run_app5()
