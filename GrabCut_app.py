@@ -80,7 +80,7 @@ def run_app1():
         image = cv.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), 1)
 
         # Hiển thị ảnh với canvas overlay
-        st.components.v1.html(get_image_with_canvas(image), height=500)
+        st.components.v1.html(get_image_with_canvas(image), height=500+50)
 
         # Nhập thông tin hình chữ nhật từ div (người dùng có thể sao chép hoặc kiểm tra thủ công)
         rect_info = st.text_input("Nhập thông tin hình chữ nhật (nếu có)", "")
