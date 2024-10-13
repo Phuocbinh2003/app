@@ -85,6 +85,32 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
 
+def extract_face(image):
+    """Tách khuôn mặt từ ảnh sử dụng mô hình YuNet và trả về ảnh khuôn mặt đã cắt ra."""
+    # Chuyển đổi ảnh sang định dạng BGR cho OpenCV
+    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    
+    # Resize ảnh để phù hợp với kích thước đầu vào của mô hình
+    resized_image = resize_image(image_bgr)
+
+    # Cài đặt kích thước đầu vào cho mô hình
+    face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
+
+    # Phát hiện khuôn mặt
+    faces = face_detector.infer(resized_image)
+
+    if faces.shape[0] == 0:
+        st.warning("Không phát hiện khuôn mặt nào trong ảnh.")
+        return None  # Trả về None nếu không phát hiện khuôn mặt
+
+    # Lấy bounding box của khuôn mặt đầu tiên
+    bbox = faces[0][:4].astype(np.int32)
+
+    # Cắt khuôn mặt từ ảnh gốc
+    x, y, w, h = bbox
+    face_image = image[y:y + h, x:x + w]
+
+    return face_image  # Trả về ảnh khuôn mặt đã cắt ra
 
 def find_similar_faces(uploaded_image, folder_path):
     """Finds similar faces in a folder based on the uploaded image."""
@@ -239,18 +265,18 @@ def run_app5():
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
         # Resize images
-        image1_resized = resize_image(image1)
-        image2_resized = resize_image(image2)
+        image1_box = extract_face(image1)
+        image2_box = extract_face(image2)
 
         # Compare faces and get the score
-        score = compare_faces(image1_resized, image2_resized)
+        score = compare_faces(image1_box, image2_box)
 
         if score is not None:
             st.success(f"Similarity Score: {score:.2f}")
 
             # Visualize the matches on the images
-            faces1 = face_detector.infer(image1_resized)
-            faces2 = face_detector.infer(image2_resized)
+            faces1 = face_detector.infer(image1_box)
+            faces2 = face_detector.infer(image2_box)
 
             # Visualize matches only if faces are detected
             if faces1.shape[0] > 0 and faces2.shape[0] > 0:
