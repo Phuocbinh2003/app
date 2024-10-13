@@ -33,45 +33,6 @@ face_recognizer = SFace(
     targetId=target_id
 )
 
-def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
-    """Visualizes matches between two images."""
-    out1, out2 = img1.copy(), img2.copy()
-    matched_box_color, mismatched_box_color = (0, 255, 0), (0, 0, 255)
-
-    # Resize and pad the first image
-    padded_out1 = resize_and_pad(out1, target_size)
-    draw_bounding_boxes(padded_out1, faces1, matches, matched_box_color, mismatched_box_color)
-
-    # Resize and pad the second image
-    padded_out2 = resize_and_pad(out2, target_size)
-    draw_bounding_boxes(padded_out2, faces2, matches, matched_box_color, mismatched_box_color, scores)
-
-    return np.concatenate([padded_out1, padded_out2], axis=1)
-
-def resize_and_pad(image, target_size):
-    """Resizes and pads an image to the target size."""
-    padded_out = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
-    h, w, _ = image.shape
-    ratio = min(target_size[0] / h, target_size[1] / w)
-    new_h, new_w = int(h * ratio), int(w * ratio)
-    resized_out = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-    top, bottom = (target_size[0] - new_h) // 2, (target_size[0] - new_h) // 2 + new_h
-    left, right = (target_size[1] - new_w) // 2, (target_size[1] - new_w) // 2 + new_w
-    padded_out[top:bottom, left:right] = resized_out
-    return padded_out
-
-def draw_bounding_boxes(image, faces, matches, matched_box_color, mismatched_box_color, scores=None):
-    """Draws bounding boxes on the given image."""
-    for index, match in enumerate(matches):
-        bbox = faces[index][:4].astype(np.int32)
-        box_color = matched_box_color if match else mismatched_box_color
-        cv2.rectangle(image, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
-
-        if scores is not None:
-            score = scores[index]
-            text_color = matched_box_color if match else mismatched_box_color
-            cv2.putText(image, "{:.2f}".format(score), (bbox[0], bbox[1] - 5), cv2.FONT_HERSHEY_DUPLEX, 0.4, text_color)
-
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     """Visualizes faces detected in an image."""
     output = image.copy()
@@ -140,17 +101,6 @@ def find_similar_faces(uploaded_image, folder_path):
                 results.append((filename, result[0], result[1]))
 
     return results
-
-def compare_faces(image1, image2):
-    """Compares two images and returns a similarity score."""
-    faces1 = face_detector.infer(image1)
-    faces2 = face_detector.infer(image2)
-
-    if faces1.shape[0] == 0 or faces2.shape[0] == 0:
-        return 0.0  # No faces found, return score of 0
-
-    result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-    return result[0]  # Return similarity score
 
 def run_app5():
     """Runs the Streamlit app."""
