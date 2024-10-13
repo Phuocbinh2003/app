@@ -162,7 +162,7 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output, face_bboxes
 
-def resize_image24(image, width=320, height=240):
+def resize_image24(image, width=240, height=320):
     """Resize image to the specified width and height."""
     return cv2.resize(image, (width, height))
     
