@@ -85,37 +85,6 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
 
-def find_similar_faces(uploaded_image, folder_path):
-    results = []
-    # Convert uploaded image to NumPy array
-    image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
-    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
-
-    # Resize image before processing
-    image1 = resize_image(image1)
-
-    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-    faces1 = face_detector.infer(image1)
-
-    if faces1.shape[0] == 0:
-        st.warning("No face detected in the uploaded image.")
-        return []
-
-    for filename in os.listdir(folder_path):
-        img_path = os.path.join(folder_path, filename)
-        image2 = cv2.imread(img_path)
-        if image2 is not None:  # Check if image was read successfully
-            # Resize image before processing
-            image2 = resize_image(image2)
-            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-            faces2 = face_detector.infer(image2)
-
-            if faces2.shape[0] > 0:
-                result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
-                results.append((filename, result[0], result[1]))
-
-    return results
-
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     output = image.copy()
     landmark_color = [
@@ -159,6 +128,37 @@ def read_student_info(filename, folder_path):
     else:
         return "No student information found."
 
+def find_similar_faces(uploaded_image, folder_path):
+    results = []
+    # Convert uploaded image to NumPy array
+    image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
+
+    # Resize image before processing
+    image1 = resize_image(image1)
+
+    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
+    faces1 = face_detector.infer(image1)
+
+    if faces1.shape[0] == 0:
+        st.warning("No face detected in the uploaded image.")
+        return []
+
+    for filename in os.listdir(folder_path):
+        img_path = os.path.join(folder_path, filename)
+        image2 = cv2.imread(img_path)
+        if image2 is not None:  # Check if image was read successfully
+            # Resize image before processing
+            image2 = resize_image(image2)
+            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
+            faces2 = face_detector.infer(image2)
+
+            if faces2.shape[0] > 0:
+                result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
+                results.append((filename, result[0], result[1]))
+
+    return results
+
 def compare_faces(image1, image2):
     # Detect faces in both images
     faces1 = face_detector.infer(image1)
@@ -179,7 +179,7 @@ def run_app5():
     uploaded_image = st.file_uploader("Upload Image...", type=["jpg", "jpeg", "png"], key="image")
 
     if uploaded_image is not None:
-        folder_path = "Face_Verification/image"  # Update with your folder path
+        folder_path = "Face_Verification/image"  # Path to the folder containing student images
 
         # Display uploaded image
         image1 = Image.open(uploaded_image).convert("RGB")
@@ -212,9 +212,13 @@ def run_app5():
             st.image(image2, channels="BGR", caption="Comparison Image", use_column_width=True)
             st.write(f"Similarity Score: {score:.4f}")
 
-            # Display images side by side with bounding boxes
-            vis_image = visualize_matches(image1, faces1, image2, faces2, [score > 0.5], [score])
-            st.image(vis_image, channels="BGR", caption="Comparison Result", use_column_width=True)
+            # Visualize matches
+            vis_image, faces1 = visualize_faces(image1, face_detector.infer(image1))
+            vis_image2, faces2 = visualize_faces(image2, face_detector.infer(image2))
+
+            # Display images side by side
+            comparison_result = visualize_matches(vis_image, faces1, vis_image2, faces2, [score > 0.5], [score])
+            st.image(comparison_result, channels="BGR", caption="Comparison Result", use_column_width=True)
         else:
             st.warning("Please upload the first image for comparison.")
 
