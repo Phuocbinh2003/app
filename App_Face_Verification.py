@@ -108,7 +108,7 @@ def find_similar_faces(uploaded_image, folder_path):
         return [], image1  # Return original image
 
     # Visualize faces detected in the uploaded image
-    image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
+    image1_with_faces = visualize_faces(image1_resized, faces1)
 
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
@@ -155,14 +155,6 @@ def resize_image(image, width=320, height=239):
     resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
     return resized_image
 
-def read_student_info(filename, folder_path):
-    txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
-    if os.path.exists(txt_file_path):
-        with open(txt_file_path, "r") as f:
-            return f.read()
-    else:
-        return "No student information found."
-
 def compare_faces(image1, image2):
     # Detect faces in both images
     faces1 = face_detector.infer(image1)
@@ -179,59 +171,23 @@ def run_app5():
     """Runs the Streamlit app."""
     st.title("Face Recognition App")
 
-    # Part 1: Find student information from image
-    st.header("Find Student Information from Image")
-    uploaded_image = st.file_uploader("Upload Image...", type=["jpg", "jpeg", "png"], key="image")
+    # Part 1: Upload the image and find similar faces
+    uploaded_image = st.file_uploader("Upload your image", type=["jpg", "jpeg", "png"])
 
     if uploaded_image is not None:
-        folder_path = "Face_Verification/image"  # Path to the folder containing student images
+        folder_path = "path/to/student/images"  # Update this path to your student images folder
+        results, img_with_faces = find_similar_faces(uploaded_image, folder_path)
 
-        # Display uploaded image
-        image1 = Image.open(uploaded_image).convert("RGB")
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-        st.image(image1, channels="BGR", caption="Uploaded Image", use_column_width=True)
+        st.image(img_with_faces, caption="Detected Faces in Uploaded Image", use_column_width=True)
 
-        results, image_with_faces = find_similar_faces(uploaded_image, folder_path)
-
-        # Display image with visualized faces only
-        st.image(image_with_faces, channels="BGR", caption="Detected Faces", use_column_width=True)
-
+        # Display results
         if results:
-            # Find the result with the highest score
-            best_match = max(results, key=lambda x: x[1])
-            st.subheader("Best Match Found:")
-            st.write(f"File: {best_match[0]}, Similarity Score: {best_match[1]:.2f}")
-            student_info = read_student_info(best_match[0], folder_path)
-            st.write(f"Student Information: {student_info}")
-        else:
-            st.warning("No similar faces found.")
+            st.subheader("Matching Results:")
+            for filename, score, match in results:
+                st.write(f"Filename: {filename}, Score: {score:.2f}, Match: {match}")
 
-    # Part 2: Compare portrait with ID photo
-    st.header("Compare Portrait Image with ID Image")
-    portrait_image = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
-    id_image = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+    st.write("---")
 
-    if portrait_image and id_image:
-        portrait = Image.open(portrait_image).convert("RGB")
-        id_img = Image.open(id_image).convert("RGB")
-        
-        # Convert to BGR
-        portrait = cv2.cvtColor(np.array(portrait), cv2.COLOR_RGB2BGR)
-        id_img = cv2.cvtColor(np.array(id_img), cv2.COLOR_RGB2BGR)
-
-        # Resize images before processing
-        portrait = resize_image(portrait)
-        id_img = resize_image(id_img)
-
-        similarity_score = compare_faces(portrait, id_img)
-        st.image(portrait, caption='Portrait Image', use_column_width=True)
-        st.image(id_img, caption='ID Image', use_column_width=True)
-        st.write(f"Similarity Score: {similarity_score:.2f}")
-
-        if similarity_score > 0.5:  # Threshold for considering them as the same person
-            st.success("The images match!")
-        else:
-            st.error("The images do not match.")
-
+# Run the app
 if __name__ == "__main__":
     run_app5()
