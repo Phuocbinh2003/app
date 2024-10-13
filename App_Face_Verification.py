@@ -95,9 +95,6 @@ def find_similar_faces(uploaded_image, folder_path):
     image1_np = np.array(image1)  # Convert to NumPy array
     image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
-    # Display the original image in RGB and its dimensions
-    # st.image(image1_np, caption=f"Original RGB Image (Size: {image1_np.shape[1]}x{image1_np.shape[0]})", use_column_width=True)
-
     # Resize the uploaded image for detection
     image1_resized = resize_image(image1_bgr)  # Resize uploaded image
     face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
@@ -115,6 +112,9 @@ def find_similar_faces(uploaded_image, folder_path):
     # Display the resized image with detected faces
     st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
+    best_match_filename = None
+    best_score = 0.0  # Initialize best score
+
     # Now compare this image with others in the folder
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
@@ -126,9 +126,15 @@ def find_similar_faces(uploaded_image, folder_path):
 
             if faces2.shape[0] > 0:
                 result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
-                results.append((filename, result[0], result[1]))
+                score = result[1]  # Get the score from the match result
 
-    return results, image1_with_faces  # Return image with detected faces
+                # Update best match if the current score is higher
+                if score > best_score:
+                    best_score = score
+                    best_match_filename = filename
+
+    return best_match_filename, best_score, image1_with_faces  # Return the best match details
+
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     """Visualizes faces detected in an image."""
@@ -187,28 +193,25 @@ def run_app5():
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
-        # st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
         folder_path = "Face_Verification/image"  # Define folder path
         if os.path.isdir(folder_path):
             st.write(f"Finding similar faces in the folder: {folder_path}")
-            results, processed_image = find_similar_faces(uploaded_image, folder_path)
+            best_match_filename, best_score, processed_image = find_similar_faces(uploaded_image, folder_path)
 
             # Display processed image with detected faces
-            # st.image(processed_image, caption="Processed Image with Detected Faces", use_column_width=True)
+            st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
-            if results:
-                st.write("### Similar Faces Found:")
-                for filename, match, score in results:
-                    st.write(f"- {filename} | Matched: {match} | Score: {score:.2f}")
+            if best_match_filename is not None:
+                st.write(f"### Best Match Found:")
+                st.write(f"- {best_match_filename} | Score: {best_score:.2f}")
 
-                    # Show the matching student's information
-                    student_info = read_student_info(filename, folder_path)
-                    st.write(f"**Student Information:** {student_info}")
+                # Show the matching student's information
+                student_info = read_student_info(best_match_filename, folder_path)
+                st.write(f"**Student Information:** {student_info}")
             else:
                 st.warning("No matching faces found.")
         else:
             st.error(f"Folder '{folder_path}' does not exist.")
-
 
     # Part 2: Compare portrait and ID photo
     st.header("Compare Portrait and ID Photo")
