@@ -1,8 +1,8 @@
 import streamlit as st
 import cv2
 import numpy as np
-from yunet import YuNet
-from sface import SFace
+from Face_Verification/yunet import YuNet
+from Face_Verification/sface import SFace
 import matplotlib.pyplot as plt
 from PIL import Image
 
@@ -19,7 +19,7 @@ backend_id = backend_target_pairs[0][0]
 target_id = backend_target_pairs[0][1]
 
 # Instantiate YuNet
-face_detector = YuNet(modelPath="face_detection_yunet_2023mar.onnx",
+face_detector = YuNet(modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
                 inputSize=[320, 320],
                 confThreshold=0.5,
                 nmsThreshold=0.3,
