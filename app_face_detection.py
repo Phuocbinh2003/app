@@ -144,7 +144,7 @@ def run_app3():
             w_original = int(w * scale_x)
             h_original = int(h * scale_y)
 
-            cv2.rectangle(image, (x_original, y_original), (x_original + w_original, y_original + h_original), (0, 255, 0), 2)
+            cv2.rectangle(image, (x_original, y_original), (x_original + w_original, y_original + h_original), (0, 255, 0), 1)
 
         # Display image with detection boxes
         st.image(image, channels="BGR", caption="Detected Faces")
