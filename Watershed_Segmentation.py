@@ -12,12 +12,8 @@ def resize_image(image, target_height):
     resized_image = cv.resize(image, (new_width, target_height))
     return resized_image
 
-# Hàm để áp dụng Watershed
-def apply_watershed(img):
-    kernel_size = 3
-    distance_thresh_factor = 0.3
-    dilation_iterations = 3
-
+# Hàm để áp dụng Watershed với tham số động
+def apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations):
     # Resize ảnh về 500x400
     img = cv.resize(img, (500, 400))
 
@@ -58,7 +54,7 @@ def apply_watershed(img):
 
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if h > 40 and w > 30 :#and h < 500 and w < 400
+        if h > 40 and w > 30:
             result_img[y:y+h, x:x+w] = binary[y:y+h, x:x+w]
 
     return result_img
@@ -67,78 +63,11 @@ def apply_watershed(img):
 def run_app2():
     st.title('✨ Ứng dụng phân đoạn ký tự biển số ✨')
 
-    # Đường dẫn tới các hình ảnh phần 1
-    step_image_path_1 = "my_folder/Buoc_test1.png"
-    result_image_path_1 = "my_folder/KQ_test1.png"
-
-    step_image_path_2 = "my_folder/Buoc_test2.png"
-    result_image_path_2 = "my_folder/KQ_test2.png"
-
-    # Phần 1: Hiển thị cho 2 cặp ảnh đầu tiên (theo hàng dọc)
-    st.header("1. Ảnh Train và Kết quả")
-
-    st.write("### Các bước Watershed")
-    if os.path.exists(step_image_path_1):
-        img_step_1 = cv.imread(step_image_path_1)
-        if img_step_1 is not None:
-            st.image(img_step_1, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_1}")
-
-    st.write("### Kết quả 1")
-    if os.path.exists(result_image_path_1):
-        img_result_1 = cv.imread(result_image_path_1)
-        if img_result_1 is not None and img_step_1 is not None:
-            img_result_1_resized = resize_image(img_result_1, img_step_1.shape[0])
-            st.image(img_result_1_resized, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
-
-    st.write("### Các bước Watershed")
-    if os.path.exists(step_image_path_2):
-        img_step_2 = cv.imread(step_image_path_2)
-        if img_step_2 is not None:
-            st.image(img_step_2, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_2}")
-
-    st.write("### Kết quả 2")
-    if os.path.exists(result_image_path_2):
-        img_result_2 = cv.imread(result_image_path_2)
-        if img_result_2 is not None and img_step_2 is not None:
-            img_result_2_resized = resize_image(img_result_2, img_step_2.shape[0])
-            st.image(img_result_2_resized, caption='Kết quả', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_2}")
-
-    # Đường dẫn tới các hình ảnh phần 2 (chỉ 2 ảnh)
-    step_image_path_3 = "my_folder/KQ1.png"
-    result_image_path_3 = "my_folder/KQ2.png"
-    st.text("Sử dụng grid_search để tìm kiếm thông số phân đoạn ký tự khá tốt")
-    st.text("Thông số tốt nhất tìm kiếm được là")
-    st.text("kernel_size = 3 ")
-    st.text("distance_thresh_factor = 0.3 ")
-    st.text("dilation_iterations = 3")
-
-    # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
-    st.header("2. Ảnh Test và Kết quả")
-
-    st.write("### Kết quả 1")
-    if os.path.exists(step_image_path_3):
-        img_step_3 = cv.imread(step_image_path_3)
-        if img_step_3 is not None:
-            st.image(img_step_3, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_3}")
-
-    st.write("### Kết quả 2")
-    if os.path.exists(result_image_path_3):
-        img_result_3 = cv.imread(result_image_path_3)
-        if img_result_3 is not None and img_step_3 is not None:
-            img_result_3_resized = resize_image(img_result_3, img_step_3.shape[0])
-            st.image(img_result_3_resized, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_3}")
+    # Thêm input để nhập các tham số
+    st.sidebar.header("Tùy chỉnh tham số Watershed")
+    kernel_size = st.sidebar.slider("Kích thước kernel", min_value=1, max_value=15, value=3, step=1)
+    distance_thresh_factor = st.sidebar.slider("Ngưỡng Distance Transform", min_value=0.1, max_value=1.0, value=0.3, step=0.1)
+    dilation_iterations = st.sidebar.slider("Số lần Dilation", min_value=1, max_value=10, value=3, step=1)
 
     # Phần 3: Tải ảnh lên và phân đoạn ký tự
     st.header("3. Tải ảnh lên và phân đoạn ký tự")
@@ -150,8 +79,8 @@ def run_app2():
         img = np.array(Image.open(uploaded_image))
         st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
 
-        # Áp dụng thuật toán Watershed
-        result = apply_watershed(img)
+        # Áp dụng thuật toán Watershed với tham số nhập vào
+        result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
 
         # Hiển thị kết quả
         st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
