@@ -114,7 +114,8 @@ def run_app2():
     # Đường dẫn tới các hình ảnh phần 2 (chỉ 2 ảnh)
     step_image_path_3 = "my_folder/KQ1.png"
     result_image_path_3 = "my_folder/KQ2.png"
-    st.text("This is a plain text without any formatting.")
+    st.text("Sử dụng grid_search để tìm kiếm thông số phân đoạn ký tự khá tốt")
+    st.text("Thông số tốt nhất tìm kiếm được là  kernel_size = 3 distance_thresh_factor = 0.3 dilation_iterations = 3")
     # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
     st.header("2. Ảnh Test và Kết quả")
 
