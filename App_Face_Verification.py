@@ -35,7 +35,10 @@ face_recognizer = SFace(
 
 def find_similar_faces(uploaded_image, folder_path):
     results = []
-    image1 = cv2.cvtColor(np.array(uploaded_image), cv2.COLOR_RGB2BGR)
+    # Chuyển đổi hình ảnh từ file uploader thành mảng NumPy
+    image1 = Image.open(uploaded_image).convert("RGB")  # Chuyển đổi sang RGB
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Chuyển đổi sang BGR
+
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
     faces1 = face_detector.infer(image1)
 
@@ -55,6 +58,7 @@ def find_similar_faces(uploaded_image, folder_path):
                 results.append((filename, result[0], result[1]))
 
     return results
+
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255)):
     output = image.copy()
