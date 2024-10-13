@@ -99,7 +99,7 @@ def find_similar_faces(uploaded_image, folder_path):
     # st.image(image1_np, caption=f"Original RGB Image (Size: {image1_np.shape[1]}x{image1_np.shape[0]})", use_column_width=True)
 
     # Resize the uploaded image for detection
-    image1_resized = resize_image(image1_bgr)  # Resize uploaded image
+    # image1_resized = resize_image(image1_bgr)  # Resize uploaded image
     face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
     
     # Detect faces in the resized image
