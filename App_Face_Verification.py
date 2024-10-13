@@ -85,36 +85,44 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
 
+def read_student_info(filename, folder_path):
+    """Reads student information from a text file associated with the image."""
+    txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
+    if os.path.exists(txt_file_path):
+        with open(txt_file_path, "r") as f:
+            return f.read()
+    return "No student information found."
+
 def find_similar_faces(uploaded_image, folder_path):
+    """Finds similar faces in a folder based on the uploaded image."""
     results = []
-    # Convert uploaded image to NumPy array
-    image1 = Image.open(uploaded_image).convert("RGB")  # Convert to RGB
-    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)  # Convert to BGR
+    image1 = Image.open(uploaded_image).convert("RGB")
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+    image1_resized, new_w, new_h = resize_image(image1)  # Resize uploaded image
 
-    # Resize image before processing
-    image1 = resize_image(image1)
-
-    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-    faces1 = face_detector.infer(image1)
+    face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
+    faces1 = face_detector.infer(image1_resized)
 
     if faces1.shape[0] == 0:
         st.warning("No face detected in the uploaded image.")
-        return []
+        return [], image1  # Return original image
+
+    # Visualize faces detected in the uploaded image
+    image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
 
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
-        if image2 is not None:  # Check if image was read successfully
-            # Resize image before processing
-            image2 = resize_image(image2)
-            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-            faces2 = face_detector.infer(image2)
+        if image2 is not None:
+            image2_resized, _, _ = resize_image(image2)  # Resize comparison image
+            face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
+            faces2 = face_detector.infer(image2_resized)
 
             if faces2.shape[0] > 0:
-                result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
+                result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
                 results.append((filename, result[0], result[1]))
 
-    return results
+    return results, image1_with_faces  # Return image with detected faces
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
     output = image.copy()
