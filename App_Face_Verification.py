@@ -180,9 +180,12 @@ def run_app5():
         # Convert uploaded image to NumPy array
         image1 = Image.open(uploaded_file).convert("RGB")
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-        
+
         # Resize uploaded image
         image1 = resize_image(image1)
+
+        # In kích thước của ảnh sau khi resize
+        st.write(f"Resized image shape: {image1.shape}")
 
         # Detect faces in the uploaded image
         face_detector.setInputSize([image1.shape[1], image1.shape[0]])
@@ -209,6 +212,9 @@ def run_app5():
                 img = Image.open(img_path).convert("RGB")
                 img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
                 
+                # In kích thước của ảnh đã resize trong thư mục
+                st.write(f"Resized {filename} shape: {img_resized.shape}")
+
                 # Find similar faces using the compare_faces function
                 score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
                 similar_faces.append((filename, score))
