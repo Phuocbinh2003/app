@@ -236,10 +236,6 @@ def compare_faces(image1, image2):
     score = calculate_similarity(faces1, faces2)
     return score
 
-import cv2
-import numpy as np
-import streamlit as st
-
 def draw_bounding_boxes(image, faces):
     """
     Vẽ hình chữ nhật bao quanh các khuôn mặt phát hiện được trong hình ảnh.
