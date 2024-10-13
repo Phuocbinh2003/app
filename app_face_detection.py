@@ -17,6 +17,26 @@ def haar_features(img):
             haar_value = (integral_img[i + 1, j + 1] - integral_img[i, j + 1] -
                           integral_img[i + 1, j] + integral_img[i, j])
             haar_features.append(haar_value)
+        # Mẫu ngang
+    for i in range(0, img.shape[0] - 1):
+        for j in range(0, img.shape[1] - 1):
+            haar_value = (integral_img[i, j + 1] - integral_img[i + 1, j + 1] -
+                          integral_img[i, j] + integral_img[i + 1, j])
+            haar_features.append(haar_value)
+
+    # Mẫu góc (Diagonal)
+    for i in range(0, img.shape[0] - 1):
+        for j in range(0, img.shape[1] - 1):
+            haar_value = (integral_img[i + 1, j + 1] - integral_img[i, j + 1] -
+                          integral_img[i + 1, j] + integral_img[i, j])
+            haar_features.append(haar_value)
+
+    # Mẫu ba vùng (Three-rectangle)
+    for i in range(0, img.shape[0] - 1):
+        for j in range(0, img.shape[1] - 1):
+            haar_value = (integral_img[i + 1, j] - integral_img[i, j] +
+                          integral_img[i, j + 1] - integral_img[i + 1, j + 1])
+            haar_features.append(haar_value)
 
     return np.array(haar_features)
 
