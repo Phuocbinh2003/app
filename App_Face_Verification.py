@@ -112,30 +112,33 @@ def find_similar_faces(uploaded_image, folder_path):
     return results
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
-    output = image.copy()
+    output = image.copy()  # Giữ nguyên ảnh gốc
+
+    # Định nghĩa màu sắc cho các điểm landmark
     landmark_color = [
-        (255, 0, 0),   # right eye
-        (0, 0, 255),   # left eye
-        (0, 255, 0),   # nose tip
-        (255, 0, 255), # right mouth corner
-        (0, 255, 255)  # left mouth corner
+        (255, 0, 0),   # mắt phải
+        (0, 0, 255),   # mắt trái
+        (0, 255, 0),   # đầu mũi
+        (255, 0, 255), # góc miệng phải
+        (0, 255, 255)  # góc miệng trái
     ]
 
     if fps is not None:
         cv2.putText(output, 'FPS: {:.2f}'.format(fps), (0, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color)
 
     for det in results:
-        bbox = det[0:4].astype(np.int32)
-        cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), box_color, 2)
+        bbox = det[0:4].astype(np.int32)  # Lấy bounding box
+        cv2.rectangle(output, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), box_color, 2)
 
-        conf = det[-1]
-        cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1]+12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
+        conf = det[-1]  # Lấy độ tin cậy
+        cv2.putText(output, '{:.4f}'.format(conf), (bbox[0], bbox[1] + 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, text_color)
 
-        landmarks = det[4:14].astype(np.int32).reshape((5, 2))
+        landmarks = det[4:14].astype(np.int32).reshape((5, 2))  # Lấy các điểm landmark
         for idx, landmark in enumerate(landmarks):
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
 
     return output
+
 
 def resize_image(image, target_size=320):
     h, w, _ = image.shape
@@ -177,17 +180,14 @@ def run_app5():
     uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        # Convert uploaded image to NumPy array
+        # Chuyển đổi ảnh đã tải lên thành mảng NumPy
         image1 = Image.open(uploaded_file).convert("RGB")
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
 
-        # Resize uploaded image
-        image1 = resize_image(image1)
+        # In kích thước của ảnh gốc
+        st.write(f"Original image shape: {image1.shape}")
 
-        # In kích thước của ảnh sau khi resize
-        st.write(f"Resized image shape: {image1.shape}")
-
-        # Detect faces in the uploaded image
+        # Phát hiện khuôn mặt trong ảnh đã tải lên
         face_detector.setInputSize([image1.shape[1], image1.shape[0]])
         faces1 = face_detector.infer(image1)
 
@@ -195,19 +195,19 @@ def run_app5():
             st.warning("No face detected in the uploaded image.")
             return
 
-        # Visualize faces with boxes drawn
+        # Hiển thị khuôn mặt với bounding box
         output_image = visualize_faces(image1, faces1)
 
-        # Display the output image with boxes
+        # Hiển thị ảnh đầu ra với bounding box
         st.image(output_image, caption="Detected Faces", use_column_width=True)
 
-        # Find similar faces
-        folder_path = 'Face_Verification/image'  # Adjust to your folder path
+        # Tìm khuôn mặt tương tự
+        folder_path = 'Face_Verification/image'  # Điều chỉnh đường dẫn đến thư mục
         similar_faces = []
 
         for filename in os.listdir(folder_path):
             if filename.endswith(('.jpg', '.jpeg', '.png')):
-                # Load and resize each image in the folder
+                # Tải và resize mỗi ảnh trong thư mục
                 img_path = os.path.join(folder_path, filename)
                 img = Image.open(img_path).convert("RGB")
                 img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
@@ -215,24 +215,24 @@ def run_app5():
                 # In kích thước của ảnh đã resize trong thư mục
                 st.write(f"Resized {filename} shape: {img_resized.shape}")
 
-                # Find similar faces using the compare_faces function
-                score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
+                # Tìm khuôn mặt tương tự bằng hàm compare_faces
+                score = compare_faces(image1, img_resized)
                 similar_faces.append((filename, score))
 
         if similar_faces:
-            # Find the file with the highest accuracy
-            best_match = max(similar_faces, key=lambda x: x[1])  # x[1] is the accuracy
+            # Tìm file có độ chính xác cao nhất
+            best_match = max(similar_faces, key=lambda x: x[1])  # x[1] là độ chính xác
             st.write(f"Best match: {best_match[0]} with score: {best_match[1]:.4f}")
 
-            # Display results for all similar faces
+            # Hiển thị kết quả cho tất cả các khuôn mặt tương tự
             for filename, score in similar_faces:
                 st.write(f"{filename}: Score: {score:.4f}")
 
-            # Display the best match
+            # Hiển thị ảnh tương tự tốt nhất
             img_best_match = Image.open(os.path.join(folder_path, best_match[0]))
             st.image(img_best_match, caption="Best Match Image", use_column_width=True)
 
-            # Read student info
+            # Đọc thông tin sinh viên
             student_info = read_student_info(best_match[0], folder_path)
             st.write("Student Information:")
             st.write(student_info)
@@ -241,3 +241,4 @@ def run_app5():
 
 if __name__ == "__main__":
     run_app5()
+
