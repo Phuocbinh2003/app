@@ -112,7 +112,7 @@ def find_similar_faces(uploaded_image, folder_path):
     return results
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
-    output = image.copy()  # Copy the original image
+    output = image.copy()
     landmark_color = [
         (255, 0, 0),   # right eye
         (0, 0, 255),   # left eye
@@ -136,7 +136,6 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
             cv2.circle(output, landmark, 2, landmark_color[idx], 2)
 
     return output
-
 
 def resize_image(image, target_size=320):
     h, w, _ = image.shape
@@ -183,7 +182,10 @@ def run_app5():
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
 
         # Resize uploaded image
-        image1_resized = resize_image(image1)
+        image1 = resize_image(image1)
+
+        # In kích thước của ảnh sau khi resize
+        st.write(f"Resized image shape: {image1.shape}")
 
         # Detect faces in the uploaded image
         face_detector.setInputSize([image1.shape[1], image1.shape[0]])
@@ -193,7 +195,7 @@ def run_app5():
             st.warning("No face detected in the uploaded image.")
             return
 
-        # Visualize faces with boxes drawn on the original image
+        # Visualize faces with boxes drawn
         output_image = visualize_faces(image1, faces1)
 
         # Display the output image with boxes
@@ -210,6 +212,9 @@ def run_app5():
                 img = Image.open(img_path).convert("RGB")
                 img_resized = resize_image(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
                 
+                # In kích thước của ảnh đã resize trong thư mục
+                st.write(f"Resized {filename} shape: {img_resized.shape}")
+
                 # Find similar faces using the compare_faces function
                 score = compare_faces(image1, img_resized)  # Use the defined compare_faces function
                 similar_faces.append((filename, score))
@@ -236,4 +241,3 @@ def run_app5():
 
 if __name__ == "__main__":
     run_app5()
-
