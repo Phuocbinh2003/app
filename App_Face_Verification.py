@@ -79,28 +79,31 @@ def find_similar_faces(uploaded_image, folder_path):
     results = []
     image1 = Image.open(uploaded_image).convert("RGB")
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    image1 = resize_image(image1)  # Use resize_image for the uploaded image
+    image1_resized = resize_image(image1)  # Resize uploaded image
 
-    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-    faces1 = face_detector.infer(image1)
+    face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
+    faces1 = face_detector.infer(image1_resized)
 
     if faces1.shape[0] == 0:
         st.warning("No face detected in the uploaded image.")
-        return []
+        return [], image1  # Return original image
+
+    # Visualize faces detected in the uploaded image
+    image1_with_faces = visualize_faces(image1_resized, faces1)
 
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
         image2 = cv2.imread(img_path)
         if image2 is not None:
-            image2 = resize_image(image2)  # Use resize_image for the comparison images
-            face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-            faces2 = face_detector.infer(image2)
+            image2_resized = resize_image(image2)  # Resize comparison image
+            face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
+            faces2 = face_detector.infer(image2_resized)
 
             if faces2.shape[0] > 0:
-                result = face_recognizer.match(image1, faces1[0][:-1], image2, faces2[0][:-1])
+                result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
                 results.append((filename, result[0], result[1]))
 
-    return results
+    return results, image1_with_faces  # Return detected faces image
 
 def run_app5():
     """Runs the Streamlit app."""
@@ -118,7 +121,10 @@ def run_app5():
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
         st.image(image1, channels="BGR", caption="Uploaded Image", use_column_width=True)
 
-        results = find_similar_faces(uploaded_image, folder_path)
+        results, image_with_faces = find_similar_faces(uploaded_image, folder_path)
+
+        # Display image with visualized faces
+        st.image(image_with_faces, channels="BGR", caption="Detected Faces", use_column_width=True)
 
         if results:
             st.subheader("Similar Faces Found:")
