@@ -84,6 +84,25 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
         cv2.putText(padded_out2, "{:.2f}".format(score), (x + left, y + top - 5), cv2.FONT_HERSHEY_DUPLEX, 0.4, text_color)
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
+def calculate_similarity(features1, features2):
+    """
+    Tính toán điểm tương đồng giữa hai vector đặc trưng từ SFace.
+
+    Args:
+        features1: Vector đặc trưng từ hình ảnh đầu tiên.
+        features2: Vector đặc trưng từ hình ảnh thứ hai.
+
+    Returns:
+        Điểm tương đồng (0 đến 1), hoặc None nếu không có khuôn mặt nào.
+    """
+    if features1 is None or features2 is None:
+        return None  # Trả về None nếu không có đặc trưng nào được trích xuất
+
+    # Tính khoảng cách Euclidean giữa hai vector đặc trưng
+    distance = np.linalg.norm(features1 - features2)  # Tính khoảng cách Euclidean
+    similarity = 1 / (1 + distance)  # Chuyển đổi khoảng cách thành điểm tương đồng
+
+    return similarity
 
 def extract_face(image):
     """Tách khuôn mặt từ ảnh sử dụng mô hình YuNet và trả về ảnh khuôn mặt đã cắt ra."""
@@ -211,18 +230,20 @@ def read_student_info(filename, folder_path):
     with open(txt_file_path, "r", encoding="utf-8") as txt_file:
         student_info = txt_file.read()
     return student_info
+# Giả sử bạn đã có một hàm để lấy đặc trưng từ SFace
+def get_face_features(image):
+    # Sử dụng SFace để lấy đặc trưng từ ảnh
+    features = sface_model.extract_features(image)  # Thay thế với mã thực tế của bạn
+    return features
+
+# Ví dụ trong hàm compare_faces
 def compare_faces(image1, image2):
-    # Assuming face_detector is already defined and loaded
-    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-    faces1 = face_detector.infer(image1)
+    features1 = get_face_features(image1)
+    features2 = get_face_features(image2)
 
-    face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-    faces2 = face_detector.infer(image2)
+    score = calculate_similarity(features1, features2)
+    return score
 
-    # Check if faces are detected and unpack properly
-    if len(faces1) == 0 or len(faces2) == 0:
-        st.warning("No faces detected.")
-        return None
 
     # Draw bounding boxes on the images based on the detected faces
     image1_with_boxes = draw_bounding_boxes(image1, faces1)
