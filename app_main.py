@@ -5,7 +5,7 @@ from app_face_detection import run_app3
 from app_update_firebase import run_app4
 from App_Face_Verification import run_app5
 
-# Tạo thanh điều hướng
+# Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
     ('GrabCut', 'App2','Face_detection','Update_firebase','Face_Verification')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
