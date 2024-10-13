@@ -72,7 +72,7 @@ def sliding_window_haar_detect(img, model, window_size=(24, 24)):
     return boxes
 
 # Chạy ứng dụng Streamlit
-def main():
+def run_app3():
     st.title("Face Detection Application")
     
     # Tải mô hình đã lưu
@@ -106,4 +106,4 @@ def main():
         st.image(result_img, channels="GRAY", caption="Detection Result")
 
 if __name__ == "__main__":
-    main()
+    run_app3()
