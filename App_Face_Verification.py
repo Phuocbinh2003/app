@@ -166,7 +166,25 @@ def run_app5():
     uploaded_file = st.file_uploader("Upload a face image", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+        # Convert uploaded image to NumPy array
+        image1 = Image.open(uploaded_file).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+
+        # Detect faces in the uploaded image
+        face_detector.setInputSize([image1.shape[1], image1.shape[0]])
+        faces1 = face_detector.infer(image1)
+
+        if faces1.shape[0] == 0:
+            st.warning("No face detected in the uploaded image.")
+            return
+
+        # Visualize faces with boxes drawn
+        output_image = visualize_faces(image1, faces1)
+
+        # Display the output image with boxes
+        st.image(output_image, caption="Detected Faces", use_column_width=True)
+
+        # Find similar faces
         folder_path = 'Face_Verification/image'  # Adjust to your folder path
         similar_faces = find_similar_faces(uploaded_file, folder_path)
 
@@ -189,6 +207,10 @@ def run_app5():
             st.write(student_info)
         else:
             st.write("No similar faces found.")
+
+if __name__ == "__main__":
+    run_app5()
+
 
 if __name__ == "__main__":
     run_app5()
