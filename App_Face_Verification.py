@@ -32,7 +32,16 @@ face_recognizer = SFace(
     backendId=backend_id,
     targetId=target_id
 )
+def compare_faces(image1, face1, image2, face2):
+    """So sánh hai khuôn mặt và trả về điểm tương đồng."""
+    # Trích xuất đặc trưng từ khuôn mặt
+    feature1 = face_recognizer.infer(image1, face1)
+    feature2 = face_recognizer.infer(image2, face2)
 
+    # Tính toán độ tương đồng
+    similarity_score = calculate_similarity(feature1, feature2)
+
+    return similarity_score
 def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
     """Hiển thị kết quả so khớp khuôn mặt giữa hai ảnh."""
     out1 = img1.copy()
@@ -117,6 +126,31 @@ def find_similar_faces(uploaded_image, folder_path):
     if faces1.shape[0] == 0:
         st.warning("Không phát hiện khuôn mặt trong ảnh đã tải lên.")
         return [], image1
+
+    image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
+    st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Hình ảnh đã xử lý với khuôn mặt được phát hiện", use_column_width=True)
+
+    best_match_filename = None
+    best_score = 0.0
+
+    for filename in os.listdir(folder_path):
+        img_path = os.path.join(folder_path, filename)
+        image2 = cv2.imread(img_path)
+        if image2 is not None:
+            image2_resized = resize_image(image2)
+            face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
+            faces2 = face_detector.infer(image2_resized)
+
+            if faces2.shape[0] > 0:
+                # Sử dụng hàm compare_faces
+                score = compare_faces(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
+
+                if score > best_score:
+                    best_score = score
+                    best_match_filename = filename
+
+    return best_match_filename, best_score, image1_with_faces
+
 
     image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
     st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Hình ảnh đã xử lý với khuôn mặt được phát hiện", use_column_width=True)
