@@ -32,16 +32,30 @@ face_recognizer = SFace(
     backendId=backend_id,
     targetId=target_id
 )
+def extract_face_feature(image, face):
+    """Trích xuất đặc trưng khuôn mặt từ bức ảnh."""
+    # Giả định face là một bounding box [x, y, w, h]
+    x, y, w, h = face
+    face_image = image[y:y+h, x:x+w]
+    
+    # Chuyển đổi khuôn mặt thành đặc trưng (ví dụ: sử dụng mô hình học sâu để trích xuất đặc trưng)
+    # Thay thế dòng sau bằng cách sử dụng mô hình của bạn
+    features = some_deep_learning_model(face_image)  # Ví dụ: Sử dụng một mô hình CNN
+    return features
+
 def compare_faces(image1, face1, image2, face2):
     """So sánh hai khuôn mặt và trả về điểm tương đồng."""
     # Trích xuất đặc trưng từ khuôn mặt
-    feature1 = face_recognizer.infer(image1, face1)
-    feature2 = face_recognizer.infer(image2, face2)
+    feature1 = extract_face_feature(image1, face1)
+    feature2 = extract_face_feature(image2, face2)
 
-    # Tính toán độ tương đồng
-    similarity_score = calculate_similarity(feature1, feature2)
+    # Tính toán độ tương đồng (giả sử sử dụng khoảng cách Euclid)
+    score = np.linalg.norm(feature1 - feature2)
 
+    # Chuyển đổi độ tương đồng thành điểm (điểm thấp hơn có nghĩa là giống nhau nhiều hơn)
+    similarity_score = 1 / (1 + score)  # Giá trị giữa 0 và 1
     return similarity_score
+    
 def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
     """Hiển thị kết quả so khớp khuôn mặt giữa hai ảnh."""
     out1 = img1.copy()
@@ -150,6 +164,7 @@ def find_similar_faces(uploaded_image, folder_path):
                     best_match_filename = filename
 
     return best_match_filename, best_score, image1_with_faces
+
 
 
     image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
