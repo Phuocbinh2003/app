@@ -33,6 +33,28 @@ face_recognizer = SFace(
     targetId=target_id
 )
 
+def calculate_similarity(faces1, faces2):
+    """
+    Tính toán điểm tương đồng giữa hai danh sách các khuôn mặt.
+
+    Args:
+        faces1: Danh sách các đặc trưng khuôn mặt từ hình ảnh đầu tiên.
+        faces2: Danh sách các đặc trưng khuôn mặt từ hình ảnh thứ hai.
+
+    Returns:
+        Điểm tương đồng giữa hai hình ảnh (0 đến 1), hoặc None nếu không có khuôn mặt nào.
+    """
+    if len(faces1) == 0 or len(faces2) == 0:
+        return None  # Trả về None nếu không có khuôn mặt nào được phát hiện
+
+    # Giả sử faces chứa các vector đặc trưng khuôn mặt
+    # Tính toán Euclidean Distance
+    # Chỉ cần so sánh khuôn mặt đầu tiên của mỗi danh sách
+    distance = np.linalg.norm(faces1[0] - faces2[0])  # Tính khoảng cách Euclidean
+    similarity = 1 / (1 + distance)  # Chuyển đổi khoảng cách thành điểm tương đồng
+
+    return similarity
+
 def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
     out1 = img1.copy()
     out2 = img2.copy()
