@@ -279,9 +279,13 @@ def run_app5():
         image1_resize = resize_image(image1)
         image2_resize = resize_image(image2)
 
+        # Phát hiện khuôn mặt trong cả hai ảnh
+        faces1 = face_detector.infer(image1_resize)
+        faces2 = face_detector.infer(image2_resize)
+
         # So sánh khuôn mặt và lấy điểm số
         if faces1.shape[0] > 0 and faces2.shape[0] > 0:
-            score = compare_faces(image1_resize, faces1[0][:-1], image2_resize, faces2[0][:-1])
+            score = compare_faces(image1_resize, faces1[0], image2_resize, faces2[0])
 
             if score is not None:
                 st.success(f"Similarity Score: {score:.2f}")
