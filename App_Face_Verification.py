@@ -249,7 +249,7 @@ def run_app5():
             best_match_filename, best_score, processed_image = find_similar_faces(uploaded_image, folder_path)
 
             # Hiển thị hình ảnh đã xử lý với khuôn mặt được phát hiện
-           # st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
+            st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
 
             if best_match_filename is not None:
                 st.write(f"### Best Match Found:")
@@ -268,7 +268,7 @@ def run_app5():
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
-    if uploaded_image1 and uploaded_image2:
+    if uploaded_image1 is not None and uploaded_image2 is not None:
         image1 = Image.open(uploaded_image1).convert("RGB")
         image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
 
@@ -279,30 +279,25 @@ def run_app5():
         image1_resize = resize_image(image1)
         image2_resize = resize_image(image2)
 
-        # Compare faces and get the score
-        score = compare_faces(image1_resize, image2_resize)
+        # So sánh khuôn mặt và lấy điểm số
+        if faces1.shape[0] > 0 and faces2.shape[0] > 0:
+            score = compare_faces(image1_resize, faces1[0][:-1], image2_resize, faces2[0][:-1])
 
-        if score is not None:
-            st.success(f"Similarity Score: {score:.2f}")
+            if score is not None:
+                st.success(f"Similarity Score: {score:.2f}")
 
-            # Visualize the matches on the images
-            faces1 = face_detector.infer(image1)
-            faces2 = face_detector.infer(image2)
-            
-            st.write(f"faces1: {faces1}")
-            st.write(f"faces2: {faces2}")
-
-
-            # Visualize matches only if faces are detected
-            if faces1.shape[0] > 0 and faces2.shape[0] > 0:
+                # Visualize the matches on the images
                 matches = [1]  # Assuming a match for visualization, adjust logic as needed
                 scores = [score]  # Using the score for visualization
                 matched_image = visualize_matches(image1_resize, faces1, image2_resize, faces2, matches, scores)
 
                 # Display the matched image
                 st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
+            else:
+                st.warning("Could not compare the images, no faces detected.")
         else:
-            st.warning("Could not compare the images, no faces detected.")
+            st.warning("No faces detected in one or both images.")
 
 if __name__ == "__main__":
     run_app5()
+
