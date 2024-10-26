@@ -25,7 +25,7 @@ def run_app6():
     """)
     
     # Hình minh họa Precision và Recall
-    img2 = Image.open("images/precision_recall_diagram.png")
+    img2 = Image.open("folder_Keypoint_Detection/PR.png")
     st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
     
     # Phần 3: Bảng so sánh độ đo Precision và Recall của SIFT và ORB
