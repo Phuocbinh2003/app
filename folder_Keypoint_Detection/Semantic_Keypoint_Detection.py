@@ -3,12 +3,10 @@ import pandas as pd
 import cv2
 
 def run_app6():
-    # Tiêu đề ứng dụng
-    st.title("Precision and Recall in Object Detection")
-    
     # Phần 1: Synthetic Shapes Dataset
     st.header("1. Synthetic Shapes Dataset")
-    st.image("folder_Keypoint_Detection/PR.png", caption="Synthetic Shapes Dataset Example", use_column_width=True)
+    img1 = Image.open("images/synthetic_shapes.png")
+    st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
     
     # Phần 2: Giới thiệu về Precision và Recall
     st.header("2. Precision and Recall")
@@ -27,7 +25,8 @@ def run_app6():
     """)
     
     # Hình minh họa Precision và Recall
-    st.image("images/precision_recall_diagram.png", caption="Precision and Recall Diagram", use_column_width=True)
+    img2 = Image.open("images/precision_recall_diagram.png")
+    st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
     
     # Phần 3: Bảng so sánh độ đo Precision và Recall của SIFT và ORB
     st.header("3. Precision and Recall Comparison Table for SIFT and ORB")
@@ -45,6 +44,8 @@ def run_app6():
     st.table(df)
     
     # Hình ảnh bảng so sánh Precision và Recall
-    st.image("images/precision_recall_table.png", caption="Precision and Recall Table for SIFT and ORB", use_column_width=True)
+    img3 = Image.open("images/precision_recall_table.png")
+    st.image(img3, caption="Precision and Recall Table for SIFT and ORB", use_column_width=True)
+
 if __name__ == "__main__":
     run_app6()
