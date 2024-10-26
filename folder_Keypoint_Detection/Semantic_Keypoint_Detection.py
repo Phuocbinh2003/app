@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import cv2
 
-def app6():
+def run_app6():
     # Tiêu đề ứng dụng
     st.title("Precision and Recall in Object Detection")
     
@@ -46,3 +46,5 @@ def app6():
     
     # Hình ảnh bảng so sánh Precision và Recall
     st.image("images/precision_recall_table.png", caption="Precision and Recall Table for SIFT and ORB", use_column_width=True)
+if __name__ == "__main__":
+    run_app6()
