@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import cv2
+from PIL import Image
 
 def run_app6():
     # Phần 1: Synthetic Shapes Dataset
