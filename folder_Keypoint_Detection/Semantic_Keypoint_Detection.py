@@ -8,7 +8,7 @@ def run_app6():
     st.header("1. Synthetic Shapes Dataset")
     img1 = Image.open("folder_Keypoint_Detection/Untitled.png")
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
-    
+    st.markdown("Bộ dữ liệu bao gồm tổng cộng 9.028 hình ảnh, mỗi hình đều được gắn kèm các điểm đặc trưng chính xác")
     # Phần 2: Giới thiệu về Precision và Recall
     st.header("2. Precision and Recall")
     
