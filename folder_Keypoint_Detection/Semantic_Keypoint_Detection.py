@@ -44,8 +44,8 @@ def run_app6():
     # Tạo bảng dữ liệu Precision và Recall cho SIFT và ORB
     data = {
         "Method": ["SIFT", "ORB"],
-        "Precision": [0.85, 0.75],  # Dữ liệu mẫu
-        "Recall": [0.80, 0.70]      # Dữ liệu mẫu
+        "Precision": [0.2168, 0.2419],  # Dữ liệu mẫu
+        "Recall": [0.3145, 0.3014]      # Dữ liệu mẫu
     }
     
     df = pd.DataFrame(data)
