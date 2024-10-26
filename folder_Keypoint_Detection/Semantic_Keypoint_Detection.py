@@ -31,8 +31,8 @@ def run_app6():
     
     # Phần 3: Bảng so sánh độ đo Precision và Recall của SIFT và ORB
     st.header("3. Precision and Recall Comparison Table for SIFT and ORB")
-    img2 = Image.open("folder_Keypoint_Detection/download.png")
-    st.image(img2, caption="", use_column_width=True)
+    img3 = Image.open("folder_Keypoint_Detection/download.png")
+    st.image(img3, caption="", use_column_width=True)
     st.markdown("""
     Việc xác định các độ đo Precision và Recall của SIFT và ORB trong bài này được thực hiện bằng cách so sánh đặc trưng SIFT và ORB với các đặc trưng thực tế trong tệp `points`.
     
@@ -53,9 +53,6 @@ def run_app6():
     # Hiển thị bảng dữ liệu
     st.table(df)
     
-    # Hình ảnh bảng so sánh Precision và Recall
-    img3 = Image.open("images/precision_recall_table.png")
-    st.image(img3, caption="Precision and Recall Table for SIFT and ORB", use_column_width=True)
 
 if __name__ == "__main__":
     run_app6()
