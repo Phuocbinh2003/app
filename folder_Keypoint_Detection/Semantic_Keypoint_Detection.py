@@ -8,7 +8,7 @@ def run_app6():
     
     # Phần 1: Synthetic Shapes Dataset
     st.header("1. Synthetic Shapes Dataset")
-    st.image("images/synthetic_shapes.png", caption="Synthetic Shapes Dataset Example", use_column_width=True)
+    st.image("folder_Keypoint_Detection/PR.png", caption="Synthetic Shapes Dataset Example", use_column_width=True)
     
     # Phần 2: Giới thiệu về Precision và Recall
     st.header("2. Precision and Recall")
