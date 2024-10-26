@@ -5,7 +5,7 @@ import cv2
 def run_app6():
     # Phần 1: Synthetic Shapes Dataset
     st.header("1. Synthetic Shapes Dataset")
-    img1 = Image.open("images/synthetic_shapes.png")
+    img1 = Image.open("folder_Keypoint_Detection/PR.png")
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
     
     # Phần 2: Giới thiệu về Precision và Recall
