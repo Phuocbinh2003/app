@@ -6,7 +6,7 @@ from PIL import Image
 def run_app6():
     # Phần 1: Synthetic Shapes Dataset
     st.header("1. Synthetic Shapes Dataset")
-    img1 = Image.open("folder_Keypoint_Detection/PR.png")
+    img1 = Image.open("folder_Keypoint_Detection/Untitled.png")
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
     
     # Phần 2: Giới thiệu về Precision và Recall
