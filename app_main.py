@@ -9,7 +9,7 @@ from folder_SuperPoint_Rotation.app_superpoint_rotation import run_app7
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification',' Semantic_Keypoint_Detection','SuperPoint_Rotation')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
