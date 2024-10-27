@@ -25,7 +25,7 @@ def run_app7():
     superpoint_image_path1 = 'folder_SuperPoint_Rotation/sp1.png'
     # superpoint_image_path2 = 'folder_SuperPoint_Rotation/superpoint2.png'
     # superpoint_image_pathbd = 'folder_SuperPoint_Rotation/superpointbd.png'
-
+ 
     # Phần SIFT
     st.header("2. Hiển thị kết quả mô hình")
     st.subheader("2.1. Mô hình SIFT")
