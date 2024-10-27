@@ -27,6 +27,6 @@ elif option == 'Face_Verification':
 elif option == 'app_6':
     run_app6()  # Gọi hàm chạy ứng dụng 6
 elif option == 'app_7':
-    run_app7()  # Gọi hàm chạy ứng dụng 7
+    run_app7()  # Gọi hàm chạy ứng dụng 
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
