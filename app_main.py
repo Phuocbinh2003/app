@@ -9,7 +9,7 @@ from folder_SuperPoint_Rotation.app_superpoint_rotation import run_app7
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','app_6','app_7')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification',' Semantic_Keypoint_Detection','SuperPoint_Rotation')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
@@ -24,9 +24,9 @@ elif option == 'Update_firebase':
 
 elif option == 'Face_Verification':
     run_app5()  # Gọi hàm chạy ứng dụng 5
-elif option == 'app_6':
+elif option == 'Semantic_Keypoint_Detection':
     run_app6()  # Gọi hàm chạy ứng dụng 6
-elif option == 'app_7':
+elif option == 'SuperPoint_Rotation':
     run_app7()  # Gọi hàm chạy ứng dụng 
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
