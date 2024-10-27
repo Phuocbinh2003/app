@@ -22,7 +22,7 @@ def run_app7():
     orb_image_path1 = 'folder_SuperPoint_Rotation/orb1.png'
     orb_image_path2 = 'folder_SuperPoint_Rotation/orb2.png'
     orb_image_pathbd = 'folder_SuperPoint_Rotation/orbbd.png'
-    # superpoint_image_path1 = 'folder_SuperPoint_Rotation/superpoint1.png'
+    superpoint_image_path1 = 'folder_SuperPoint_Rotation/sp1.png'
     # superpoint_image_path2 = 'folder_SuperPoint_Rotation/superpoint2.png'
     # superpoint_image_pathbd = 'folder_SuperPoint_Rotation/superpointbd.png'
 
@@ -49,10 +49,10 @@ def run_app7():
     st.image(orb_imagebd, caption="Biểu đồ ORB", use_column_width=True)
     st.write("Với ORB, việc xoay ảnh làm tăng mạnh các đặc trưng (từ 23 đến 84), nhưng các đặc trưng tương đồng thay đổi ít, từ 10-20.")
 
-    # # Phần SuperPoint
-    # st.subheader("2.3. Mô hình SuperPoint")
-    # superpoint_image1 = Image.open(superpoint_image_path1)
-    # st.image(superpoint_image1, caption="Ảnh với đặc trưng SuperPoint", use_column_width=True)
+    # Phần SuperPoint
+    st.subheader("2.3. Mô hình SuperPoint")
+    superpoint_image1 = Image.open(superpoint_image_path1)
+    st.image(superpoint_image1, caption="Ảnh với đặc trưng SuperPoint", use_column_width=True)
     # superpoint_image2 = Image.open(superpoint_image_path2)
     # st.image(superpoint_image2, caption="So sánh các đặc trưng tương đồng", use_column_width=True)
     # st.write("**Nhận xét:** Mô hình SuperPoint có hiệu quả cao trong phát hiện đặc trưng chính trong ảnh, phù hợp cho môi trường thay đổi.")
