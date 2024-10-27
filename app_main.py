@@ -5,10 +5,11 @@ from app_face_detection import run_app3
 from app_update_firebase import run_app4
 from App_Face_Verification import run_app5
 from folder_Keypoint_Detection.Semantic_Keypoint_Detection import run_app6
+from folder_SuperPoint_Rotation.app_superpoint_rotation import run_app7
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','app_6')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','app_6','app_7')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
@@ -24,6 +25,8 @@ elif option == 'Update_firebase':
 elif option == 'Face_Verification':
     run_app5()  # Gọi hàm chạy ứng dụng 5
 elif option == 'app_6':
-    run_app6()  # Gọi hàm chạy ứng dụng 5
+    run_app6()  # Gọi hàm chạy ứng dụng 6
+elif option == 'app_7':
+    run_app7()  # Gọi hàm chạy ứng dụng 7
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
