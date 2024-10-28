@@ -308,13 +308,17 @@ def run_app5():
     
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-    
-        face_img = extract_face(image1)
-        st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"", use_column_width=True)
-    
-    
-        face_img = extract_face(image2)
-        st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"", use_column_width=True)
+        face_img1 = extract_face(image1)
+        if face_img1 is not None:
+            st.image(cv2.cvtColor(face_img1, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
+        else:
+            st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+            
+        face_img2 = extract_face(image2)
+        if face_img2 is not None:
+            st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
+        else:
+            st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
       
     
         
