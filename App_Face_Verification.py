@@ -319,7 +319,7 @@ def run_app5():
         if faces1.shape[0] > 0:
             st.subheader("Detected Faces in Portrait Image")
             for i, face in enumerate(faces1):
-                face_img = extract_face(image1, face)
+                face_img = extract_face(faces1)
                 st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in Portrait Image", use_column_width=True)
         else:
             st.warning("No faces detected in the portrait image.")
@@ -328,29 +328,11 @@ def run_app5():
         if faces2.shape[0] > 0:
             st.subheader("Detected Faces in ID Image")
             for i, face in enumerate(faces2):
-                face_img = extract_face(image2, face)
+                face_img = extract_face(faces2)
                 st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in ID Image", use_column_width=True)
         else:
             st.warning("No faces detected in the ID image.")
     
-        # Kiểm tra xem có ít nhất một khuôn mặt được phát hiện trên cả hai ảnh không để so sánh
-        if faces1.shape[0] > 0 and faces2.shape[0] > 0:
-            # Tách và resize khuôn mặt đầu tiên từ mỗi ảnh
-            face_img1 = extract_face(image1, faces1[0])
-            face_img2 = extract_face(image2, faces2[0])
-    
-            # Resize khuôn mặt về cùng kích thước 
-            face_img1_resized = resize_image32(face_img1)
-            face_img2_resized = resize_image32(face_img2)
-    
-            # So sánh khuôn mặt đã resize và lấy điểm tương đồng
-            score = compare_faces(face_img1_resized, face_img2_resized)
-    
-            if score is not None:
-                st.success(f"Similarity Score: {score:.2f}")
-            else:
-                st.warning("Could not compare the images, face extraction failed.")
-        else:
-            st.warning("No faces detected in one or both images.")
+        
 if __name__ == "__main__":
     run_app5()
