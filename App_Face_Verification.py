@@ -145,7 +145,7 @@ def extract_face_the_sv(image):
     face_detector.setInputSize([image.shape[1], image.shape[0]])
 
     # Phát hiện khuôn mặt
-    faces = face_detector.infer(resized_image)
+    faces = face_detector.infer(image)
 
     if faces.shape[0] == 0:
         st.warning("Không phát hiện khuôn mặt nào trong ảnh.")
