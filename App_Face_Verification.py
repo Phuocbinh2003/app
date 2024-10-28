@@ -337,9 +337,9 @@ def run_app5():
             face_img1 = extract_face(image1, faces1[0])
             face_img2 = extract_face(image2, faces2[0])
     
-            # Resize khuôn mặt về cùng kích thước (ví dụ: 112x112)
-            face_img1_resized = cv2.resize(face_img1, (112, 112))
-            face_img2_resized = cv2.resize(face_img2, (112, 112))
+            # Resize khuôn mặt về cùng kích thước 
+            face_img1_resized = cv2.resize(face_img1)
+            face_img2_resized = cv2.resize(face_img2)
     
             # So sánh khuôn mặt đã resize và lấy điểm tương đồng
             score = compare_faces(face_img1_resized, face_img2_resized)
