@@ -308,10 +308,12 @@ def run_app5():
     
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+        img1_resized = cv2.resize(image1)
+        img2_resized = cv2.resize(image2)
     
         # Phát hiện khuôn mặt trên từng ảnh
-        faces1 = face_detector.infer(image1)
-        faces2 = face_detector.infer(image2)
+        faces1 = face_detector.infer(img1_resized)
+        faces2 = face_detector.infer(img2_resized)
     
         # Hiển thị từng khuôn mặt phát hiện trong ảnh chân dung
         if faces1.shape[0] > 0:
