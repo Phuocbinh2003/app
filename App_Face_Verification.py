@@ -142,7 +142,7 @@ def extract_face_the_sv(image):
     # resized_image = resize_image(image)
 
     # Cài đặt kích thước đầu vào cho mô hình
-    face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
+    face_detector.setInputSize([image.shape[1], image.shape[0]])
 
     # Phát hiện khuôn mặt
     faces = face_detector.infer(resized_image)
