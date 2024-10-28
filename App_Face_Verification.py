@@ -133,6 +133,32 @@ def extract_face(image):
     face_image = image[y:y + h, x:x + w]
 
     return face_image  # Trả về ảnh khuôn mặt đã cắt ra
+def extract_face_the_sv(image):
+    """Tách khuôn mặt từ ảnh sử dụng mô hình YuNet và trả về ảnh khuôn mặt đã cắt ra."""
+    # Chuyển đổi ảnh sang định dạng BGR cho OpenCV
+    # image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    
+    # Resize ảnh để phù hợp với kích thước đầu vào của mô hình
+    # resized_image = resize_image(image)
+
+    # Cài đặt kích thước đầu vào cho mô hình
+    face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
+
+    # Phát hiện khuôn mặt
+    faces = face_detector.infer(resized_image)
+
+    if faces.shape[0] == 0:
+        st.warning("Không phát hiện khuôn mặt nào trong ảnh.")
+        return None  # Trả về None nếu không phát hiện khuôn mặt
+
+    # Lấy bounding box của khuôn mặt đầu tiên
+    bbox = faces[0][:4].astype(np.int32)
+
+    # Cắt khuôn mặt từ ảnh gốc
+    x, y, w, h = bbox
+    face_image = image[y:y + h, x:x + w]
+
+    return face_image  # Trả về ảnh khuôn mặt đã cắt ra
 
 def find_similar_faces(uploaded_image, folder_path):
     """Finds similar faces in a folder based on the uploaded image."""
@@ -314,7 +340,7 @@ def run_app5():
         else:
             st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
             
-        face_img2 = extract_face(image2)
+        face_img2 = extract_face_the_sv(image2)
         if face_img2 is not None:
             st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
         else:
