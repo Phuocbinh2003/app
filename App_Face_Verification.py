@@ -300,45 +300,45 @@ def run_app5():
     """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
     st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
-uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
-if uploaded_image1 and uploaded_image2:
-    image1 = Image.open(uploaded_image1).convert("RGB")
-    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-
-    image2 = Image.open(uploaded_image2).convert("RGB")
-    image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-
-    # Phát hiện khuôn mặt trên từng ảnh
-    faces1 = face_detector.infer(image1)
-    faces2 = face_detector.infer(image2)
-
-    # Kiểm tra xem có phát hiện được khuôn mặt không
-    if faces1.shape[0] > 0 and faces2.shape[0] > 0:
-        # Tách khuôn mặt đầu tiên từ mỗi ảnh
-        face_img1 = extract_face(image1, faces1[0])
-        face_img2 = extract_face(image2, faces2[0])
-
-        # Resize khuôn mặt về cùng kích thước (ví dụ: 112x112)
-        face_img1_resized = cv2.resize(face_img1, (112, 112))
-        face_img2_resized = cv2.resize(face_img2, (112, 112))
-
-        # So sánh khuôn mặt và lấy điểm tương đồng
-        score = compare_faces(face_img1_resized, face_img2_resized)
-
-        if score is not None:
-            st.success(f"Similarity Score: {score:.2f}")
-
-            # Visualize matches
-            matches = [1]  # Giả sử là match để hiển thị
-            scores = [score]
-            matched_image = visualize_matches(image1, faces1, image2, faces2, matches, scores)
-
-            # Hiển thị ảnh với khuôn mặt được matched
-            st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
+    if uploaded_image1 and uploaded_image2:
+        image1 = Image.open(uploaded_image1).convert("RGB")
+        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+    
+        image2 = Image.open(uploaded_image2).convert("RGB")
+        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+    
+        # Phát hiện khuôn mặt trên từng ảnh
+        faces1 = face_detector.infer(image1)
+        faces2 = face_detector.infer(image2)
+    
+        # Kiểm tra xem có phát hiện được khuôn mặt không
+        if faces1.shape[0] > 0 and faces2.shape[0] > 0:
+            # Tách khuôn mặt đầu tiên từ mỗi ảnh
+            face_img1 = extract_face(image1, faces1[0])
+            face_img2 = extract_face(image2, faces2[0])
+    
+            # Resize khuôn mặt về cùng kích thước (ví dụ: 112x112)
+            face_img1_resized = cv2.resize(face_img1, (112, 112))
+            face_img2_resized = cv2.resize(face_img2, (112, 112))
+    
+            # So sánh khuôn mặt và lấy điểm tương đồng
+            score = compare_faces(face_img1_resized, face_img2_resized)
+    
+            if score is not None:
+                st.success(f"Similarity Score: {score:.2f}")
+    
+                # Visualize matches
+                matches = [1]  # Giả sử là match để hiển thị
+                scores = [score]
+                matched_image = visualize_matches(image1, faces1, image2, faces2, matches, scores)
+    
+                # Hiển thị ảnh với khuôn mặt được matched
+                st.image(cv2.cvtColor(matched_image, cv2.COLOR_BGR2RGB), caption="Matched Images", use_column_width=True)
+            else:
+                st.warning("Could not compare the images, face extraction failed.")
         else:
-            st.warning("Could not compare the images, face extraction failed.")
-    else:
-        st.warning("No faces detected in one or both images.")
+            st.warning("No faces detected in one or both images.")
 if __name__ == "__main__":
     run_app5()
