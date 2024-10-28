@@ -116,7 +116,7 @@ def extract_face(image):
     resized_image = resize_image(image)
 
     # Cài đặt kích thước đầu vào cho mô hình
-    # face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
+    face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
 
     # Phát hiện khuôn mặt
     faces = face_detector.infer(resized_image)
