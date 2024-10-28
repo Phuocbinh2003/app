@@ -300,16 +300,16 @@ def run_app5():
     """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
     st.header("Compare Portrait and ID Photo")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
-    uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
+uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
-    if uploaded_image1 and uploaded_image2:
-        image1 = Image.open(uploaded_image1).convert("RGB")
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+if uploaded_image1 and uploaded_image2:
+    image1 = Image.open(uploaded_image1).convert("RGB")
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
 
-        image2 = Image.open(uploaded_image2).convert("RGB")
-        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+    image2 = Image.open(uploaded_image2).convert("RGB")
+    image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
-           # Phát hiện khuôn mặt trên từng ảnh
+    # Phát hiện khuôn mặt trên từng ảnh
     faces1 = face_detector.infer(image1)
     faces2 = face_detector.infer(image2)
 
