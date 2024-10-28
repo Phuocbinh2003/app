@@ -210,7 +210,7 @@ def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255
 
     return output, face_bboxes
 
-def resize_image24(image, width=240, height=320):
+def resize_image32(image, width=320, height=320):
     """Resize image to the specified width and height."""
     return cv2.resize(image, (width, height))
     
@@ -308,8 +308,8 @@ def run_app5():
     
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-        img1_resized = resize_image(image1)
-        img2_resized = resize_image(image2)
+        img1_resized = resize_image32(image1)
+        img2_resized = resize_image32(image2)
     
         # Phát hiện khuôn mặt trên từng ảnh
         faces1 = face_detector.infer(img1_resized)
@@ -340,8 +340,8 @@ def run_app5():
             face_img2 = extract_face(image2, faces2[0])
     
             # Resize khuôn mặt về cùng kích thước 
-            face_img1_resized = resize_image(face_img1)
-            face_img2_resized = resize_image(face_img2)
+            face_img1_resized = resize_image32(face_img1)
+            face_img2_resized = resize_image32(face_img2)
     
             # So sánh khuôn mặt đã resize và lấy điểm tương đồng
             score = compare_faces(face_img1_resized, face_img2_resized)
