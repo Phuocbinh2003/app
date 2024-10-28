@@ -308,30 +308,14 @@ def run_app5():
     
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-        img1_resized = resize_image32(image1)
-        img2_resized = resize_image32(image2)
     
-        # Phát hiện khuôn mặt trên từng ảnh
-        faces1 = face_detector.infer(img1_resized)
-        faces2 = face_detector.infer(img2_resized)
+        face_img = extract_face(image1)
+        st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in Portrait Image", use_column_width=True)
     
-        # Hiển thị từng khuôn mặt phát hiện trong ảnh chân dung
-        if faces1.shape[0] > 0:
-            st.subheader("Detected Faces in Portrait Image")
-            for i, face in enumerate(faces1):
-                face_img = extract_face(faces1)
-                st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in Portrait Image", use_column_width=True)
-        else:
-            st.warning("No faces detected in the portrait image.")
     
-        # Hiển thị từng khuôn mặt phát hiện trong ảnh thẻ
-        if faces2.shape[0] > 0:
-            st.subheader("Detected Faces in ID Image")
-            for i, face in enumerate(faces2):
-                face_img = extract_face(faces2)
-                st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in ID Image", use_column_width=True)
-        else:
-            st.warning("No faces detected in the ID image.")
+        face_img = extract_face(image2)
+        st.image(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB), caption=f"Face {i+1} in ID Image", use_column_width=True)
+      
     
         
 if __name__ == "__main__":
