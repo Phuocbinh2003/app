@@ -27,9 +27,11 @@ def run_app1():
     uploaded_image = st.file_uploader("Chọn hoặc kéo ảnh vào ô bên dưới", type=["jpg", "jpeg", "png"])
     
     if uploaded_image is not None:
+        # Mở ảnh và chuyển sang định dạng RGB
+        raw_image = Image.open(uploaded_image).convert("RGB")
+        
         drawing_mode, stroke_width = display_form_draw()
         cols = st.columns(2, gap="large")
-        raw_image = Image.open(uploaded_image)
     
         with cols[0]:
             canvas_result = display_st_canvas(raw_image, drawing_mode, stroke_width)
