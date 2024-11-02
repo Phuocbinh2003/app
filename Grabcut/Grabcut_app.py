@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-def run_app():
+def run_app1():
     init_session_state()
     
     st.title("Ứng dụng tách nền bằng thuật toán GrabCut")
@@ -49,4 +49,4 @@ def run_app():
         st.info("Vui lòng tải lên một bức ảnh để bắt đầu.")
 
 if __name__ == "__main__":
-    run_app()
+    run_app1()
