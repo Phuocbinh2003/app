@@ -43,3 +43,5 @@ def run_app1():
             with cols[1]:
                 result = process_grabcut(raw_image, canvas_result, rects, true_fgs, true_bgs)
                 st.image(result, caption="Ảnh sau khi tách nền", use_column_width="always")
+if __name__ == "__main__":
+    run_app1()
