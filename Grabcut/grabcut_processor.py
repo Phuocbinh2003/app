@@ -22,7 +22,7 @@ def display_guide():
     """)
 
 def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: int):
-    raw_image_rgb = raw_image.convert("RGB")
+    
     w, h = raw_image.size
     width = min(w, 475)
     height = width * h // w
@@ -37,9 +37,9 @@ def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: i
         stroke_color = "rgb(255, 0, 0)"
 
     canvas_result = st_canvas(
-        background_image=raw_image_rgb,
+        background_image=raw_image,
         drawing_mode=mode,
-        fill_color="rgba(255, 255, 0, 0)",
+        fill_color="rgba(0, 0, 0, 0)",
         stroke_width=stroke_width,
         stroke_color=stroke_color,
         width=width + 1,
