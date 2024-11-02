@@ -26,6 +26,8 @@ def display_guide():
 
 # Hiển thị canvas để người dùng vẽ lên ảnh
 def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: int):
+    raw_image_rgb = raw_image.convert("RGB")
+
     w, h = raw_image.size
     width = min(w, 475)
     height = width * h // w
