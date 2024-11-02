@@ -4,7 +4,7 @@ from PIL import Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas, CanvasResult
 
-from Grabcut.Grabcut import grabcut
+from Grabcut.grabcut import grabcut
 
 # Khởi tạo trạng thái
 def init_session_state():
