@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-def run_app1():
+def run_app():
     init_session_state()
     
     st.title("Ứng dụng tách nền bằng thuật toán GrabCut")
@@ -38,10 +38,15 @@ def run_app1():
         if len(rects) < 1:
             st.session_state["result_grabcut"] = None
             st.session_state["final_mask"] = None
-        elif len(rects) > 0:
+            st.warning("Vui lòng vẽ một hình chữ nhật để chọn vùng cần tách nền.")
+        elif len(rects) > 1:
+            st.warning("Chỉ được chọn một vùng cần tách nền.")
+        else:
             with cols[1]:
                 result = process_grabcut(raw_image, canvas_result, rects, true_fgs, true_bgs)
                 st.image(result, caption="Ảnh sau khi tách nền", use_column_width="always")
+    else:
+        st.info("Vui lòng tải lên một bức ảnh để bắt đầu.")
 
 if __name__ == "__main__":
-    run_app1()
+    run_app()
