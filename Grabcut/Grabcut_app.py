@@ -30,19 +30,33 @@ def run_app1():
     
     if uploaded_image is not None:
         with st.container(border=True):
-            drawing_mode, stroke_width = display_form_draw()
-    
+            drawing_mode = "rect"  # Đặt mặc định chế độ vẽ hình chữ nhật
+            stroke_width = 3       # Đặt độ dày nét vẽ mặc định là 3
+
         with st.container(border=True):
             cols = st.columns(2, gap="large")
             raw_image = Image.open(uploaded_image)
     
             with cols[0]:
+                # Kiểm tra nếu đã có hình chữ nhật nào được vẽ
+                rect_drawn = st.session_state.get("rect_drawn", False)
+
+                if rect_drawn:
+                    st.warning("Bạn đã vẽ một hình chữ nhật. Không thể vẽ thêm.")
+                    drawing_mode = "none"  # Vô hiệu hóa chế độ vẽ nếu đã có hình chữ nhật
+
                 canvas_result = display_st_canvas(raw_image, drawing_mode, stroke_width)
                 rects, true_fgs, true_bgs = get_object_from_st_canvas(canvas_result)
-    
+
+                # Cập nhật trạng thái nếu đã vẽ hình chữ nhật
+                if len(rects) > 0:
+                    st.session_state["rect_drawn"] = True
+
+            # Reset trạng thái khi không có hình chữ nhật nào được vẽ
             if len(rects) < 1:
                 st.session_state["result_grabcut"] = None
                 st.session_state["final_mask"] = None
+                st.session_state["rect_drawn"] = False
             elif len(rects) > 1:
                 st.warning("Chỉ được chọn một vùng cần tách nền")
             else:
