@@ -1,13 +1,13 @@
 from PIL import Image
 import streamlit as st
-from components.grabcut import (
+from Grabcut.Grabcut_processor import (
     display_form_draw,
     display_guide,
     display_st_canvas,
     init_session_state,
     process_grabcut,
 )
-from services.grabcut.ultis import get_object_from_st_canvas
+from Grabcut.ultis import get_object_from_st_canvas
 
 init_session_state()
 
