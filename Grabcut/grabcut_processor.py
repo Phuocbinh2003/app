@@ -3,17 +3,14 @@ import numpy as np
 from PIL import Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas, CanvasResult
-
 from Grabcut.grabcut import grabcut
 
-# Khởi tạo trạng thái
 def init_session_state():
     keys = ["final_mask", "result_grabcut"]
     for key in keys:
         if key not in st.session_state:
             st.session_state[key] = None
 
-# Hướng dẫn sử dụng
 def display_guide():
     st.markdown("""
         #### Hướng dẫn sử dụng
@@ -24,10 +21,8 @@ def display_guide():
         5. Ấn nút `Tách nền` để xem kết quả.
     """)
 
-# Hiển thị canvas để người dùng vẽ lên ảnh
 def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: int):
     raw_image_rgb = raw_image.convert("RGB")
-
     w, h = raw_image.size
     width = min(w, 475)
     height = width * h // w
@@ -53,7 +48,6 @@ def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: i
     )
     return canvas_result
 
-# Hiển thị lựa chọn chế độ vẽ và độ dày nét vẽ
 def display_form_draw():
     def format_func(option):
         if option == "rect":
@@ -67,7 +61,6 @@ def display_form_draw():
     stroke_width = cols[1].slider("Độ dày nét vẽ", 1, 10, 2)
     return (drawing_mode, stroke_width)
 
-# Xử lý thuật toán GrabCut
 def process_grabcut(raw_image: Image.Image, st_canvas: CanvasResult, rects: list, true_fgs: list, true_bgs: list):
     orginal_image = np.array(raw_image)
     orginal_image = cv2.cvtColor(orginal_image, cv2.COLOR_RGBA2BGR)
@@ -83,22 +76,16 @@ def process_grabcut(raw_image: Image.Image, st_canvas: CanvasResult, rects: list
     if len(true_fgs) > 0:
         for fg in true_fgs:
             for path in fg["path"]:
-                points = np.array(path[1:])
-                points = (points * scale).astype(int).reshape((-1, 2))
-                if len(points) == 1:
-                    mask = cv2.circle(mask, points[0], fg["strokeWidth"], cv2.GC_FGD, -1)
-                else:
-                    mask = cv2.polylines(mask, [points], False, cv2.GC_FGD, fg["strokeWidth"])
+                points = np.array(path[1:]).reshape((-1, 2))
+                points = (points * scale).astype(int)
+                mask = cv2.polylines(mask, [points], False, cv2.GC_FGD, fg["strokeWidth"])
 
     if len(true_bgs) > 0:
         for bg in true_bgs:
             for path in bg["path"]:
-                points = np.array(path[1:])
-                points = (points * scale).astype(int).reshape((-1, 2))
-                if len(points) == 1:
-                    mask = cv2.circle(mask, points[0], bg["strokeWidth"], cv2.GC_BGD, -1)
-                else:
-                    mask = cv2.polylines(mask, [points], False, cv2.GC_BGD, bg["strokeWidth"])
+                points = np.array(path[1:]).reshape((-1, 2))
+                points = (points * scale).astype(int)
+                mask = cv2.polylines(mask, [points], False, cv2.GC_BGD, bg["strokeWidth"])
 
     result, final_mask = grabcut(
         original_image=orginal_image,
