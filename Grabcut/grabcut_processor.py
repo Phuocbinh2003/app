@@ -42,7 +42,7 @@ def display_st_canvas(raw_image: Image.Image, drawing_mode: str, stroke_width: i
         stroke_color = "rgb(255, 0, 0)"
 
     canvas_result = st_canvas(
-        background_image=raw_image,
+        background_image=raw_image_rgb,
         drawing_mode=mode,
         fill_color="rgba(0, 0, 0, 0)",
         stroke_width=stroke_width,
