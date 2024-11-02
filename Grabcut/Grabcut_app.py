@@ -1,6 +1,6 @@
 from PIL import Image
 import streamlit as st
-from Grabcut.Grabcut_processor import (
+from Grabcut.grabcut_processor import (
     display_form_draw,
     display_guide,
     display_st_canvas,
