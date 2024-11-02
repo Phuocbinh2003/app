@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 
 def grabcut(original_image: np.ndarray, rect: np.ndarray, mask: np.ndarray, mode: int):
-    # Số lần lặp lại để cải thiện chất lượng kết quả
     number_of_iterations = 5
     background_model = np.zeros((1, 65), np.float64)
     foreground_model = np.zeros((1, 65), np.float64)
@@ -17,10 +16,9 @@ def grabcut(original_image: np.ndarray, rect: np.ndarray, mask: np.ndarray, mode
         mode=mode,
     )
 
-    # Tạo mask cuối cùng để hiển thị kết quả
     grabcut_mask = np.where(
         (final_mask == cv2.GC_PR_BGD) | (final_mask == cv2.GC_BGD), 0, 1
     ).astype("uint8")
-    segmented_image = original_image.copy() * grabcut_mask[:, :, np.newaxis]
+    segmented_image = original_image * grabcut_mask[:, :, np.newaxis]
 
     return (segmented_image, final_mask)
