@@ -1,5 +1,5 @@
 import streamlit as st
-from GrabCut_app import run_app1
+from Grabcut.Grabcut_app import run_app1
 from Watershed_Segmentation import run_app2  # Đã sửa tên module không có khoảng trắng
 from app_face_detection import run_app3
 from app_update_firebase import run_app4
