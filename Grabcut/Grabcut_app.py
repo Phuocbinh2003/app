@@ -1,5 +1,5 @@
-from PIL import Image
 import streamlit as st
+from PIL import Image
 from Grabcut.grabcut_processor import (
     display_form_draw,
     display_guide,
@@ -9,14 +9,15 @@ from Grabcut.grabcut_processor import (
 )
 from Grabcut.ultis import get_object_from_st_canvas
 
-init_session_state()
+# Thiết lập cấu hình trang phải đặt ở đầu tiên
+st.set_page_config(
+    page_title="Ứng dụng tách nền bằng thuật toán GrabCut",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 def run_app1():
-    st.set_page_config(
-        page_title="Ứng dụng tách nền bằng thuật toán GrabCut",
-        layout="wide",
-        initial_sidebar_state="expanded",
-    )
+    init_session_state()
     
     st.title("Ứng dụng tách nền bằng thuật toán GrabCut")
     
