@@ -70,7 +70,7 @@ def display_form_draw():
         format_func=format_func,
     )
 
-    stroke_width = cols[1].slider(":material/pen_size_3: Độ dày nét vẽ", 1, 10, 2)
+    stroke_width = 3
 
     return (drawing_mode, stroke_width)
 
