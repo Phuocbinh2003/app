@@ -64,7 +64,7 @@ def run_app6():
     ax1.set_xticks(x)
     ax1.set_xticklabels(df["Shape"], rotation=45, ha="right")
     ax1.set_title("4.1 Đánh giá dựa trên độ đo Precision")
-    ax1.set_xlabel("Shape")
+    ax1.set_xlabel("")
     ax1.set_ylabel("Precision Score")
     ax1.legend()
 
@@ -74,7 +74,7 @@ def run_app6():
     ax2.set_xticks(x)
     ax2.set_xticklabels(df["Shape"], rotation=45, ha="right")
     ax2.set_title("4.2 Đánh giá dựa trên độ đo Recall")
-    ax2.set_xlabel("Shape")
+    ax2.set_xlabel("")
     ax2.set_ylabel("Recall Score")
     ax2.legend()
 
