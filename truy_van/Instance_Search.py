@@ -7,9 +7,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from PIL import Image
 
 # Tải các mô hình và dữ liệu đã lưu
-codebook = joblib.load("models/bovw_codebook.joblib")
-frequency_vectors = joblib.load("models/frequency_vectors.joblib")
-image_paths = joblib.load("models/image_paths.joblib")
+codebook = joblib.load("truy_van/bovw_codebook.joblib")
+frequency_vectors = joblib.load("truy_van/frequency_vectors.joblib")
+image_paths = joblib.load("truy_van/image_paths.joblib")
 
 # Thiết lập SIFT cho việc trích xuất đặc trưng
 sift = cv2.SIFT_create()
