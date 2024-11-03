@@ -18,9 +18,17 @@ k = codebook.shape[0]  # Số lượng visual words
 def extract_bovw_vector(image, codebook, k):
     # Tiền xử lý và trích xuất đặc trưng SIFT từ ảnh đầu vào
     img = np.array(image)
-    img_resized = cv2.resize(img, (200, int(200 * img.shape[0] / img.shape[1])))
-    img_smoothed = cv2.GaussianBlur(img_resized, (5, 5), 0)
-    img_gray = cv2.cvtColor(img_smoothed, cv2.COLOR_BGR2GRAY)
+    
+    # Kiểm tra xem ảnh đã ở dạng màu chưa
+    if len(img.shape) == 3 and img.shape[2] == 3:
+        img_resized = cv2.resize(img, (200, int(200 * img.shape[0] / img.shape[1])))
+        img_smoothed = cv2.GaussianBlur(img_resized, (5, 5), 0)
+        img_gray = cv2.cvtColor(img_smoothed, cv2.COLOR_BGR2GRAY)
+    elif len(img.shape) == 2:  # Ảnh đã ở dạng grayscale
+        img_gray = img
+    else:
+        st.error("Định dạng ảnh không hợp lệ.")
+        return None
     
     # Trích xuất đặc trưng SIFT
     _, descriptors = sift.detectAndCompute(img_gray, None)
@@ -44,7 +52,7 @@ def find_similar_images(query_vector, frequency_vectors, image_paths, top_n=5):
 
 def run_app8():
     # Thiết lập giao diện Streamlit
-    st.title("Image Similarity Search")
+    st.title("Tìm Kiếm Ảnh Tương Tự")
     
     uploaded_file = st.file_uploader("Tải lên một ảnh", type=["jpg", "png", "jpeg"])
     if uploaded_file is not None:
@@ -63,6 +71,7 @@ def run_app8():
                 similar_image = Image.open(img_path)
                 st.image(similar_image, caption=img_path, use_column_width=True)
         else:
-            st.write("Không tìm thấy đặc trưng trong ảnh tải lên.")
+            st.error("Không tìm thấy đặc trưng trong ảnh tải lên.")
+
 if __name__ == "__main__":
     run_app8()
