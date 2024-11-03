@@ -11,9 +11,9 @@ from PIL import Image
 data_directory = "truy_van/test"  # Đảm bảo đường dẫn này là chính xác
 
 # Tải các mô hình và dữ liệu đã lưu
-codebook_path = os.path.join(data_directory, "bovw_codebook.joblib")
-frequency_vectors_path = os.path.join(data_directory, "frequency_vectors.joblib")
-image_paths_path = os.path.join(data_directory, "image_paths.joblib")
+codebook_path = os.path.join(data_directory, "truy_van/bovw_codebook.joblib")
+frequency_vectors_path = os.path.join(data_directory, "truy_van/frequency_vectors.joblib")
+image_paths_path = os.path.join(data_directory, "truy_van/image_paths.joblib")
 
 codebook = joblib.load(codebook_path)
 frequency_vectors = joblib.load(frequency_vectors_path)
