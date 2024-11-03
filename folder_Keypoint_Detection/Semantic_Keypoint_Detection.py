@@ -11,7 +11,7 @@ def run_app6():
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
     st.markdown("Bộ dữ liệu bao gồm tổng cộng 9.028 hình ảnh, mỗi hình đều được gắn kèm các điểm đặc trưng chính xác")
     
-    # Part 2: Introduction to Precision and Recall
+    # Part 2: Introduction to Precision and Recal
     st.header("2. Precision and Recall")
     
     st.markdown("""
