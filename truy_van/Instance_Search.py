@@ -42,24 +42,25 @@ def find_similar_images(query_vector, frequency_vectors, image_paths, top_n=5):
     top_images = [(image_paths[i], similarities[i]) for i in top_indices]
     return top_images
 
-# Thiết lập giao diện Streamlit
-st.title("Image Similarity Search")
-
-uploaded_file = st.file_uploader("Tải lên một ảnh", type=["jpg", "png", "jpeg"])
-if uploaded_file is not None:
-    query_image = Image.open(uploaded_file)
-    st.image(query_image, caption="Ảnh đã tải lên", use_column_width=True)
-
-    # Trích xuất vector BoVW cho ảnh truy vấn
-    query_vector = extract_bovw_vector(query_image, codebook, k)
-    if query_vector is not None:
-        # Tìm ảnh tương tự
-        similar_images = find_similar_images(query_vector, frequency_vectors, image_paths, top_n=5)
-
-        st.write("5 Ảnh Tương Tự Nhất:")
-        for img_path, similarity in similar_images:
-            st.write(f"Độ tương đồng: {similarity:.2f}")
-            similar_image = Image.open(img_path)
-            st.image(similar_image, caption=img_path, use_column_width=True)
-    else:
-        st.write("Không tìm thấy đặc trưng trong ảnh tải lên.")
+def run_app8():
+    # Thiết lập giao diện Streamlit
+    st.title("Image Similarity Search")
+    
+    uploaded_file = st.file_uploader("Tải lên một ảnh", type=["jpg", "png", "jpeg"])
+    if uploaded_file is not None:
+        query_image = Image.open(uploaded_file)
+        st.image(query_image, caption="Ảnh đã tải lên", use_column_width=True)
+    
+        # Trích xuất vector BoVW cho ảnh truy vấn
+        query_vector = extract_bovw_vector(query_image, codebook, k)
+        if query_vector is not None:
+            # Tìm ảnh tương tự
+            similar_images = find_similar_images(query_vector, frequency_vectors, image_paths, top_n=5)
+    
+            st.write("5 Ảnh Tương Tự Nhất:")
+            for img_path, similarity in similar_images:
+                st.write(f"Độ tương đồng: {similarity:.2f}")
+                similar_image = Image.open(img_path)
+                st.image(similar_image, caption=img_path, use_column_width=True)
+        else:
+            st.write("Không tìm thấy đặc trưng trong ảnh tải lên.")
