@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import numpy as np
 import cv2
@@ -6,10 +7,17 @@ from scipy.cluster.vq import vq
 from sklearn.metrics.pairwise import cosine_similarity
 from PIL import Image
 
+# Đường dẫn đến thư mục chứa tệp mô hình và dữ liệu
+data_directory = "truy_van/test"  # Đảm bảo đường dẫn này là chính xác
+
 # Tải các mô hình và dữ liệu đã lưu
-codebook = joblib.load("truy_van/bovw_codebook.joblib")
-frequency_vectors = joblib.load("truy_van/frequency_vectors.joblib")
-image_paths = joblib.load("truy_van/image_paths.joblib")
+codebook_path = os.path.join(data_directory, "bovw_codebook.joblib")
+frequency_vectors_path = os.path.join(data_directory, "frequency_vectors.joblib")
+image_paths_path = os.path.join(data_directory, "image_paths.joblib")
+
+codebook = joblib.load(codebook_path)
+frequency_vectors = joblib.load(frequency_vectors_path)
+image_paths = joblib.load(image_paths_path)
 
 # Thiết lập SIFT cho việc trích xuất đặc trưng
 sift = cv2.SIFT_create()
@@ -18,8 +26,7 @@ k = codebook.shape[0]  # Số lượng visual words
 def extract_bovw_vector(image, codebook, k):
     # Tiền xử lý và trích xuất đặc trưng SIFT từ ảnh đầu vào
     img = np.array(image)
-    
-    # Kiểm tra xem ảnh đã ở dạng màu chưa
+
     if len(img.shape) == 3 and img.shape[2] == 3:
         img_resized = cv2.resize(img, (200, int(200 * img.shape[0] / img.shape[1])))
         img_smoothed = cv2.GaussianBlur(img_resized, (5, 5), 0)
