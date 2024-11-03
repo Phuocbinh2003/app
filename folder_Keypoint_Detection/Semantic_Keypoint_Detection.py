@@ -22,9 +22,12 @@ def run_app6():
     # Precision and Recall Diagram
     img2 = Image.open("folder_Keypoint_Detection/PR.png")
     st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
-
+    
+    st.header("3. ")
+    img1 = Image.open("folder_Keypoint_Detection/download.png")
+    st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
     # Part 3: Precision and Recall Comparison for SIFT and ORB
-    st.header("3. Precision and Recall Comparison for SIFT and ORB")
+    st.header("4. Precision and Recall Comparison for SIFT and ORB")
 
     # Data setup for shapes with SIFT and ORB methods
     data = {
