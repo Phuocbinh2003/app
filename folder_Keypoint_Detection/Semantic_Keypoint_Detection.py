@@ -26,6 +26,13 @@ def run_app6():
     st.header("3. ")
     img1 = Image.open("folder_Keypoint_Detection/download.png")
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
+
+    st.markdown("""
+    Việc xác định các độ đo Precision và Recall của SIFT và ORB trong bài này được thực hiện bằng cách so sánh đặc trưng SIFT và ORB với các đặc trưng thực tế trong tệp points.
+    
+    - **True Positives (TP)**: Số lượng điểm đặc trưng được phát hiện nằm trong một bán kính cho trước từ các điểm đặc trưng thực tế.
+    - **False Positives (FP)**: Số lượng điểm đặc trưng được phát hiện nhưng không khớp với bất kỳ điểm thực tế nào trong bán kính đã định. Nghĩa là, khoảng cách từ điểm được phát hiện đến tất cả các điểm thực tế đều lớn hơn ngưỡng đã đặt.
+    - **False Negatives (FN)**: Số lượng điểm thực tế không có điểm phát hiện nào nằm trong bán kính cho trước xung quanh nó, tức là không có điể
     # Part 3: Precision and Recall Comparison for SIFT and ORB
     st.header("4. Precision and Recall Comparison for SIFT and ORB")
 
