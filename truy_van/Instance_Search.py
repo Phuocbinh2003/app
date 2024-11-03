@@ -8,12 +8,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from PIL import Image
 
 # Đường dẫn đến thư mục chứa tệp mô hình và dữ liệu
-data_directory = "truy_van/test"  # Đảm bảo đường dẫn này là chính xác
+model_directory = "truy_van"  # Đường dẫn đến thư mục chứa mô hình và dữ liệu
+test_directory = os.path.join(model_directory, "test")  # Đường dẫn đến thư mục chứa ảnh thử nghiệm
 
 # Tải các mô hình và dữ liệu đã lưu
-codebook_path = os.path.join(data_directory, "truy_van/bovw_codebook.joblib")
-frequency_vectors_path = os.path.join(data_directory, "truy_van/frequency_vectors.joblib")
-image_paths_path = os.path.join(data_directory, "truy_van/image_paths.joblib")
+codebook_path = os.path.join(model_directory, "bovw_codebook.joblib")
+frequency_vectors_path = os.path.join(model_directory, "frequency_vectors.joblib")
+image_paths_path = os.path.join(model_directory, "image_paths.joblib")
 
 codebook = joblib.load(codebook_path)
 frequency_vectors = joblib.load(frequency_vectors_path)
@@ -74,9 +75,11 @@ def run_app8():
     
             st.write("5 Ảnh Tương Tự Nhất:")
             for img_path, similarity in similar_images:
+                # Kết hợp đường dẫn của ảnh thử nghiệm với đường dẫn đã lưu
+                full_image_path = os.path.join(test_directory, img_path)
                 st.write(f"Độ tương đồng: {similarity:.2f}")
-                similar_image = Image.open(img_path)
-                st.image(similar_image, caption=img_path, use_column_width=True)
+                similar_image = Image.open(full_image_path)
+                st.image(similar_image, caption=full_image_path, use_column_width=True)
         else:
             st.error("Không tìm thấy đặc trưng trong ảnh tải lên.")
 
