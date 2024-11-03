@@ -24,13 +24,7 @@ def run_app6():
     st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
     
     # Công thức cho Precision và Recall
-    st.latex(r"""
-    \text{Precision} = \frac{TP}{TP + FP}
-    """)
-    st.latex(r"""
-    \text{Recall} = \frac{TP}{TP + FN}
-    """)
-    
+ 
 
     
     st.header("3. ")
