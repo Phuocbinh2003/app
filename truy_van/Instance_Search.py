@@ -64,3 +64,5 @@ def run_app8():
                 st.image(similar_image, caption=img_path, use_column_width=True)
         else:
             st.write("Không tìm thấy đặc trưng trong ảnh tải lên.")
+if __name__ == "__main__":
+    run_app8()
