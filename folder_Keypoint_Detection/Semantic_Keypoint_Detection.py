@@ -80,6 +80,19 @@ def run_app6():
 
     # Display the plots in Streamlit
     st.pyplot(fig)
+    st.header("5. Nhận xét")
+    st.markdown(
+    """
+    ### Nhận Xét về SIFT
+    - **Hiệu suất tốt trên một số hình dạng**: SIFT đạt kết quả Precision và Recall cao đối với các hình như `draw_lines`, `draw_star`, và `draw_cube`, nhưng lại cho hiệu suất kém với `draw_ellipses` và `gaussian_noise` (cả Precision và Recall bằng 0).
+    - **Độ ổn định**: SIFT thể hiện độ ổn định với các hình chứa nhiều chi tiết phức tạp, tuy nhiên, quá trình tính toán chậm hơn so với ORB.
+    
+    ### Nhận Xét về ORB
+    - **Hiệu suất đa dạng**: ORB cho kết quả tốt trên các hình như `draw_polygon` và `draw_cube`, nhưng có Precision và Recall thấp ở `draw_stripes` và `gaussian_noise`.
+    - **Tốc độ nhanh hơn SIFT**: ORB là lựa chọn phù hợp khi yêu cầu xử lý nhanh, mặc dù Precision có thể thấp hơn trong một số trường hợp phức tạp.
+    """
 
+          
+      )
 if __name__ == "__main__":
     run_app6()
