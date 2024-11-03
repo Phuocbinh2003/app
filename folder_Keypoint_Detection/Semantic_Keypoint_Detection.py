@@ -27,9 +27,13 @@ def run_app6():
 
     # Dữ liệu cho biểu đồ
     data = {
-        "Method": ["SIFT", "ORB"],
-        "Precision": [0.3411, 0.4075],  # Trung bình của Precision cho SIFT và ORB
-        "Recall": [0.3295, 0.5744]      # Trung bình của Recall cho SIFT và ORB
+        "Method": ["draw_stripes ", "draw_lines ""draw_polygon ", 
+                   "draw_ellipses", "draw_cube", "gaussian_noise ", 
+                   "draw_checkerboard", "draw_star", "draw_multiple_polygons"],
+        "Precision": [0.2004, 0.4995, 0.1429, 0.0000, 0.2513, 0.0000, 0.1498, 0.4431, 0.2646,
+                      0.0934, 0.4135, 0.4172, 0.0000, 0.3446, 0.0000, 0.2075, 0.3706, 0.3307],
+        "Recall": [0.2519, 0.7348, 0.1393, 0.0000, 0.4274, 0.0000, 0.1760, 0.7603, 0.3411,
+                   0.0640, 0.2559, 0.5417, 0.0000, 0.5120, 0.0000, 0.3949, 0.6244, 0.3202]
     }
     
     df = pd.DataFrame(data)
