@@ -19,7 +19,7 @@ def run_app6():
     - **Recall** (hoặc Tỉ lệ phát hiện) là tỉ lệ giữa số lượng dự đoán đúng và tổng số thực sự (True Positives + False Negatives).
     """)
     
-    # Công thức cho Precision và Recal
+    # Công thức cho Precision và Recall
     st.latex(r"""
     \text{Precision} = \frac{TP}{TP + FP}
     """)
@@ -32,7 +32,7 @@ def run_app6():
     st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
 
     # Phần 3: Biểu đồ so sánh độ đo Precision và Recall của SIFT và ORB
-    st.header("3. Precision and Recall Comparison Chart for SIFT and ORB")
+    st.header("3. Precision and Recall Comparison Charts for SIFT and ORB")
 
     # Dữ liệu cho biểu đồ
     data = {
@@ -50,14 +50,22 @@ def run_app6():
     
     df = pd.DataFrame(data)
 
-    # Tạo biểu đồ cột cho Precision và Recall
-    fig, ax = plt.subplots(figsize=(10, 6))
-    df.set_index("Method")[["Precision", "Recall"]].plot(kind='bar', ax=ax)
-    ax.set_title("Precision and Recall for SIFT and ORB")
-    ax.set_ylabel("Score")
-    ax.set_xlabel("Methods")
-    ax.axhline(0, color='grey', lw=1)
-    ax.legend(title='Metrics')
+    # Tạo hai biểu đồ cho Precision và Recall
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+    # Biểu đồ Precision
+    df.set_index("Method")["Precision"].plot(kind='barh', ax=ax1, color='blue')
+    ax1.set_title("Precision for SIFT and ORB")
+    ax1.set_xlabel("Precision Score")
+    ax1.axvline(0, color='grey', lw=1)
+
+    # Biểu đồ Recall
+    df.set_index("Method")["Recall"].plot(kind='barh', ax=ax2, color='orange')
+    ax2.set_title("Recall for SIFT and ORB")
+    ax2.set_xlabel("Recall Score")
+    ax2.axvline(0, color='grey', lw=1)
+
+    # Hiển thị biểu đồ
     st.pyplot(fig)  # Hiển thị biểu đồ trong Streamlit
 
 if __name__ == "__main__":
