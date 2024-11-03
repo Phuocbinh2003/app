@@ -28,8 +28,8 @@ def run_app6():
 
     # Data setup for shapes with SIFT and ORB methods
     data = {
-        "Shape": ["draw_stripes", "draw_lines", "draw_polygon", "draw_ellipses", "draw_cube", 
-                  "gaussian_noise", "draw_checkerboard", "draw_star", "draw_multiple_polygons"],
+        "Shape": ["stripes", "lines", "polygon", "ellipses", "cube", 
+                  "gaussian_noise", "checkerboard", "star", "multiple_polygons"],
         "SIFT_Precision": [0.2004, 0.4995, 0.1429, 0.0000, 0.2513, 0.0000, 0.1498, 0.4431, 0.2646],
         "SIFT_Recall": [0.2519, 0.7348, 0.1393, 0.0000, 0.4274, 0.0000, 0.1760, 0.7603, 0.3411],
         "ORB_Precision": [0.0934, 0.4135, 0.4172, 0.0000, 0.3446, 0.0000, 0.2075, 0.3706, 0.3307],
