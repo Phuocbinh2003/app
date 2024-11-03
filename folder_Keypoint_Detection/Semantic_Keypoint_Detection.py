@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-import cv2
-from PIL import Image
 import matplotlib.pyplot as plt
+from PIL import Image
 
 def run_app6():
     # Phần 1: Synthetic Shapes Dataset
@@ -17,14 +16,6 @@ def run_app6():
     st.markdown("""
     - **Precision** là tỉ lệ giữa số lượng dự đoán đúng (True Positives) và tổng số dự đoán (True Positives + False Positives).
     - **Recall** (hoặc Tỉ lệ phát hiện) là tỉ lệ giữa số lượng dự đoán đúng và tổng số thực sự (True Positives + False Negatives).
-    """)
-    
-    # Công thức cho Precision và Recall
-    st.latex(r"""
-    \text{Precision} = \frac{TP}{TP + FP}
-    """)
-    st.latex(r"""
-    \text{Recall} = \frac{TP}{TP + FN}
     """)
     
     # Hình minh họa Precision và Recall
@@ -54,14 +45,16 @@ def run_app6():
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
     # Biểu đồ Precision
-    df.set_index("Method")["Precision"].plot(kind='barh', ax=ax1, color='blue')
-    ax1.set_title("Precision for SIFT and ORB")
+    df.set_index("Method")["Precision"].plot(kind='barh', ax=ax1, color='orange')  # SIFT là màu cam
+    df.set_index("Method")["Precision"].plot(kind='barh', ax=ax1, color='blue', alpha=0.7)  # ORB là màu xanh
+    ax1.set_title("4.1 Đánh giá dựa trên độ đo Precision")
     ax1.set_xlabel("Precision Score")
     ax1.axvline(0, color='grey', lw=1)
 
     # Biểu đồ Recall
-    df.set_index("Method")["Recall"].plot(kind='barh', ax=ax2, color='orange')
-    ax2.set_title("Recall for SIFT and ORB")
+    df.set_index("Method")["Recall"].plot(kind='barh', ax=ax2, color='orange')  # SIFT là màu cam
+    df.set_index("Method")["Recall"].plot(kind='barh', ax=ax2, color='blue', alpha=0.7)  # ORB là màu xanh
+    ax2.set_title("4.2 Đánh giá dựa trên độ đo Recall")
     ax2.set_xlabel("Recall Score")
     ax2.axvline(0, color='grey', lw=1)
 
