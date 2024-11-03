@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
+import numpy as np
 
 def run_app6():
     # Part 1: Synthetic Shapes Dataset
@@ -22,7 +23,7 @@ def run_app6():
     img2 = Image.open("folder_Keypoint_Detection/PR.png")
     st.image(img2, caption="Precision and Recall Diagram", use_column_width=True)
 
-    # Part 3: Precision and Recall Comparison Charts for SIFT and ORB
+    # Part 3: Precision and Recall Comparison for SIFT and ORB
     st.header("3. Precision and Recall Comparison for SIFT and ORB")
 
     # Data setup for shapes with SIFT and ORB methods
@@ -36,25 +37,33 @@ def run_app6():
     }
     
     df = pd.DataFrame(data)
+    x = np.arange(len(df["Shape"]))  # X-axis locations for shapes
+    width = 0.35  # Width of the bars
 
-    # Create bar charts for Precision and Recall side by side
+    # Create the grouped bar chart for Precision
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-
-    # Precision bar chart
-    ax1.barh(df["Shape"], df["SIFT_Precision"], color='orange', label="SIFT")
-    ax1.barh(df["Shape"], df["ORB_Precision"], color='blue', label="ORB", alpha=0.7)
+    
+    # Precision grouped bars
+    ax1.bar(x - width/2, df["SIFT_Precision"], width, label="SIFT", color='orange')
+    ax1.bar(x + width/2, df["ORB_Precision"], width, label="ORB", color='blue')
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(df["Shape"], rotation=45, ha="right")
     ax1.set_title("4.1 Đánh giá dựa trên độ đo Precision")
-    ax1.set_xlabel("Precision Score")
+    ax1.set_xlabel("Shape")
+    ax1.set_ylabel("Precision Score")
     ax1.legend()
 
-    # Recall bar chart
-    ax2.barh(df["Shape"], df["SIFT_Recall"], color='orange', label="SIFT")
-    ax2.barh(df["Shape"], df["ORB_Recall"], color='blue', label="ORB", alpha=0.7)
+    # Recall grouped bars
+    ax2.bar(x - width/2, df["SIFT_Recall"], width, label="SIFT", color='orange')
+    ax2.bar(x + width/2, df["ORB_Recall"], width, label="ORB", color='blue')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(df["Shape"], rotation=45, ha="right")
     ax2.set_title("4.2 Đánh giá dựa trên độ đo Recall")
-    ax2.set_xlabel("Recall Score")
+    ax2.set_xlabel("Shape")
+    ax2.set_ylabel("Recall Score")
     ax2.legend()
 
-    # Display charts in Streamlit
+    # Display the plots in Streamlit
     st.pyplot(fig)
 
 if __name__ == "__main__":
