@@ -19,7 +19,7 @@ def run_app6():
     - **Recall** (hoặc Tỉ lệ phát hiện) là tỉ lệ giữa số lượng dự đoán đúng và tổng số thực sự (True Positives + False Negatives).
     """)
     
-    # Công thức cho Precision và Recall
+    # Công thức cho Precision và Recal
     st.latex(r"""
     \text{Precision} = \frac{TP}{TP + FP}
     """)
