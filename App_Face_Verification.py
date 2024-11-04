@@ -113,7 +113,7 @@ def extract_face(image):
     # image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     
     # Resize ảnh để phù hợp với kích thước đầu vào của mô hình
-    resized_image = resize_image(image)
+    # resized_image = resize_image(image)
 
     # Cài đặt kích thước đầu vào cho mô hình
     face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
