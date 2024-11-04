@@ -240,7 +240,7 @@ def resize_image32(image, width=320, height=320):
     """Resize image to the specified width and height."""
     return cv2.resize(image, (width, height))
     
-def resize_image(image, target_size=320):
+def resize_image(image, target_size=500):
     h, w, _ = image.shape
     # Check which dimension is larger
     if w > h:
