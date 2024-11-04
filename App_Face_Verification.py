@@ -14,7 +14,7 @@ backend_target_pairs = [
 backend_id = backend_target_pairs[0][0]
 target_id = backend_target_pairs[0][1]
 
-# Instantiate YuNet
+# Instantiate YuNe
 face_detector = YuNet(
     modelPath="Face_Verification/face_detection_yunet_2023mar.onnx",
     inputSize=[320, 320],
