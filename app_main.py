@@ -21,7 +21,7 @@ elif option == 'Watershed_Segmentation':
 elif option == 'Face_detection':
     run_app3()  # Gọi hàm chạy ứng dụng 3
 elif option == 'Update_firebase':
-    st.write("Ứng dụng đang fix.")
+    st.write("Ứng dụng đang fix. Tạm tắt để tránh lỗi toàn cục")
 
 elif option == 'Face_Verification':
     run_app5()  # Gọi hàm chạy ứng dụng 5
