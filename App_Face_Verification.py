@@ -109,11 +109,14 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
 
 def extract_face(image):
     """Tách khuôn mặt từ ảnh sử dụng mô hình YuNet và trả về ảnh khuôn mặt đã cắt ra."""
-    # Chuyển đổi ảnh sang định dạng BGR cho OpenCV
-    # image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    
-    # Resize ảnh để phù hợp với kích thước đầu vào của mô hình
-    resized_image = resize_image(image)
+    # Kích thước mà bạn muốn resize ảnh về trước khi đưa vào mô hình
+    desired_size = (250, 250)
+
+    # Resize ảnh và lưu tỷ lệ thay đổi
+    h_orig, w_orig = image.shape[:2]
+    resized_image = cv2.resize(image, desired_size)
+    scale_x = w_orig / desired_size[0]
+    scale_y = h_orig / desired_size[1]
 
     # Cài đặt kích thước đầu vào cho mô hình
     face_detector.setInputSize([resized_image.shape[1], resized_image.shape[0]])
@@ -128,8 +131,20 @@ def extract_face(image):
     # Lấy bounding box của khuôn mặt đầu tiên
     bbox = faces[0][:4].astype(np.int32)
 
-    # Cắt khuôn mặt từ ảnh gốc
+    # Scale lại tọa độ bounding box để khớp với ảnh gốc
     x, y, w, h = bbox
+    x = int(x * scale_x)
+    y = int(y * scale_y)
+    w = int(w * scale_x)
+    h = int(h * scale_y)
+
+    # Đảm bảo bounding box không vượt quá giới hạn ảnh gốc
+    x = max(0, x)
+    y = max(0, y)
+    w = min(w_orig - x, w)
+    h = min(h_orig - y, h)
+
+    # Cắt khuôn mặt từ ảnh gốc
     face_image = image[y:y + h, x:x + w]
 
     return face_image  # Trả về ảnh khuôn mặt đã cắt ra
