@@ -101,7 +101,7 @@ def run_app3():
         st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
 
     st.title("3. Độ đo IoU")
-    img = Image.open(img_path)
+    img = Image.open("Face_Detection_folder/iou_equation.png")
     st.image(img, caption=f"", use_column_width=True)
 
     
