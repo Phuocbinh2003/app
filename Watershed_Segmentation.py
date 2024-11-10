@@ -120,7 +120,7 @@ def run_app2():
 
 
     st.text("Sử dụng grid_search để tìm kiếm thông số phân đoạn ký tự khá tốt")
-    st.text("Thông số tốt nhất tìm kiếm được là")
+    st.text("**Thông số tốt nhất tìm kiếm được là**")
     st.text("kernel_size = 3 ")
     st.text("distance_thresh_factor = 0.3 ")
     st.text("dilation_iterations = 3")
