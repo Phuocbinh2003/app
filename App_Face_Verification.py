@@ -312,7 +312,7 @@ def draw_bounding_boxes(image, faces):
 def run_app5():
     """Phần 1: Tìm khuôn mặt giống nhất trong thư mục."""
     
-    st.title("Face Recognition - Find Similar Faces in a Class")
+    st.title("1: Tìm thông tin khuôn mặt trong lớp")
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
@@ -337,7 +337,7 @@ def run_app5():
             st.error(f"Folder '{folder_path}' does not exist.")
 
     """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
-    st.header("Compare Portrait and ID Photo")
+    st.header("So sánh ảnh chân dung và ảnh thẻ")
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
