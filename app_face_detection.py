@@ -93,7 +93,8 @@ def run_app3():
     # Part 2: Display training results and vector image
      st.title("2. Dataset test")
     face_image_paths = [
-        'Face_Detection_folder/FACE1.png', 
+        'Face_Detection_folder/face_data1.png', 
+        'Face_Detection_folder/face_data2.png',
     ]  # Add your actual image paths here
     for img_path in face_image_paths:
         img = Image.open(img_path)
