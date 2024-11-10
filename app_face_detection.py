@@ -71,7 +71,7 @@ def sliding_window_haar_detect(img, model, window_size=(24, 24)):
     return boxes
 
 def run_app3():
-    st.title("Face and Non-Face Data")
+    st.title("1.Face and Non-Face Data")
     
     # Part 1: Display face and non-face images
     st.subheader("Face Images")
@@ -91,6 +91,15 @@ def run_app3():
         st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
     # Part 2: Display training results and vector image
+     st.title("2. Dataset test")
+    face_image_paths = [
+        'Face_Detection_folder/FACE1.png', 
+    ]  # Add your actual image paths here
+    for img_path in face_image_paths:
+        img = Image.open(img_path)
+        st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
+
+    
     st.title("Training Results")
     st.subheader("Vector Image")
     vector_image_paths = [
