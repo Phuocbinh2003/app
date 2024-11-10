@@ -5,7 +5,7 @@ import joblib
 import streamlit as st
 from PIL import Image
 
-# Function to compute Haar feature
+# Function to compute Haar featur
 def haar_features(img):
     integral_img = cv2.integral(img)
     haar_features = []
