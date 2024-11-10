@@ -135,7 +135,15 @@ def run_app3():
     for img_path in vector_image_paths:
         img = Image.open(img_path)
         st.image(img, caption="Vector Image", use_column_width=True)
+    st.write("""
+        - Haar Features là các đặc trưng hình ảnh được tính toán bằng cách thực hiện các phép toán tích phân giữa các vùng sáng và tối trong ảnh.
+        - Vector đặc trưng là một đại diện số học của ảnh, được xây dựng từ các giá trị của Haar Features và có thể được sử dụng cho các thuật toán phân loại như KNN.
+        - KNN được thử nghiệm với nhiều giá trị tham số k khác nhau để tìm ra giá trị k tối ưu.
+    """)
 
+
+
+    
     st.subheader("Training Chart")
     chart_image_paths = [
         'Face_Detection_folder/bieu_do.png'
