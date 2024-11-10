@@ -102,7 +102,25 @@ def run_app3():
 
     st.title("3. Độ đo IoU")
     img = Image.open("Face_Detection_folder/iou_equation.png")
-    st.image(img, caption=f"", use_column_width=True)
+    st.image(img, caption="Độ đo IoU và công thức tính toán", use_column_width=True)
+    st.write("""
+        Độ đo **IoU (Intersection over Union)** là một chỉ số quan trọng trong các bài toán phát hiện và nhận diện đối tượng, dùng để đánh giá mức độ chồng lắp giữa hai hộp bao (bounding boxes): hộp dự đoán và hộp thực tế. IoU được tính bằng tỷ lệ diện tích giao nhau giữa hai hộp so với diện tích hợp nhất của chúng.
+    
+        Công thức tính IoU:
+    
+        \\[ \\text{IoU} = \\frac{\\text{Diện tích giao nhau}}{\\text{Diện tích hợp nhất}} \\]
+    
+        Trong đó:
+        - **Diện tích giao nhau** là phần diện tích mà hai hộp bao trùng nhau.
+        - **Diện tích hợp nhất** là tổng diện tích của hai hộp trừ đi diện tích giao nhau.
+    
+        IoU có giá trị từ 0 đến 1:
+        - **IoU = 0**: Không có phần giao nhau nào giữa hai hộp.
+        - **IoU = 1**: Hai hộp trùng khớp hoàn toàn.
+    
+        Trong thực tế, một ngưỡng IoU (thường là 0.5 hoặc 0.7) được đặt ra để xác định xem một dự đoán có chính xác hay không. Nếu IoU giữa hộp dự đoán và hộp thực tế lớn hơn ngưỡng này, dự đoán được coi là đúng.
+    """)
+
 
     
     st.title("Training Results")
