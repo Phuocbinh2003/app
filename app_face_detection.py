@@ -145,11 +145,15 @@ def run_app3():
         st.image(img, caption="Training Chart", use_column_width=True)
 
     # Part 3: Display final result
-    st.title("Final Result")
-    result_image_path = 'Face_Detection_folder/kq_face.png'  # Add your actual image path here
+    st.title("Kết quả")
+    result_image_path = 'Face_Detection_folder/kq.png'  # Add your actual image path here
     result_image = Image.open(result_image_path)
     st.image(result_image, caption="Detection Result", use_column_width=True)
 
+
+
+
+    
     st.title("Face Detection Application")
     st.write("Upload an image to detect faces.")
 
