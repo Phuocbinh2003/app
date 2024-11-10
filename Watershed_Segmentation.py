@@ -63,50 +63,61 @@ def apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iteration
 def run_app2():
     st.title('✨ Ứng dụng phân đoạn ký tự biển số ✨')
 
-    # Đường dẫn tới các hình ảnh phần 1
-    step_image_path_1 = "my_folder/Buoc_test1.png"
-    result_image_path_1 = "my_folder/KQ_test1.png"
-
-    step_image_path_2 = "my_folder/Buoc_test2.png"
-    result_image_path_2 = "my_folder/KQ_test2.png"
+    # Đường dẫn tới các hình ảnh phần 
 
     # Phần 1: Hiển thị cho 2 cặp ảnh đầu tiên (theo hàng dọc)
     st.header("1. Ảnh Train và Kết quả")
 
-    st.write("### Các bước Watershed")
-    if os.path.exists(step_image_path_1):
-        img_step_1 = cv.imread(step_image_path_1)
-        if img_step_1 is not None:
-            st.image(img_step_1, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_1}")
+   
+    img_step_1 = cv.imread("my_folder/train_test.png")
+    st.image(img_step_1, caption='', use_column_width=True)
+  
+     st.header("1. Ảnh Train và Kết quả")
 
-    st.write("### Kết quả 1")
-    if os.path.exists(result_image_path_1):
-        img_result_1 = cv.imread(result_image_path_1)
-        if img_result_1 is not None and img_step_1 is not None:
-            img_result_1_resized = resize_image(img_result_1, img_step_1.shape[0])
-            st.image(img_result_1_resized, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_1}")
+   
+    img_step_1 = cv.imread("my_folder/cb.png")
+    st.image(img_step_1, caption='', use_column_width=True)
+st.write("""
+1. **Chuyển ảnh sang ảnh xám và nhị phân (Otsu thresholding):**
 
-    st.write("### Các bước Watershed")
-    if os.path.exists(step_image_path_2):
-        img_step_2 = cv.imread(step_image_path_2)
-        if img_step_2 is not None:
-            st.image(img_step_2, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_2}")
+    Ảnh đầu vào được chuyển sang ảnh xám để dễ dàng xử lý. Sau đó, sử dụng phương pháp thresholding Otsu để chuyển ảnh xám thành ảnh nhị phân. Phương pháp này giúp phân biệt rõ các đối tượng với nền trong ảnh.
 
-    st.write("### Kết quả 2")
-    if os.path.exists(result_image_path_2):
-        img_result_2 = cv.imread(result_image_path_2)
-        if img_result_2 is not None and img_step_2 is not None:
-            img_result_2_resized = resize_image(img_result_2, img_step_2.shape[0])
-            st.image(img_result_2_resized, caption='Kết quả', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_2}")
+2. **Áp dụng phép mở rộng (Dilation):**
 
+    Phép mở rộng được áp dụng với một kernel hình vuông để làm tăng kích thước của các đối tượng trong ảnh nhị phân. Mục tiêu là làm mịn các biên và tăng cường các đối tượng nhỏ.
+
+3. **Tính toán Distance Transform:**
+
+    Sử dụng hàm `cv.distanceTransform` để tính toán ảnh distance transform. Quá trình này giúp xác định khoảng cách từ các pixel nền tới các biên giới của các đối tượng, tạo ra một bản đồ thể hiện độ xa của mỗi điểm từ biên.
+
+4. **Ngưỡng hóa Distance Transform:**
+
+    Áp dụng ngưỡng (thresholding) trên ảnh distance transform với một hệ số (`distance_thresh_factor`) để xác định vùng foreground (đối tượng) chắc chắn. Vùng này sẽ được phân loại là các đối tượng trong ảnh.
+
+    Tiếp theo, dùng phép giãn nở (dilation) để tạo ra ảnh background, giúp xác định các vùng nền trong ảnh.
+
+5. **Tìm vùng chưa biết (Unknown regions):**
+
+    Vùng chưa biết được xác định bằng cách lấy hiệu giữa background và foreground chắc chắn. Những vùng này chưa thể xác định rõ là đối tượng hay nền, nên sẽ được đánh dấu là vùng chưa biết.
+
+6. **Tạo markers cho Watershed:**
+
+    Sử dụng hàm `cv.connectedComponents` để tạo các markers từ vùng foreground chắc chắn. Các vùng chưa biết được gán giá trị marker là 0, còn vùng background được gán giá trị là 1. Các markers này sẽ được sử dụng trong thuật toán Watershed.
+
+7. **Áp dụng thuật toán Watershed:**
+
+    Thuật toán Watershed được áp dụng với các markers đã tạo. Thuật toán này phân chia ảnh thành các vùng khác nhau dựa trên các marker, giúp tách các đối tượng trong ảnh. Biên của các vùng sẽ được đánh dấu bằng màu đỏ `[0, 0, 255]`.
+
+8. **Tìm các contours và hiển thị kết quả:**
+
+    Sử dụng hàm `cv.findContours` để tìm các contours trong ảnh đã qua dilation. Các contours này đại diện cho các biên của các đối tượng trong ảnh.
+
+    Sau đó, lọc các contours theo kích thước (chiều cao và chiều rộng) để chỉ giữ lại những đối tượng có kích thước hợp lý. Kết quả là một ảnh với các ký tự màu trắng trên nền đen, thể hiện các đối tượng đã được phân vùng. Ảnh này sẽ được hiển thị với matplotlib.
+""")
+
+
+
+ 
     # Đường dẫn tới các hình ảnh phần 2 (chỉ 2 ảnh)
     step_image_path_3 = "my_folder/KQ1.png"
     result_image_path_3 = "my_folder/KQ2.png"
