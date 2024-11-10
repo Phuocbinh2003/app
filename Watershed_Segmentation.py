@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import os
 
-# Hàm để resize ảnh sao cho chiều cao của chúng bằng nhau
+# Hàm để resize ảnh sao cho chiều cao của chúng bằng nha
 def resize_image(image, target_height):
     h, w = image.shape[:2]
     scaling_factor = target_height / h
