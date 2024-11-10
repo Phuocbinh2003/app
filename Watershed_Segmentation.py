@@ -77,43 +77,43 @@ def run_app2():
    
     img_step_1 = cv.imread("my_folder/cb.png")
     st.image(img_step_1, caption='', use_column_width=True)
-st.write("""
-1. **Chuyển ảnh sang ảnh xám và nhị phân (Otsu thresholding):**
-
-    Ảnh đầu vào được chuyển sang ảnh xám để dễ dàng xử lý. Sau đó, sử dụng phương pháp thresholding Otsu để chuyển ảnh xám thành ảnh nhị phân. Phương pháp này giúp phân biệt rõ các đối tượng với nền trong ảnh.
-
-2. **Áp dụng phép mở rộng (Dilation):**
-
-    Phép mở rộng được áp dụng với một kernel hình vuông để làm tăng kích thước của các đối tượng trong ảnh nhị phân. Mục tiêu là làm mịn các biên và tăng cường các đối tượng nhỏ.
-
-3. **Tính toán Distance Transform:**
-
-    Sử dụng hàm `cv.distanceTransform` để tính toán ảnh distance transform. Quá trình này giúp xác định khoảng cách từ các pixel nền tới các biên giới của các đối tượng, tạo ra một bản đồ thể hiện độ xa của mỗi điểm từ biên.
-
-4. **Ngưỡng hóa Distance Transform:**
-
-    Áp dụng ngưỡng (thresholding) trên ảnh distance transform với một hệ số (`distance_thresh_factor`) để xác định vùng foreground (đối tượng) chắc chắn. Vùng này sẽ được phân loại là các đối tượng trong ảnh.
-
-    Tiếp theo, dùng phép giãn nở (dilation) để tạo ra ảnh background, giúp xác định các vùng nền trong ảnh.
-
-5. **Tìm vùng chưa biết (Unknown regions):**
-
-    Vùng chưa biết được xác định bằng cách lấy hiệu giữa background và foreground chắc chắn. Những vùng này chưa thể xác định rõ là đối tượng hay nền, nên sẽ được đánh dấu là vùng chưa biết.
-
-6. **Tạo markers cho Watershed:**
-
-    Sử dụng hàm `cv.connectedComponents` để tạo các markers từ vùng foreground chắc chắn. Các vùng chưa biết được gán giá trị marker là 0, còn vùng background được gán giá trị là 1. Các markers này sẽ được sử dụng trong thuật toán Watershed.
-
-7. **Áp dụng thuật toán Watershed:**
-
-    Thuật toán Watershed được áp dụng với các markers đã tạo. Thuật toán này phân chia ảnh thành các vùng khác nhau dựa trên các marker, giúp tách các đối tượng trong ảnh. Biên của các vùng sẽ được đánh dấu bằng màu đỏ `[0, 0, 255]`.
-
-8. **Tìm các contours và hiển thị kết quả:**
-
-    Sử dụng hàm `cv.findContours` để tìm các contours trong ảnh đã qua dilation. Các contours này đại diện cho các biên của các đối tượng trong ảnh.
-
-    Sau đó, lọc các contours theo kích thước (chiều cao và chiều rộng) để chỉ giữ lại những đối tượng có kích thước hợp lý. Kết quả là một ảnh với các ký tự màu trắng trên nền đen, thể hiện các đối tượng đã được phân vùng. Ảnh này sẽ được hiển thị với matplotlib.
-""")
+    st.write("""
+    1. **Chuyển ảnh sang ảnh xám và nhị phân (Otsu thresholding):**
+    
+        Ảnh đầu vào được chuyển sang ảnh xám để dễ dàng xử lý. Sau đó, sử dụng phương pháp thresholding Otsu để chuyển ảnh xám thành ảnh nhị phân. Phương pháp này giúp phân biệt rõ các đối tượng với nền trong ảnh.
+    
+    2. **Áp dụng phép mở rộng (Dilation):**
+    
+        Phép mở rộng được áp dụng với một kernel hình vuông để làm tăng kích thước của các đối tượng trong ảnh nhị phân. Mục tiêu là làm mịn các biên và tăng cường các đối tượng nhỏ.
+    
+    3. **Tính toán Distance Transform:**
+    
+        Sử dụng hàm `cv.distanceTransform` để tính toán ảnh distance transform. Quá trình này giúp xác định khoảng cách từ các pixel nền tới các biên giới của các đối tượng, tạo ra một bản đồ thể hiện độ xa của mỗi điểm từ biên.
+    
+    4. **Ngưỡng hóa Distance Transform:**
+    
+        Áp dụng ngưỡng (thresholding) trên ảnh distance transform với một hệ số (`distance_thresh_factor`) để xác định vùng foreground (đối tượng) chắc chắn. Vùng này sẽ được phân loại là các đối tượng trong ảnh.
+    
+        Tiếp theo, dùng phép giãn nở (dilation) để tạo ra ảnh background, giúp xác định các vùng nền trong ảnh.
+    
+    5. **Tìm vùng chưa biết (Unknown regions):**
+    
+        Vùng chưa biết được xác định bằng cách lấy hiệu giữa background và foreground chắc chắn. Những vùng này chưa thể xác định rõ là đối tượng hay nền, nên sẽ được đánh dấu là vùng chưa biết.
+    
+    6. **Tạo markers cho Watershed:**
+    
+        Sử dụng hàm `cv.connectedComponents` để tạo các markers từ vùng foreground chắc chắn. Các vùng chưa biết được gán giá trị marker là 0, còn vùng background được gán giá trị là 1. Các markers này sẽ được sử dụng trong thuật toán Watershed.
+    
+    7. **Áp dụng thuật toán Watershed:**
+    
+        Thuật toán Watershed được áp dụng với các markers đã tạo. Thuật toán này phân chia ảnh thành các vùng khác nhau dựa trên các marker, giúp tách các đối tượng trong ảnh. Biên của các vùng sẽ được đánh dấu bằng màu đỏ `[0, 0, 255]`.
+    
+    8. **Tìm các contours và hiển thị kết quả:**
+    
+        Sử dụng hàm `cv.findContours` để tìm các contours trong ảnh đã qua dilation. Các contours này đại diện cho các biên của các đối tượng trong ảnh.
+    
+        Sau đó, lọc các contours theo kích thước (chiều cao và chiều rộng) để chỉ giữ lại những đối tượng có kích thước hợp lý. Kết quả là một ảnh với các ký tự màu trắng trên nền đen, thể hiện các đối tượng đã được phân vùng. Ảnh này sẽ được hiển thị với matplotlib.
+    """)
 
 
 
