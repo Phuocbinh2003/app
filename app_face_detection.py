@@ -100,6 +100,10 @@ def run_app3():
         img = Image.open(img_path)
         st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
 
+    st.title("3. Độ đo IoU")
+    img = Image.open(img_path)
+    st.image(img, caption=f"", use_column_width=True)
+
     
     st.title("Training Results")
     st.subheader("Vector Image")
