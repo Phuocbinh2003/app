@@ -312,7 +312,7 @@ def draw_bounding_boxes(image, faces):
 def run_app5():
     """Phần 1: Tìm khuôn mặt giống nhất trong thư mục."""
     
-    st.title("1: Tìm thông tin khuôn mặt trong lớp")
+    st.title("Tìm thông tin khuôn mặt trong lớp")
 
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
