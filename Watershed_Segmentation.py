@@ -117,35 +117,8 @@ def run_app2():
 
 
 
- 
-    # Đường dẫn tới các hình ảnh phần 2 (chỉ 2 ảnh)
-    step_image_path_3 = "my_folder/KQ1.png"
-    result_image_path_3 = "my_folder/KQ2.png"
-    st.text("Sử dụng grid_search để tìm kiếm thông số phân đoạn ký tự khá tốt")
-    st.text("Thông số tốt nhất tìm kiếm được là")
-    st.text("kernel_size = 3 ")
-    st.text("distance_thresh_factor = 0.3 ")
-    st.text("dilation_iterations = 3")
 
-    # Phần 2: Hiển thị cho 1 cặp ảnh tiếp theo (theo hàng dọc)
-    st.header("2. Ảnh Test và Kết quả")
 
-    st.write("### Kết quả 1")
-    if os.path.exists(step_image_path_3):
-        img_step_3 = cv.imread(step_image_path_3)
-        if img_step_3 is not None:
-            st.image(img_step_3, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {step_image_path_3}")
-
-    st.write("### Kết quả 2")
-    if os.path.exists(result_image_path_3):
-        img_result_3 = cv.imread(result_image_path_3)
-        if img_result_3 is not None and img_step_3 is not None:
-            img_result_3_resized = resize_image(img_result_3, img_step_3.shape[0])
-            st.image(img_result_3_resized, caption='', use_column_width=True)
-    else:
-        st.error(f"Không tìm thấy ảnh: {result_image_path_3}")
 
     # Phần 3: Tải ảnh lên và phân đoạn ký tự
     st.sidebar.header("Tùy chỉnh tham số Watershed")
@@ -154,7 +127,7 @@ def run_app2():
     dilation_iterations = st.sidebar.slider("Số lần Dilation", min_value=1, max_value=10, value=3, step=1)
 
     # Phần 3: Tải ảnh lên và phân đoạn ký tự
-    st.header("3. Tải ảnh lên và phân đoạn ký tự")
+    st.header("2. Tải ảnh lên và phân đoạn ký tự")
     
     uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
     
