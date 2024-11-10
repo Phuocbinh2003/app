@@ -91,7 +91,7 @@ def run_app3():
         st.image(img, caption=f"Non-Face Image: {img_path}", use_column_width=True)
 
     # Part 2: Display training results and vector image
-     st.title("2. Dataset test")
+    st.title("2. Dataset test")
     face_image_paths = [
         'Face_Detection_folder/face_data1.png', 
         'Face_Detection_folder/face_data2.png',
