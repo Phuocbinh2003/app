@@ -72,6 +72,18 @@ def run_app8():
     st.title("1.Phương pháp")
     img = Image.open('truy_van/anh_buoc.png')
     st.image(img, caption=f"", use_column_width=True)
+    st.write("""
+    Các bước chính trong quy trình nhận diện hình ảnh bao gồm:
+    
+    **Bước 1:** Chuyển đổi ảnh màu sang ảnh xám để giảm độ phức tạp và tập trung vào các đặc trưng quan trọng.
+    
+    **Bước 2:** Sử dụng hai phương pháp phát hiện đặc trưng mạnh mẽ là SIFT và ORB để tìm ra các điểm đặc trưng quan trọng trong ảnh.
+    
+    **Bước 3:** Lọc ra các đặc trưng mà cả hai mô hình SIFT và ORB đều nhận diện được, đảm bảo tính chính xác cao trong việc nhận diện.
+    
+    **Bước 4:** So sánh các đặc trưng đã chọn với ảnh trong thư mục để tìm ra sự trùng khớp, từ đó xác định đối tượng cần truy vấn.
+    """)
+
 
     st.title("Tìm Kiếm Ảnh Tương Tự(Trái cây)")
     
