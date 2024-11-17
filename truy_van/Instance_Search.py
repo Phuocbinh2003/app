@@ -60,6 +60,14 @@ def find_similar_images(query_vector, frequency_vectors, image_paths, top_n=5):
 
 def run_app8():
     # Thiết lập giao diện Streamlit
+     st.title("1.Dữ liệu truy vấn")
+    
+
+    img = Image.open(img_path)
+    st.image(img, caption=f"Face Image: {img_path}", use_column_width=True)
+
+
+
     st.title("Tìm Kiếm Ảnh Tương Tự(Trái cây)")
     
     uploaded_file = st.file_uploader("Tải lên một ảnh", type=["jpg", "png", "jpeg"])
