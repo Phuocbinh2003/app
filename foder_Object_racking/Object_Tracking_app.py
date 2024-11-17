@@ -16,7 +16,7 @@ def run_app9():
     st.title("2. Ví dụ minh họa")
     
     # Đường dẫn video có sẵn trong thư mục
-    video_path = "videos/your_video.mp4"  # Thay thế 'your_video.mp4' bằng tên video của bạn trong thư mục 'videos'
+    video_path = "foder_Object_racking/Untitled video - Made with Clipchamp.mp4"  # Thay thế 'your_video.mp4' bằng tên video của bạn trong thư mục 'videos'
     
     # Kiểm tra xem video có tồn tại hay không
     if os.path.exists(video_path):
