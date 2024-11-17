@@ -5,7 +5,7 @@ import os
 
 
 def run_app9():
-    # Tiêu đề của ứng dụng
+    # Tiêu đề của ứng dụn
     st.title("1. Object Tracking Using KCF")
     
     st.markdown("""
