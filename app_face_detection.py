@@ -57,7 +57,7 @@ def resize_image(image, target_size=100):
 def sliding_window_haar_detect(img, model, window_size=(24, 24)):
     height, width = img.shape
     boxes = []
-    step = 1  # Slide step of 1 pixel
+    step = 5  # Slide step of 1 pixel
 
     for y in range(0, height - window_size[1] + 1, step):
         for x in range(0, width - window_size[0] + 1, step):
@@ -122,7 +122,7 @@ def run_app3():
         - **IoU = 0**: Không có phần giao nhau nào giữa hai hộp.
         - **IoU = 1**: Hai hộp trùng khớp hoàn toàn.
     
-        Trong thực tế, một ngưỡng IoU (thường là 0.5 hoặc 0.7) được đặt ra để xác định xem một dự đoán có chính xác hay không. Nếu IoU giữa hộp dự đoán và hộp thực tế lớn hơn ngưỡng này, dự đoán được coi là đúng.
+        Trong thực tế, một ngưỡng IoU  được đặt ra để xác định xem một dự đoán có chính xác hay không. Nếu IoU giữa hộp dự đoán và hộp thực tế lớn hơn ngưỡng này, dự đoán được coi là đúng.
     """)
     
 
@@ -146,7 +146,7 @@ def run_app3():
     
     st.subheader("Training Chart")
     chart_image_paths = [
-        'Face_Detection_folder/bieu_do.png'
+        'Face_Detection_folder/Bieudo.png'
     ]  # Add your actual image paths here
     for img_path in chart_image_paths:
         img = Image.open(img_path)
