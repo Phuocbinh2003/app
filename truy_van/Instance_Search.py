@@ -69,7 +69,9 @@ def run_app8():
     Với sự đa dạng về hình ảnh, tập dữ liệu "Fruit 360" giúp cải thiện độ chính xác của các mô hình nhận diện hình ảnh trong môi trường thực tế.
     """)
 
-
+    st.title("1.Phương pháp")
+    img = Image.open('truy_van/anh_buoc.png')
+    st.image(img, caption=f"", use_column_width=True)
 
     st.title("Tìm Kiếm Ảnh Tương Tự(Trái cây)")
     
