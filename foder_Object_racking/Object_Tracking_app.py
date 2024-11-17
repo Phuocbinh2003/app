@@ -4,7 +4,7 @@ import os
 
 
 
-def app9():
+def run_app9():
     # Tiêu đề của ứng dụng
     st.title("1. Object Tracking Using KCF")
     
