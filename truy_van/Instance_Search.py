@@ -63,6 +63,11 @@ def run_app8():
     st.title("1.Dữ liệu truy vấn")
     img = Image.open('truy_van/data.png')
     st.image(img, caption=f"Dữ liệu trái cây", use_column_width=True)
+    st.write("""
+    Tập dữ liệu "Fruit 360" trên Kaggle là một bộ sưu tập hình ảnh chứa 36 loại trái cây khác nhau.
+
+    Với sự đa dạng về hình ảnh, tập dữ liệu "Fruit 360" giúp cải thiện độ chính xác của các mô hình nhận diện hình ảnh trong môi trường thực tế.
+    """)
 
 
 
