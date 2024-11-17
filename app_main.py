@@ -7,10 +7,12 @@ from App_Face_Verification import run_app5
 from folder_Keypoint_Detection.Semantic_Keypoint_Detection import run_app6
 from folder_SuperPoint_Rotation.app_superpoint_rotation import run_app7
 from truy_van.Instance_Search import run_app8
+from 
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation','Instance_Search')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation','Instance_Search'
+    ,'OpenCV_Object_Tracking')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
@@ -31,5 +33,7 @@ elif option == 'SuperPoint_Rotation':
     run_app7()  # Gọi hàm chạy ứng dụng 
 elif option == 'Instance_Search':
     run_app8()  # Gọi hàm chạy ứng dụng 
+elif option == 'OpenCV_Object_Tracking':
+    run_app9()  # Gọi hàm chạy ứng dụng 
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
