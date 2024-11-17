@@ -4,7 +4,7 @@ import os
 
 
 
-def app8():
+def app9():
     # Tiêu đề của ứng dụng
     st.title("1. Object Tracking Using KCF")
     
@@ -42,4 +42,4 @@ def app8():
         Các giải pháp có thể bao gồm việc tăng tốc độ xử lý thuật toán hoặc sử dụng các tracker mạnh mẽ hơn có thể theo dõi đối tượng trong các điều kiện chuyển động nhanh.
     """)
 if __name__ == "__main__":
-    run_app8()
+    run_app9()
