@@ -151,6 +151,12 @@ def run_app3():
     for img_path in chart_image_paths:
         img = Image.open(img_path)
         st.image(img, caption="Training Chart", use_column_width=True)
+    st.write("""
+    ### Kết quả sau khi huấn luyện:
+    
+    - **Tham số k tốt nhất:** 10  
+    - **Average IoU tốt nhất:** 0.151906
+    """)
 
     # Part 3: Display final resul
     st.title("Kết quả")
