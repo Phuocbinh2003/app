@@ -11,7 +11,7 @@ from foder_Object_racking.Object_Tracking_app import run_app9
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Update_firebase','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation','Instance_Search'
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation','Instance_Search'
     ,'OpenCV_Object_Tracking')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
@@ -22,8 +22,8 @@ elif option == 'Watershed_Segmentation':
     run_app2()  # Gọi hàm chạy ứng dụng 2
 elif option == 'Face_detection':
     run_app3()  # Gọi hàm chạy ứng dụng 3
-elif option == 'Update_firebase':
-    st.write("Ứng dụng đang fix. Tạm tắt để tránh lỗi toàn cục")
+# elif option == 'Update_firebase':
+#     st.write("Ứng dụng đang fix. Tạm tắt để tránh lỗi toàn cục")
 
 elif option == 'Face_Verification':
     run_app5()  # Gọi hàm chạy ứng dụng 5
