@@ -18,23 +18,25 @@ def run_app9():
     ### Công thức của KCF:
 
     1. **Cập nhật bộ lọc (Filter Update):**
+    Bộ lọc được tối ưu hóa bằng cách sử dụng công thức sau:
     \[
-    \hat{f}(x) = \text{argmin}_f \sum_i || \mathcal{K}(x_i, f) - \mathcal{I}_i ||^2 + \lambda ||f||^2
+    \hat{f}(x) = \argmin_f \sum_i \left\| \mathcal{K}(x_i, f) - \mathcal{I}_i \right\|^2 + \lambda \left\| f \right\|^2
     \]
     Trong đó:
     - \( \mathcal{K}(x_i, f) \) là sự tương quan giữa vị trí \( x_i \) trong hình ảnh và bộ lọc \( f \).
-    - \( \mathcal{I}_i \) là các đặc trưng được trích xuất từ hình ảnh.
-    - \( \lambda \) là tham số điều chỉnh độ phức tạp của bộ lọc.
-
-    2. **Sử dụng kernel để tính toán đặc trưng:**
+    - \( \mathcal{I}_i \) là các đặc trưng được trích xuất từ hình ảnh tại vị trí \( i \).
+    - \( \lambda \) là tham số điều chỉnh độ phức tạp của bộ lọc và tránh overfitting.
+    
+    2. **Sử dụng kernel để tính toán đặc trưng (Kernel Computation):**
+    Để tính toán đặc trưng giữa các điểm \( x \) và \( y \) trong không gian hình ảnh, ta sử dụng công thức:
     \[
     \mathcal{K}(x, y) = \phi(x)^\top \phi(y)
     \]
     Trong đó:
-    - \( \phi(x) \) và \( \phi(y) \) là các hàm ánh xạ đặc trưng của điểm \( x \) và \( y \).
-
+    - \( \phi(x) \) và \( \phi(y) \) là các hàm ánh xạ đặc trưng của điểm \( x \) và \( y \), giúp đưa các điểm trong không gian hình ảnh về một không gian đặc trưng có chiều cao hơn.
+    
     3. **Tính toán vị trí đối tượng trong các frame kế tiếp:**
-    Khi bộ lọc đã được huấn luyện từ các frame trước đó, thuật toán sẽ tính toán vị trí của đối tượng trong frame tiếp theo bằng cách tìm điểm có giá trị cao nhất trong ma trận kết quả của phép tương quan.
+    Sau khi huấn luyện bộ lọc từ các frame trước, thuật toán sẽ tính toán vị trí của đối tượng trong frame tiếp theo bằng cách tìm điểm có giá trị cao nhất trong ma trận kết quả của phép tương quan giữa bộ lọc và các vùng trong hình ảnh.
 
     Thuật toán này mang lại hiệu suất tốt trong nhiều tình huống với các đối tượng di chuyển chậm hoặc thay đổi hình dạng không quá lớn.
     """)
