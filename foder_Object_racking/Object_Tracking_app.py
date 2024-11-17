@@ -2,8 +2,6 @@ import streamlit as st
 import cv2
 import os
 
-
-
 def run_app9():
     # Tiêu đề của ứng dụn
     st.title("1. Object Tracking Using KCF")
@@ -73,5 +71,6 @@ def run_app9():
     st.markdown("""
         **Lưu ý**: KCF có thể gặp khó khăn trong việc theo dõi khi đối tượng bị che khuất hoàn toàn, có sự thay đổi lớn về ánh sáng, hoặc di chuyển quá nhanh.
     """)
+    
 if __name__ == "__main__":
     run_app9()
