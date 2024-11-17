@@ -62,7 +62,7 @@ def run_app8():
     # Thiết lập giao diện Streamlit
     st.title("1.Dữ liệu truy vấn")
     img = Image.open('truy_van/data.png')
-    st.image(img, caption=f"Dữ liệu trái cây: {img_path}", use_column_width=True)
+    st.image(img, caption=f"Dữ liệu trái cây", use_column_width=True)
 
 
 
