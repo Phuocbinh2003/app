@@ -152,7 +152,7 @@ def run_app3():
         img = Image.open(img_path)
         st.image(img, caption="Training Chart", use_column_width=True)
 
-    # Part 3: Display final result
+    # Part 3: Display final resul
     st.title("Kết quả")
     result_image_path = 'Face_Detection_folder/kq.png'  # Add your actual image path here
     result_image = Image.open(result_image_path)
