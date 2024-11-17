@@ -4,7 +4,7 @@ import os
 
 
 
-def app9():
+def app8():
     # Tiêu đề của ứng dụng
     st.title("1. Object Tracking Using KCF")
     
@@ -41,3 +41,5 @@ def app9():
     - **Fast Motion**: Đối tượng di chuyển quá nhanh có thể khiến thuật toán không kịp cập nhật vị trí chính xác.
         Các giải pháp có thể bao gồm việc tăng tốc độ xử lý thuật toán hoặc sử dụng các tracker mạnh mẽ hơn có thể theo dõi đối tượng trong các điều kiện chuyển động nhanh.
     """)
+if __name__ == "__main__":
+    run_app8()
