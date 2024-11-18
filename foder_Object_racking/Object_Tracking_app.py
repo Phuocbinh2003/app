@@ -17,9 +17,7 @@ def run_app9():
 
     1. **Cập nhật bộ lọc (Filter Update):**
     Bộ lọc được tối ưu hóa bằng cách sử dụng công thức sau:
-    $$
-    \hat{f}(x) = \argmin_f \sum_i \left\| \mathcal{K}(x_i, f) - \mathcal{I}_i \right\|^2 + \lambda \left\| f \right\|^2
-    $$
+    $$\\hat{f}(x) = \\arg\\min_f \\sum_i \\left\\| \\mathcal{K}(x_i, f) - \\mathcal{I}_i \\right\\|^2 + \\lambda \\left\\| f \\right\\|^2$$
     Trong đó:
     - $ \mathcal{K}(x_i, f) $ là sự tương quan giữa vị trí $ x_i $ trong hình ảnh và bộ lọc $ f $.
     - $ \mathcal{I}_i $ là các đặc trưng được trích xuất từ hình ảnh tại vị trí $ i $.
