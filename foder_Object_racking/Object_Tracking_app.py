@@ -5,7 +5,9 @@ import os
 def run_app9():
     # Tiêu đề của ứng dụn
     st.title("1. Object Tracking Using KCF")
-    
+    st.latex(r"""
+    \hat{f} = \arg\min_f \sum_i \left\| \mathcal{K}(x_i, f) - y_i \right\|^2 + \lambda \|f\|^2
+    """)
     st.markdown("""
     **KCF (Kernelized Correlation Filters)** là một thuật toán mạnh mẽ trong việc theo dõi đối tượng. 
     KCF sử dụng kỹ thuật kernel để cải thiện hiệu suất và độ chính xác, đặc biệt trong các tình huống có sự thay đổi trong đối tượng và nền.
@@ -17,9 +19,7 @@ def run_app9():
 
     1. **Cập nhật bộ lọc (Filter Update):**
     Bộ lọc được tối ưu hóa bằng cách sử dụng công thức sau:
-    $$
-    \hat{f}(x) = \arg \min_f \sum_i \left\| \mathcal{K}(x_i, f) - \mathcal{I}_i \right\|^2 + \lambda \left\| f \right\|^2
-    $$
+   
 
     - $ \mathcal{K}(x_i, f) $ là sự tương quan giữa vị trí $ x_i $ trong hình ảnh và bộ lọc $ f $.
     - $ \mathcal{I}_i $ là các đặc trưng được trích xuất từ hình ảnh tại vị trí $ i $.
