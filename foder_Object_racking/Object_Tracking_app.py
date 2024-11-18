@@ -57,17 +57,31 @@ def run_app9():
     st.title("3. Thảo luận")
     
     st.write("""
-        Dưới đây là một số thách thức mà thuật toán KCF có thể gặp phải trong quá trình theo dõi đối tượng:
+    ### Các thách thức chính của thuật toán KCF
     
-        - **Background Clutters**: Khi nền chứa nhiều chuyển động hoặc đối tượng không liên quan, thuật toán có thể bị nhiễu và không nhận diện đúng đối tượng. KCF cần cải thiện khả năng phân biệt giữa đối tượng và các yếu tố nền.
+    1. **Nhiễu nền (Background Clutters):**
+       - Khi nền chứa nhiều đối tượng chuyển động hoặc phức tạp, thuật toán dễ bị nhiễu.
+       - Đối tượng có thể bị nhầm lẫn với các yếu tố không liên quan, đặc biệt trong môi trường đông đúc.
     
-        - **Illumination Variations**: Sự thay đổi ánh sáng mạnh trong video có thể làm thay đổi hình dạng và đặc trưng của đối tượng, làm cho việc theo dõi gặp khó khăn. Để khắc phục, cần có các phương pháp xử lý ánh sáng hoặc sử dụng các thuật toán khử nhiễu.
+    2. **Thay đổi ánh sáng (Illumination Variations):**
+       - Sự thay đổi mạnh về ánh sáng có thể làm biến dạng đặc trưng của đối tượng.
+       - Giải pháp: Sử dụng các thuật toán xử lý trước như cân bằng sáng hoặc khử nhiễu.
     
-        - **Occlusion**: Khi đối tượng bị che khuất bởi các đối tượng khác, KCF có thể mất dấu và không thể theo dõi chính xác. Đây là một trong những thách thức lớn nhất trong việc theo dõi đối tượng thực tế.
+    3. **Bị che khuất (Occlusion):**
+       - Khi đối tượng bị các vật khác che khuất, KCF thường mất dấu hoặc theo dõi sai.
+       - Đây là thách thức lớn, đặc biệt trong các video thực tế có nhiều vật cản.
     
-        - **Fast Motion**: Nếu đối tượng di chuyển quá nhanh, thuật toán có thể không kịp cập nhật vị trí chính xác. Điều này có thể dẫn đến việc mất dấu đối tượng hoặc theo dõi sai vị trí.
+    4. **Chuyển động nhanh (Fast Motion):**
+       - Nếu đối tượng di chuyển quá nhanh giữa các khung hình, thuật toán không kịp cập nhật.
+       - Điều này có thể dẫn đến sai lệch vị trí hoặc mất dấu đối tượng.
+    
+    ### Giải pháp tiềm năng:
+    - **Cải thiện thuật toán:** Kết hợp KCF với các kỹ thuật hiện đại như Deep Learning hoặc Optical Flow.
+    - **Tăng cường dữ liệu:** Sử dụng dữ liệu đa dạng với nhiều tình huống che khuất và thay đổi ánh sáng để huấn luyện mô hình tốt hơn.
+    - **Xử lý trước:** Áp dụng các bước xử lý hình ảnh để làm nổi bật đặc trưng của đối tượng và giảm nhiễu từ nền.
+    
     """)
-    
+        
     # Footer
     st.markdown("""
         **Lưu ý**: KCF có thể gặp khó khăn trong việc theo dõi khi đối tượng bị che khuất hoàn toàn, có sự thay đổi lớn về ánh sáng, hoặc di chuyển quá nhanh.
