@@ -59,7 +59,7 @@ def run_app7():
     # superpoint_imagebd = Image.open(superpoint_image_pathbd)
     # st.image(superpoint_imagebd, caption="Biểu đồ SuperPoint", use_column_width=True)
     # st.write("Với SuperPoint, số lượng đặc trưng phát hiện và số đặc trưng tương đồng duy trì ổn định qua các biến đổi xoay.")
-
+    st.subheader("Đang sửa")
 # Chạy ứng dụng
 if __name__ == "__main__":
     run_app7()
