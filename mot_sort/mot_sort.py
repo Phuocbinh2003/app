@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Function to display the introduction section
+# Function to display the introduction sectio
 def display_introduction():
     st.header("1. Giới thiệu")
     st.write(
