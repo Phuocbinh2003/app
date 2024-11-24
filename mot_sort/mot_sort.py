@@ -86,13 +86,18 @@ def display_method():
         """
         Hungarian Algorithm là một thuật toán tối ưu để giải bài toán ghép nối. Trong SORT, nó được sử dụng để ghép nối 
         các bounding box dự đoán và bounding box phát hiện dựa trên ma trận chi phí $C$, với:
-        \[
-        C_{ij} = 1 - \text{IoU}(B_i, B_j)
-        \]
+        """
+    )
+    st.latex(r"""
+    C_{ij} = 1 - \text{IoU}(B_i, B_j)
+    """)
+    st.write(
+        """
         - $C_{ij}$: Chi phí giữa bounding box $B_i$ (dự đoán) và $B_j$ (phát hiện).  
         - $\text{IoU}$: Intersection over Union giữa hai bounding box.
         """
     )
+
 
     st.subheader("2.3. Cập nhật trạng thái")
     st.write(
