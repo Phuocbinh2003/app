@@ -66,9 +66,9 @@ def display_method():
         Kalman Filter là một thuật toán ước tính trạng thái của một hệ thống động lực tuyến tính. Trong SORT, trạng thái của đối tượng được biểu diễn dưới dạng:
         """
         st.latex(r"""
-        \[
+        
         x = [u, v, s, r, \dot{u}, \dot{v}, \dot{s}]^T
-        \]
+      
         """)
     st.write(
         """
