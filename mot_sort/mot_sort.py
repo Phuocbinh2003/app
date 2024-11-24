@@ -7,7 +7,7 @@ def display_introduction():
 
     with cols[1]:
         st.image(
-            "MOT-SORT/sort.png",
+            "mot_sort/sort.png",
             use_column_width=True,
             caption=(
                 "Đánh giá hiệu suất của SORT so với các thuật toán khác trong MOTChallenge 2015. "
@@ -48,7 +48,7 @@ def display_method():
     )
 
     st.columns([1, 8, 1])[1].image(
-        "MOT-SORT/buoc_sort.png",
+        "mot_sort/buoc_sort.png",
         use_column_width=True,
         caption="Minh họa hoạt động của SORT (Nguồn: Improved sheep identification and tracking algorithm based on YOLOv5 + SORT methods).",
     )
@@ -88,7 +88,7 @@ def display_visualization():
     st.write(
         "- Dưới đây là video minh họa kết quả theo dõi đối tượng bằng thuật toán **SORT** kết hợp với mô hình phát hiện người đi bộ **YOLO**:"
     )
-    st.video("MOT-SORT/video.mp4")
+    st.video("mot_sort/video.mp4")
     st.write(
         """
         - Trong video, bạn có thể quan sát các ID được gán cho từng đối tượng trong khung hình.  

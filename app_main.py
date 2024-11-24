@@ -8,7 +8,7 @@ from folder_Keypoint_Detection.Semantic_Keypoint_Detection import run_app6
 from folder_SuperPoint_Rotation.app_superpoint_rotation import run_app7
 from truy_van.Instance_Search import run_app8
 from foder_Object_racking.Object_Tracking_app import run_app9
-from MOT-SORT.mot_sort import run_app10
+from mot_sort.mot_sort import run_app10
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
