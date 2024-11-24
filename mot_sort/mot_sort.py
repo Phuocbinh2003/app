@@ -62,24 +62,24 @@ def display_method():
 
     st.subheader("2.1. Kalman Filter")
     st.write(
-        """
-        Kalman Filter là một thuật toán ước tính trạng thái của một hệ thống động lực tuyến tính. Trong SORT, trạng thái của đối tượng được biểu diễn dưới dạng:
-        """
-        st.latex(r"""
-        
-        x = [u, v, s, r, \dot{u}, \dot{v}, \dot{s}]^T
-      
-        """)
+    """
+    Kalman Filter là một thuật toán ước tính trạng thái của một hệ thống động lực tuyến tính. Trong SORT, trạng thái của đối tượng được biểu diễn dưới dạng:
+    """
+    )
+    st.latex(r"""
+    x = [u, v, s, r, \dot{u}, \dot{v}, \dot{s}]^T
+    """)
     st.write(
         """
         - $(u, v)$: Tọa độ trung tâm bounding box.  
         - $s$: Diện tích bounding box.  
         - $r$: Tỷ lệ khung hình (width/height).  
         - $(\dot{u}, \dot{v}, \dot{s})$: Tốc độ thay đổi tương ứng.
-
+    
         Kalman Filter dự đoán vị trí tiếp theo dựa trên trạng thái hiện tại và cập nhật khi có dữ liệu mới.
         """
     )
+
 
     st.subheader("2.2. Hungarian Algorithm")
     st.write(
