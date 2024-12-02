@@ -126,7 +126,7 @@ def display_visualization():
         """
         ### Quan sát từ video:
         - SORT duy trì ID khá tốt khi đối tượng di chuyển thông thường.  
-        - Khi đối tượng bị che khuất hoặc tạm thời rời khỏi khung hình, ID của nó có thể bị thay thế bởi ID mới khi nó quay trở lại.  
+        - Khi đối tượng bị che khuất hoặc tạm thời rời khỏi khung hình, ID của nó có thể bị thay thế bởi ID mới khi nó quay trở lại(giây 12).  
         Đây là một trong những hạn chế lớn của thuật toán SORT.
         """
     )
