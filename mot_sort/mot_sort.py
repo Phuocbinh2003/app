@@ -40,6 +40,8 @@ def display_introduction():
 
 # Function to display the method section
 def display_method():
+    img = Image.open('mot_sort/buoc_sort.png')
+    st.image(img, caption=f"", use_column_width=True)
     st.header("2. Phương pháp hoạt động")
     st.write(
         """
