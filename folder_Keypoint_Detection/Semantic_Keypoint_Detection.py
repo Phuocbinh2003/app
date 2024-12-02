@@ -27,7 +27,7 @@ def run_app6():
  
 
     
-    st.header("3. ")
+    st.header("3. Phương pháp")
     img1 = Image.open("folder_Keypoint_Detection/download.png")
     st.image(img1, caption="Synthetic Shapes Dataset Example", use_column_width=True)
 
