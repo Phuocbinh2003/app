@@ -1,4 +1,5 @@
 import streamlit as st
+from PIL import Image
 
 # Function to display the introduction sectio
 def display_introduction():
@@ -42,8 +43,8 @@ def display_introduction():
 def display_method():
     
     st.header("2. Phương pháp hoạt động")
-    # img = Image.open('mot_sort/buoc_sort.png')
-    # st.image(img, caption=f"", use_column_width=True)
+    img = Image.open('mot_sort/buoc_sort.png')
+    st.image(img, caption=f"", use_column_width=True)
     st.write(
         """
         SORT thuộc nhóm thuật toán **tracking-by-detection**, nghĩa là nó dựa vào các bounding box do mô hình phát hiện 
