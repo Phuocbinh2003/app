@@ -171,7 +171,7 @@ if uploaded_image is not None:
     if params_changed:
         # Gọi lại apply_watershed với tham số mới
         st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
-
+        st.write(f"- **Kernel Size**: {kernel_size}")
         # Cập nhật giá trị tham số cũ
         st.session_state.prev_kernel_size = kernel_size
         st.session_state.prev_distance_thresh_factor = distance_thresh_factor
