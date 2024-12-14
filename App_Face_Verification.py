@@ -293,6 +293,7 @@ def compare_faces(image1, image2, target_size=[512, 512]):
     
     # Đọc ảnh và chuyển sang định dạng BGR
     image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+    image1=resize_image(image1)
 
     image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
 
