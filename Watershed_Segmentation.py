@@ -133,15 +133,25 @@ def run_app2():
 
     # Tải ảnh lên
 st.header("2. Tải ảnh lên và phân đoạn ký tự")
+
+# Khởi tạo các giá trị mặc định trong session_state nếu chưa tồn tại
+if "processed_result" not in st.session_state:
+    st.session_state.processed_result = None
+if "prev_kernel_size" not in st.session_state:
+    st.session_state.prev_kernel_size = None
+if "prev_distance_thresh_factor" not in st.session_state:
+    st.session_state.prev_distance_thresh_factor = None
+if "prev_dilation_iterations" not in st.session_state:
+    st.session_state.prev_dilation_iterations = None
+
 uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
 
-# Nếu ảnh được tải lên
 if uploaded_image is not None:
     img = np.array(Image.open(uploaded_image))
     st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
 
-    # Nếu chưa có processed_result trong session_state, xử lý ảnh ban đầu
-    if "processed_result" not in st.session_state:
+    # Nếu kết quả chưa được xử lý ban đầu, hoặc đây là ảnh mới
+    if st.session_state.processed_result is None:
         st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
         st.session_state.prev_kernel_size = kernel_size
         st.session_state.prev_distance_thresh_factor = distance_thresh_factor
@@ -150,7 +160,7 @@ if uploaded_image is not None:
     # Hiển thị kết quả ban đầu
     st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
 
-    # Kiểm tra xem có thay đổi tham số không
+    # Kiểm tra thay đổi tham số
     params_changed = (
         kernel_size != st.session_state.prev_kernel_size or
         distance_thresh_factor != st.session_state.prev_distance_thresh_factor or
@@ -166,7 +176,7 @@ if uploaded_image is not None:
         st.session_state.prev_distance_thresh_factor = distance_thresh_factor
         st.session_state.prev_dilation_iterations = dilation_iterations
 
-        # Hiển thị kết quả sau khi thay đổi tham số
+        # Hiển thị kết quả đã cập nhật
         st.image(st.session_state.processed_result, caption="Kết quả Watershed (đã cập nhật)", use_column_width=True)
 
 if __name__ == "__main__":
