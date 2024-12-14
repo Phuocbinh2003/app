@@ -185,7 +185,7 @@ def find_similar_faces(uploaded_image, folder_path):
     image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
     # Resize the uploaded image for detection
-    image1_resized = resize_image(image1_bgr)  # Resize uploaded image
+    #image1_resized = resize_image(image1_bgr)  # Resize uploaded image
     face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
     
     # Detect faces in the resized image
@@ -267,11 +267,13 @@ def resize_image(image, target_size=250):
     resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
     return resized_image
+    
 def read_student_info(filename, folder_path):
     txt_file_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.txt")
     with open(txt_file_path, "r", encoding="utf-8") as txt_file:
         student_info = txt_file.read()
     return student_info
+    
 def compare_faces(image1, image2):
     # Assuming face_detector is already defined and loaded
     face_detector.setInputSize([image1.shape[1], image1.shape[0]])
@@ -358,6 +360,7 @@ def run_app5():
             st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
         else:
             st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+        
       
     
         
