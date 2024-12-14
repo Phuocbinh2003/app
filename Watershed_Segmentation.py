@@ -153,35 +153,24 @@ def run_app2():
     if uploaded_image is not None:
         img = np.array(Image.open(uploaded_image))
         st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
-    
-        # Nếu kết quả chưa được xử lý ban đầu, hoặc đây là ảnh mới
-        if st.session_state.processed_result is None:
-            st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
-            st.session_state.prev_kernel_size = kernel_size
-            st.session_state.prev_distance_thresh_factor = distance_thresh_factor
-            st.session_state.prev_dilation_iterations = dilation_iterations
-    
-        # Hiển thị kết quả ban đầu
-        st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
-    
-        # Kiểm tra thay đổi tham số
+
+        # Kiểm tra sự thay đổi tham số
         params_changed = (
             kernel_size != st.session_state.prev_kernel_size or
             distance_thresh_factor != st.session_state.prev_distance_thresh_factor or
             dilation_iterations != st.session_state.prev_dilation_iterations
         )
-    
-        if params_changed:
-            # Gọi lại apply_watershed với tham số mới
-            #st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
-            
-            # Cập nhật giá trị tham số cũ
+
+        if params_changed or st.session_state.processed_result is None:
+            # Áp dụng Watershed với tham số mới
+            st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
+            # Cập nhật tham số cũ
             st.session_state.prev_kernel_size = kernel_size
             st.session_state.prev_distance_thresh_factor = distance_thresh_factor
             st.session_state.prev_dilation_iterations = dilation_iterations
-    
-            # Hiển thị kết quả đã cập nhật
-            st.image(apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations), caption="Kết quả Watershed (đã cập nhật)", use_column_width=True)
+
+        # Hiển thị kết quả đã cập nhật
+        st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
 
 if __name__ == "__main__":
     run_app2()
