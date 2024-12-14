@@ -362,7 +362,7 @@ def run_app5():
         image2 = Image.open(uploaded_image2).convert("RGB")
         
         # Gọi hàm để so sánh khuôn mặt
-        result_image = compare_faces(image1, image2, face_detector, face_recognizer)
+        result_image = compare_faces(image1, image2)
     
         # Kiểm tra kết quả trả về từ hàm compare_faces
         if isinstance(result_image, str):  # Nếu là chuỗi, có thể là thông báo lỗi
