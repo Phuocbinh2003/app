@@ -33,27 +33,6 @@ face_recognizer = SFace(
     targetId=target_id
 )
 
-def calculate_similarity(faces1, faces2):
-    """
-    Tính toán điểm tương đồng giữa hai danh sách các khuôn mặt.
-
-    Args:
-        faces1: Danh sách các đặc trưng khuôn mặt từ hình ảnh đầu tiên.
-        faces2: Danh sách các đặc trưng khuôn mặt từ hình ảnh thứ hai.
-
-    Returns:
-        Điểm tương đồng giữa hai hình ảnh (0 đến 1), hoặc None nếu không có khuôn mặt nào.
-    """
-    if len(faces1) == 0 or len(faces2) == 0:
-        return None  # Trả về None nếu không có khuôn mặt nào được phát hiện
-
-    # Giả sử faces chứa các vector đặc trưng khuôn mặt
-    # Tính toán Euclidean Distance
-    # Chỉ cần so sánh khuôn mặt đầu tiên của mỗi danh sách
-    distance = np.linalg.norm(faces1[0] - faces2[0])  # Tính khoảng cách Euclidean
-    similarity = 1 / (1 + distance)  # Chuyển đổi khoảng cách thành điểm tương đồng
-
-    return similarity
 
 def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]): # target_size: (h, w)
     out1 = img1.copy()
@@ -297,6 +276,51 @@ def draw_bounding_boxes(image, faces):
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
     return image
 
+def compare_faces(image1, image2, target_size=[512, 512]):
+    """
+    So sánh khuôn mặt giữa hai ảnh và vẽ kết quả lên ảnh.
+
+    Args:
+    - image1_path: Đường dẫn đến ảnh đầu tiên.
+    - image2_path: Đường dẫn đến ảnh thứ hai.
+    - face_detector: Mô hình nhận diện khuôn mặt (YuNet).
+    - face_recognizer: Mô hình nhận diện khuôn mặt cho việc so sánh (SFace).
+    - target_size: Kích thước mục tiêu để thay đổi kích thước ảnh.
+
+    Returns:
+    - image: Ảnh kết quả với các hộp giới hạn khuôn mặt và điểm số so sánh.
+    """
+    
+    # Đọc ảnh và chuyển sang định dạng BGR
+    image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
+
+    image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
+
+    # Nhận diện khuôn mặt từ ảnh 1
+    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
+    faces1 = face_detector.infer(image1)
+    
+    # Nhận diện khuôn mặt từ ảnh 2
+    face_detector.setInputSize([image2.shape[1], image2.shape[0]])
+    faces2 = face_detector.infer(image2)
+
+    # Nếu không phát hiện khuôn mặt, trả về cảnh báo
+    if len(faces1) == 0 or len(faces2) == 0:
+        return "Không tìm thấy khuôn mặt trong ít nhất một ảnh. Vui lòng thử lại."
+
+    # So sánh khuôn mặt giữa ảnh 1 và ảnh 2 bằng SFace
+    scores = []
+    matches = []
+    for face in faces2:
+        # So sánh với khuôn mặt đầu tiên từ ảnh 1
+        result = face_recognizer.match(image1, faces1[0][:-1], image2, face[:-1])  # So sánh khuôn mặt
+        scores.append(result[0])
+        matches.append(result[1])
+
+    # Vẽ các hộp giới hạn và kết quả lên ảnh
+    image = visualize_matches(image1, faces1, image2, faces2, matches, scores, target_size)
+    
+    return image
 
 
 
@@ -333,12 +357,20 @@ def run_app5():
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
     if uploaded_image1 and uploaded_image2:
+        # Đọc ảnh và chuyển đổi thành định dạng PIL
         image1 = Image.open(uploaded_image1).convert("RGB")
-        image1 = cv2.cvtColor(np.array(image1), cv2.COLOR_RGB2BGR)
-    
         image2 = Image.open(uploaded_image2).convert("RGB")
-        image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
         
+        # Gọi hàm để so sánh khuôn mặt
+        result_image = compare_faces(image1, image2, face_detector, face_recognizer)
+    
+        # Kiểm tra kết quả trả về từ hàm compare_faces
+        if isinstance(result_image, str):  # Nếu là chuỗi, có thể là thông báo lỗi
+            st.error(result_image)
+        else:
+            st.image(result_image, caption="Kết quả so sánh khuôn mặt", use_column_width=True)
+
+                  
         # face_img1 = extract_face(image1)
         # if face_img1 is not None:
         #     st.image(cv2.cvtColor(face_img1, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
@@ -351,20 +383,7 @@ def run_app5():
         # else:
         #     st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
         
-        face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-        faces1 = face_detector.infer(image1)
-        
-        face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-        faces2 = face_detector.infer(image2)
-        scores = []
-        matches = []
-        for face in faces2:
-            result = face_recognizer.match(image1, faces1[0][:-1], image2, face[:-1])
-            scores.append(result[0])
-            matches.append(result[1])
-        
-        # Draw results
-        image = visualize_matches(image1, faces1, image2, faces2, matches, scores)
+       
         
     
         
