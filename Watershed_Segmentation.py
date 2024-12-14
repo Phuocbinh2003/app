@@ -133,6 +133,7 @@ def run_app2():
 
     # Tải ảnh lên
 st.header("2. Tải ảnh lên và phân đoạn ký tự")
+uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
 
 # Khởi tạo các giá trị mặc định trong session_state nếu chưa tồn tại
 if "processed_result" not in st.session_state:
