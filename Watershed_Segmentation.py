@@ -12,7 +12,7 @@ def resize_image(image, target_height):
     resized_image = cv.resize(image, (new_width, target_height))
     return resized_image
 
-# Hàm để áp dụng Watershed
+# Hàm để áp dụng Watershe
 def apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations):
     # Resize ảnh về 500x400
     img = cv.resize(img, (500, 400))
