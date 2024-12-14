@@ -72,7 +72,7 @@ def run_app2():
 
    
     img_step_1 = cv.imread("my_folder/train_test.png")
-    st.image(img_step_1, caption='', use_column_width=True)
+    st.image(img_step_1, caption='', use_container_width =True)
   
     st.header("2. Các bước của Watershed")
 
