@@ -350,9 +350,15 @@ def run_app5():
         else:
             st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
 
-        resize_image(face_img1)
-        resize_image(face_img2)
-        st.write(f"{calculate_similarity(face_img1, face_img2)}")
+        scores = []
+        matches = []
+        for face in face_img2:
+            result = face_recognizer.match(image1, face_img1[0][:-1], image2, face[:-1])
+            scores.append(result[0])
+            matches.append(result[1])
+
+        # Draw results
+        image = visualize_matches(image1, face_img1, image2, face_img2, matches, scores)
         
     
         
