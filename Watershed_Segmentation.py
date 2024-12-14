@@ -14,6 +14,7 @@ def resize_image(image, target_height):
 
 # Hàm để áp dụng Watershe
 def apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations):
+    print(f"Kernel size: {kernel_size}, Distance thresh factor: {distance_thresh_factor}, Dilation iterations: {dilation_iterations}")
     # Resize ảnh về 500x400
     img = cv.resize(img, (500, 400))
 
@@ -172,7 +173,7 @@ def run_app2():
         if params_changed:
             # Gọi lại apply_watershed với tham số mới
             st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
-            st.write(f"- **Kernel Size**: {kernel_size}")
+            
             # Cập nhật giá trị tham số cũ
             st.session_state.prev_kernel_size = kernel_size
             st.session_state.prev_distance_thresh_factor = distance_thresh_factor
