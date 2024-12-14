@@ -144,7 +144,7 @@ def run_app2():
         st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
 
         # Chỉ gọi lại Watershed nếu slider thay đổi
-        if (
+       if (
             st.session_state.get("prev_kernel_size") != kernel_size or
             st.session_state.get("prev_distance_thresh_factor") != distance_thresh_factor or
             st.session_state.get("prev_dilation_iterations") != dilation_iterations or
@@ -156,12 +156,19 @@ def run_app2():
             st.session_state.prev_dilation_iterations = dilation_iterations
             st.session_state.prev_uploaded_image = uploaded_image
 
+            # Thông báo thay đổi và gọi Watershed
+            st.text("Thông số đã thay đổi! Đang xử lý Watershed...")
+
             # Gọi Watershed và lưu kết quả
             st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
 
+        else:
+            st.text("Không có sự thay đổi nào!")
+
         # Hiển thị kết quả phân đoạn
         if st.session_state.processed_result is not None:
-            st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
-
+            st.image(st.session_state.processed_result, caption="Kết quả phân đoạn Watershed", use_column_width=True)
+        else:
+            st.text("Không có kết quả phân đoạn!")
 if __name__ == "__main__":
     run_app2()
