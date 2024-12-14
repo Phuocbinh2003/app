@@ -129,9 +129,9 @@ def run_app2():
     # Phần 3: Tải ảnh lên và phân đoạn ký tự
         # Tùy chỉnh tham số Watershed
     st.sidebar.header("Tùy chỉnh tham số Watershed")
-    kernel_size = st.sidebar.slider("Kích thước kernel", min_value=1, max_value=15, value=3, step=1)
+    kernel_size = st.sidebar.slider("Kích thước kernel", min_value=1, max_value=15, value=1, step=1)
     distance_thresh_factor = st.sidebar.slider("Ngưỡng Distance Transform", min_value=0.1, max_value=1.0, value=0.3, step=0.1)
-    dilation_iterations = st.sidebar.slider("Số lần Dilation", min_value=1, max_value=10, value=3, step=1)
+    dilation_iterations = st.sidebar.slider("Số lần Dilation", min_value=1, max_value=10, value=1, step=1)
 
     # Tải ảnh lên
     st.header("2. Tải ảnh lên và phân đoạn ký tự")
