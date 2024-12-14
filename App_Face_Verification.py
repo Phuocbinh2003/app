@@ -176,53 +176,66 @@ def extract_face_the_sv(image):
     return face_image  # Trả về ảnh khuôn mặt đã cắt ra
 
 def find_similar_faces(uploaded_image, folder_path):
-    """Finds similar faces in a folder based on the uploaded image."""
+    """Finds the most similar face in a folder to the uploaded image."""
     results = []
-    
-    # Open the uploaded image and convert to RGB
-    image1 = Image.open(uploaded_image).convert("RGB")
-    image1_np = np.array(image1)  # Convert to NumPy array
-    image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
 
-    # Resize the uploaded image for detection
-    #image1_resized = resize_image(image1_bgr)  # Resize uploaded image
-    face_detector.setInputSize([image1_resized.shape[1], image1_resized.shape[0]])
-    
-    # Detect faces in the resized image
-    faces1 = face_detector.infer(image1_resized)
+    # Step 1: Open and preprocess the uploaded image
+    try:
+        image1 = Image.open(uploaded_image).convert("RGB")  # Open and convert to RGB
+        image1_np = np.array(image1)  # Convert to NumPy array
+        image1_bgr = cv2.cvtColor(image1_np, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV
+    except Exception as e:
+        st.error(f"Error processing uploaded image: {e}")
+        return None, None, None
+
+    # Step 2: Detect faces in the uploaded image
+    face_detector.setInputSize([image1_bgr.shape[1], image1_bgr.shape[0]])
+    faces1 = face_detector.infer(image1_bgr)
 
     if faces1.shape[0] == 0:
         st.warning("No face detected in the uploaded image.")
-        return [], image1  # Return original image if no faces detected
+        return None, None, image1  # Return original image if no faces detected
 
-    # Visualize the detected faces on the resized image
-    image1_with_faces, face_bboxes = visualize_faces(image1_resized, faces1)
-    
-    # Display the resized image with detected faces
-    st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Processed Image with Detected Faces", use_column_width=True)
+    # Visualize detected faces on the uploaded image
+    image1_with_faces, face_bboxes = visualize_faces(image1_bgr, faces1)
+    st.image(cv2.cvtColor(image1_with_faces, cv2.COLOR_BGR2RGB), caption="Uploaded Image with Detected Faces", use_column_width=True)
 
+    # Step 3: Compare with images in the folder
     best_match_filename = None
-    best_score = 0.0  # Initialize best score
+    best_score = 0.0
 
-    # Now compare this image with others in the folder
     for filename in os.listdir(folder_path):
         img_path = os.path.join(folder_path, filename)
-        image2 = cv2.imread(img_path)
-        if image2 is not None:
-            image2_resized = resize_image(image2)  # Resize comparison image
+        try:
+            # Read and preprocess each image from the folder
+            image2 = cv2.imread(img_path)
+            if image2 is None:
+                continue
+
+            image2_resized = resize_image(image2)
             face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
             faces2 = face_detector.infer(image2_resized)
 
             if faces2.shape[0] > 0:
-                result = face_recognizer.match(image1_resized, faces1[0][:-1], image2_resized, faces2[0][:-1])
-                score = result[1]  # Get the score from the match result
+                # Match the uploaded face with the detected face in the current folder image
+                match_result = face_recognizer.match(image1_bgr, faces1[0][:-1], image2_resized, faces2[0][:-1])
+                score = match_result[1]  # Similarity score
 
-                # Update best match if the current score is higher
+                # Update best match if the score is higher
                 if score > best_score:
                     best_score = score
                     best_match_filename = filename
+        except Exception as e:
+            st.warning(f"Error processing image {filename}: {e}")
 
-    return best_match_filename, best_score, image1_with_faces  # Return the best match details
+    # Step 4: Return the best match details
+    if best_match_filename:
+        st.success(f"Best match found: {best_match_filename} with score {best_score:.2f}")
+    else:
+        st.warning("No matching faces found in the folder.")
+
+    return best_match_filename, best_score, image1_with_faces
+
 
 
 def visualize_faces(image, results, box_color=(0, 255, 0), text_color=(0, 0, 255), fps=None):
