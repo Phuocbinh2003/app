@@ -374,7 +374,7 @@ def run_app5():
         else:
             st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
         
-         st.write(f"{calculate_similarity(face_img1, face_img2)}")
+        st.write(f"{calculate_similarity(face_img1, face_img2)}")
     
         
 if __name__ == "__main__":
