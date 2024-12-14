@@ -14,7 +14,8 @@ def resize_image(image, target_height):
 
 # Hàm để áp dụng Watershe
 def apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations):
-    print(f"Kernel size: {kernel_size}, Distance thresh factor: {distance_thresh_factor}, Dilation iterations: {dilation_iterations}")
+  
+    st.write(f"Kernel size: {kernel_size}, Distance thresh factor: {distance_thresh_factor}, Dilation iterations: {dilation_iterations}")
     # Resize ảnh về 500x400
     img = cv.resize(img, (500, 400))
 
