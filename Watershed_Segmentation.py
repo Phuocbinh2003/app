@@ -173,7 +173,7 @@ def run_app2():
     
         if params_changed:
             # Gọi lại apply_watershed với tham số mới
-            st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
+            #st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
             
             # Cập nhật giá trị tham số cũ
             st.session_state.prev_kernel_size = kernel_size
@@ -181,7 +181,7 @@ def run_app2():
             st.session_state.prev_dilation_iterations = dilation_iterations
     
             # Hiển thị kết quả đã cập nhật
-            st.image(st.session_state.processed_result, caption="Kết quả Watershed (đã cập nhật)", use_column_width=True)
+            st.image(apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations), caption="Kết quả Watershed (đã cập nhật)", use_column_width=True)
 
 if __name__ == "__main__":
     run_app2()
