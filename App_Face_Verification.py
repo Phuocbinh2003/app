@@ -287,30 +287,6 @@ def read_student_info(filename, folder_path):
         student_info = txt_file.read()
     return student_info
     
-def compare_faces(image1, image2):
-    # Assuming face_detector is already defined and loaded
-    face_detector.setInputSize([image1.shape[1], image1.shape[0]])
-    faces1 = face_detector.infer(image1)
-
-    face_detector.setInputSize([image2.shape[1], image2.shape[0]])
-    faces2 = face_detector.infer(image2)
-
-    # Check if faces are detected and unpack properly
-    if len(faces1) == 0 or len(faces2) == 0:
-        st.warning("No faces detected.")
-        return None
-
-    # Draw bounding boxes on the images based on the detected faces
-    image1_with_boxes = draw_bounding_boxes(image1, faces1)
-    image2_with_boxes = draw_bounding_boxes(image2, faces2)
-
-    # Display the images with bounding boxes
-    st.image(image1_with_boxes / 255.0, caption="Image 1 with Detected Faces", use_column_width=True)
-    st.image(image2_with_boxes / 255.0, caption="Image 2 with Detected Faces", use_column_width=True)
-
-    # Calculate and return the similarity score
-    score = calculate_similarity(faces1, faces2)
-    return score
 
 
 def draw_bounding_boxes(image, faces):
@@ -373,9 +349,11 @@ def run_app5():
             st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
         else:
             st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+
+        resize_image(face_img1)
+        resize_image(face_img2)
+        st.write(f"{calculate_similarity(face_img1, face_img2)}")
         
-        #st.write(f"{calculate_similarity(face_img1, face_img2)}")
-        compare_faces(image1,image2)
     
         
 if __name__ == "__main__":
