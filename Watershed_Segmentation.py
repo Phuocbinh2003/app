@@ -162,8 +162,8 @@ def run_app2():
             st.session_state.prev_distance_thresh_factor = distance_thresh_factor
             st.session_state.prev_dilation_iterations = dilation_iterations
 
-        # Hiển thị kết quả phân đoạn
-        if st.session_state.processed_result is not None:
-            st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
+            # Hiển thị kết quả phân đoạn
+            if st.session_state.processed_result is not None:
+                st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
 if __name__ == "__main__":
     run_app2()
