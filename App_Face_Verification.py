@@ -55,44 +55,44 @@ def calculate_similarity(faces1, faces2):
 
     return similarity
 
-def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]):
+def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[512, 512]): # target_size: (h, w)
     out1 = img1.copy()
     out2 = img2.copy()
-    matched_box_color = (0, 255, 0)  # BGR
-    mismatched_box_color = (0, 0, 255)  # BGR
+    matched_box_color = (0, 255, 0)    # BGR
+    mismatched_box_color = (0, 0, 255) # BGR
 
-    # Resize to target size for image 1
+    # Resize to 256x256 with the same aspect ratio
     padded_out1 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h1, w1, _ = out1.shape
     ratio1 = min(target_size[0] / out1.shape[0], target_size[1] / out1.shape[1])
     new_h1 = int(h1 * ratio1)
     new_w1 = int(w1 * ratio1)
-    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR)
+    resized_out1 = cv2.resize(out1, (new_w1, new_h1), interpolation=cv2.INTER_LINEAR).astype(np.float32)
     top = max(0, target_size[0] - new_h1) // 2
     bottom = top + new_h1
     left = max(0, target_size[1] - new_w1) // 2
     right = left + new_w1
-    padded_out1[top:bottom, left:right] = resized_out1
+    padded_out1[top : bottom, left : right] = resized_out1
 
-    # Draw bbox for image 1
+    # Draw bbox
     bbox1 = faces1[0][:4] * ratio1
     x, y, w, h = bbox1.astype(np.int32)
     cv2.rectangle(padded_out1, (x + left, y + top), (x + left + w, y + top + h), matched_box_color, 2)
 
-    # Resize to target size for image 2
+    # Resize to 256x256 with the same aspect ratio
     padded_out2 = np.zeros((target_size[0], target_size[1], 3)).astype(np.uint8)
     h2, w2, _ = out2.shape
     ratio2 = min(target_size[0] / out2.shape[0], target_size[1] / out2.shape[1])
     new_h2 = int(h2 * ratio2)
     new_w2 = int(w2 * ratio2)
-    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR)
+    resized_out2 = cv2.resize(out2, (new_w2, new_h2), interpolation=cv2.INTER_LINEAR).astype(np.float32)
     top = max(0, target_size[0] - new_h2) // 2
     bottom = top + new_h2
     left = max(0, target_size[1] - new_w2) // 2
     right = left + new_w2
-    padded_out2[top:bottom, left:right] = resized_out2
+    padded_out2[top : bottom, left : right] = resized_out2
 
-    # Draw bbox for image 2
+    # Draw bbox
     assert faces2.shape[0] == len(matches), "number of faces2 needs to match matches"
     assert len(matches) == len(scores), "number of matches needs to match number of scores"
     for index, match in enumerate(matches):
@@ -106,7 +106,7 @@ def visualize_matches(img1, faces1, img2, faces2, matches, scores, target_size=[
         cv2.putText(padded_out2, "{:.2f}".format(score), (x + left, y + top - 5), cv2.FONT_HERSHEY_DUPLEX, 0.4, text_color)
 
     return np.concatenate([padded_out1, padded_out2], axis=1)
-
+    
 def extract_face(image):
     """Tách khuôn mặt từ ảnh sử dụng mô hình YuNet và trả về ảnh khuôn mặt đã cắt ra."""
     # Kích thước mà bạn muốn resize ảnh về trước khi đưa vào mô hình
@@ -338,27 +338,33 @@ def run_app5():
     
         image2 = Image.open(uploaded_image2).convert("RGB")
         image2 = cv2.cvtColor(np.array(image2), cv2.COLOR_RGB2BGR)
-        face_img1 = extract_face(image1)
-        if face_img1 is not None:
-            st.image(cv2.cvtColor(face_img1, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
-        else:
-            st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+        
+        # face_img1 = extract_face(image1)
+        # if face_img1 is not None:
+        #     st.image(cv2.cvtColor(face_img1, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
+        # else:
+        #     st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
             
-        face_img2 = extract_face_the_sv(image2)
-        if face_img2 is not None:
-            st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
-        else:
-            st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
-
+        # face_img2 = extract_face_the_sv(image2)
+        # if face_img2 is not None:
+        #     st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
+        # else:
+        #     st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+        
+        face_detector.setInputSize([image1.shape[1], image1.shape[0]])
+        faces1 = face_detector.infer(image1)
+        
+        face_detector.setInputSize([image2.shape[1], image2.shape[0]])
+        faces2 = face_detector.infer(image2)
         scores = []
         matches = []
-        for face in face_img2:
-            result = face_recognizer.match(image1, face_img1[0][:-1], image2, face[:-1])
+        for face in faces2:
+            result = face_recognizer.match(image1, faces1[0][:-1], image2, face[:-1])
             scores.append(result[0])
             matches.append(result[1])
-
+        
         # Draw results
-        image = visualize_matches(image1, face_img1, image2, face_img2, matches, scores)
+        image = visualize_matches(image1, faces1, image2, faces2, matches, scores)
         
     
         
