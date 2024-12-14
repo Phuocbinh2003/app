@@ -6,7 +6,7 @@ from PIL import Image
 from Face_Verification.yunet import YuNet
 from Face_Verification.sface import SFace
 
-# Valid combinations of backends and target
+# Valid combinations of backends and targe
 backend_target_pairs = [
     [cv2.dnn.DNN_BACKEND_OPENCV, cv2.dnn.DNN_TARGET_CPU],
 ]
