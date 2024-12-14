@@ -149,12 +149,14 @@ def run_app2():
         distance_thresh_factor != st.session_state.prev_distance_thresh_factor or
         dilation_iterations != st.session_state.prev_dilation_iterations
     )
-
+    
     if uploaded_image is not None:
         img = np.array(Image.open(uploaded_image))
         st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
-
+        if st.session_state.processed_result is not None:
+                st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
         # Chỉ gọi apply_watershed nếu có sự thay đổi tham số hoặc ảnh mới
+        
         if params_changed or 'processed_result' not in st.session_state:
             st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
             # Cập nhật giá trị tham số cũ
