@@ -78,7 +78,7 @@ def run_app2():
 
    
     img_step_1 = cv.imread("my_folder/cb.png")
-    st.image(img_step_1, caption='', use_column_width=True)
+    st.image(img_step_1, caption='', use_container_width=True)
     st.write("""
     1. **Chuyển ảnh sang ảnh xám và nhị phân (Otsu thresholding):**
     
