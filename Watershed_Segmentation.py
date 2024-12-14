@@ -134,6 +134,7 @@ def run_app2():
     # Tải ảnh lên
 st.header("2. Tải ảnh lên và phân đoạn ký tự")
 
+uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
 
 # Khởi tạo các giá trị mặc định trong session_state nếu chưa tồn tại
 if "processed_result" not in st.session_state:
@@ -145,7 +146,7 @@ if "prev_distance_thresh_factor" not in st.session_state:
 if "prev_dilation_iterations" not in st.session_state:
     st.session_state.prev_dilation_iterations = None
 
-uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
+
 
 if uploaded_image is not None:
     img = np.array(Image.open(uploaded_image))
