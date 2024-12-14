@@ -369,7 +369,7 @@ def run_app5():
         if isinstance(result_image, str):  # Nếu là chuỗi, có thể là thông báo lỗi
             st.error(result_image)
         else:
-            st.image(result_image, caption="Kết quả so sánh khuôn mặt", use_column_width=True)
+            st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), caption="Kết quả so sánh khuôn mặt", use_column_width=True)
 
                   
         # face_img1 = extract_face(image1)
