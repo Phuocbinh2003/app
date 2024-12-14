@@ -152,7 +152,7 @@ def run_app2():
     
     if uploaded_image is not None:
         img = np.array(Image.open(uploaded_image))
-        st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
+        st.image(img, caption="Ảnh gốc đã tải lên", use_container_width=True)
 
         # Kiểm tra sự thay đổi tham số
         params_changed = (
@@ -170,7 +170,7 @@ def run_app2():
             st.session_state.prev_dilation_iterations = dilation_iterations
 
         # Hiển thị kết quả đã cập nhật
-        st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
+        st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_container_width=True)
 
 if __name__ == "__main__":
     run_app2()
