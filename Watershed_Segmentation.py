@@ -144,7 +144,7 @@ def run_app2():
         st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
 
         # Chỉ gọi lại Watershed nếu slider thay đổi
-       if (
+        if (
             st.session_state.get("prev_kernel_size") != kernel_size or
             st.session_state.get("prev_distance_thresh_factor") != distance_thresh_factor or
             st.session_state.get("prev_dilation_iterations") != dilation_iterations or
