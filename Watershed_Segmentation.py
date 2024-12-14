@@ -135,16 +135,33 @@ def run_app2():
     
     uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
     
+    if "processed_result" not in st.session_state:
+        st.session_state.processed_result = None
+
+    # Kiểm tra nếu slider hoặc ảnh thay đổi
     if uploaded_image is not None:
-        # Đọc ảnh từ người dùng tải lên
         img = np.array(Image.open(uploaded_image))
-        st.image(img, caption='Ảnh đã tải lên', use_column_width=True)
+        st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
 
-        # Áp dụng thuật toán Watershed với tham số nhập vào
-        result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
+        # Chỉ gọi lại Watershed nếu slider thay đổi
+        if (
+            st.session_state.get("prev_kernel_size") != kernel_size or
+            st.session_state.get("prev_distance_thresh_factor") != distance_thresh_factor or
+            st.session_state.get("prev_dilation_iterations") != dilation_iterations or
+            st.session_state.get("prev_uploaded_image") != uploaded_image
+        ):
+            # Cập nhật giá trị cũ
+            st.session_state.prev_kernel_size = kernel_size
+            st.session_state.prev_distance_thresh_factor = distance_thresh_factor
+            st.session_state.prev_dilation_iterations = dilation_iterations
+            st.session_state.prev_uploaded_image = uploaded_image
 
-        # Hiển thị kết quả
-        st.image(result, caption='Kết quả phân đoạn Watershed', use_column_width=True)
+            # Gọi Watershed và lưu kết quả
+            st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
+
+        # Hiển thị kết quả phân đoạn
+        if st.session_state.processed_result is not None:
+            st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
 
 if __name__ == "__main__":
     run_app2()
