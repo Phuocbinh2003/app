@@ -132,40 +132,42 @@ def run_app2():
     dilation_iterations = st.sidebar.slider("Số lần Dilation", min_value=1, max_value=10, value=3, step=1)
 
     # Tải ảnh lên
-    st.header("2. Tải ảnh lên và phân đoạn ký tự")
-    uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
+st.header("2. Tải ảnh lên và phân đoạn ký tự")
+uploaded_image = st.file_uploader("Tải ảnh biển số lên", type=["jpg", "png", "jpeg"])
 
-    # Khởi tạo session_state cho các tham số nếu chưa có
-    if 'prev_kernel_size' not in st.session_state:
+# Nếu ảnh được tải lên
+if uploaded_image is not None:
+    img = np.array(Image.open(uploaded_image))
+    st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
+
+    # Nếu chưa có processed_result trong session_state, xử lý ảnh ban đầu
+    if "processed_result" not in st.session_state:
+        st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
         st.session_state.prev_kernel_size = kernel_size
-    if 'prev_distance_thresh_factor' not in st.session_state:
         st.session_state.prev_distance_thresh_factor = distance_thresh_factor
-    if 'prev_dilation_iterations' not in st.session_state:
         st.session_state.prev_dilation_iterations = dilation_iterations
 
-    # Kiểm tra sự thay đổi của các tham số
+    # Hiển thị kết quả ban đầu
+    st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
+
+    # Kiểm tra xem có thay đổi tham số không
     params_changed = (
         kernel_size != st.session_state.prev_kernel_size or
         distance_thresh_factor != st.session_state.prev_distance_thresh_factor or
         dilation_iterations != st.session_state.prev_dilation_iterations
     )
-    
-    if uploaded_image is not None:
-        img = np.array(Image.open(uploaded_image))
-        st.image(img, caption="Ảnh gốc đã tải lên", use_column_width=True)
-        if st.session_state.processed_result is not None:
-                st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
-        # Chỉ gọi apply_watershed nếu có sự thay đổi tham số hoặc ảnh mới
-        
-        if params_changed or 'processed_result' not in st.session_state:
-            st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
-            # Cập nhật giá trị tham số cũ
-            st.session_state.prev_kernel_size = kernel_size
-            st.session_state.prev_distance_thresh_factor = distance_thresh_factor
-            st.session_state.prev_dilation_iterations = dilation_iterations
 
-            # Hiển thị kết quả phân đoạn
-            if st.session_state.processed_result is not None:
-                st.image(st.session_state.processed_result, caption="Kết quả Watershed", use_column_width=True)
+    if params_changed:
+        # Gọi lại apply_watershed với tham số mới
+        st.session_state.processed_result = apply_watershed(img, kernel_size, distance_thresh_factor, dilation_iterations)
+
+        # Cập nhật giá trị tham số cũ
+        st.session_state.prev_kernel_size = kernel_size
+        st.session_state.prev_distance_thresh_factor = distance_thresh_factor
+        st.session_state.prev_dilation_iterations = dilation_iterations
+
+        # Hiển thị kết quả sau khi thay đổi tham số
+        st.image(st.session_state.processed_result, caption="Kết quả Watershed (đã cập nhật)", use_column_width=True)
+
 if __name__ == "__main__":
     run_app2()
