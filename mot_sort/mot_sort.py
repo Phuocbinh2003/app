@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-# Function to display the introduction sectio
+# Function to display the introduction secti
 def display_introduction():
     st.header("1. Giới thiệu")
     st.write(
