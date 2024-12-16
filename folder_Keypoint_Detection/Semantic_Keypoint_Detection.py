@@ -58,19 +58,36 @@ def run_app6():
     st.write("### Bảng kết quả Precision và Recall")
     st.dataframe(df)
     
-    # Vẽ biểu đồ bằng Altair
-    st.write("### Biểu đồ Precision và Recall")
-    chart = alt.Chart(df).transform_fold(
-        fold=["SIFT_Precision", "SIFT_Recall", "ORB_Precision", "ORB_Recall"],
-        as_=["Metric", "Value"]
-    ).mark_line(point=True).encode(
-        x="Shape",
-        y="Value:Q",
-        color="Metric:N",
-        tooltip=["Shape", "Metric", "Value"]
-    ).properties(width=700, height=400)
     
-    st.altair_chart(chart)
+    df = pd.DataFrame(data)
+    x = np.arange(len(df["Shape"]))  # X-axis locations for shapes
+    width = 0.35  # Width of the bars
+
+    # Create the grouped bar chart for Precision
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Precision grouped bars
+    ax1.bar(x - width/2, df["SIFT_Precision"], width, label="SIFT", color='orange')
+    ax1.bar(x + width/2, df["ORB_Precision"], width, label="ORB", color='blue')
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(df["Shape"], rotation=45, ha="right")
+    ax1.set_title("4.1 Đánh giá dựa trên độ đo Precision")
+    ax1.set_xlabel("")
+    ax1.set_ylabel("Precision Score")
+    ax1.legend()
+
+    # Recall grouped bars
+    ax2.bar(x - width/2, df["SIFT_Recall"], width, label="SIFT", color='orange')
+    ax2.bar(x + width/2, df["ORB_Recall"], width, label="ORB", color='blue')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(df["Shape"], rotation=45, ha="right")
+    ax2.set_title("4.2 Đánh giá dựa trên độ đo Recall")
+    ax2.set_xlabel("")
+    ax2.set_ylabel("Recall Score")
+    ax2.legend()
+
+    # Display the plots in Streamlit
+    st.pyplot(fig)
     
     # Nhận xét về SIFT
     st.markdown("""
