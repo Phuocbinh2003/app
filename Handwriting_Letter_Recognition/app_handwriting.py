@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import mnist
 
 
-def run_app10:
+def run_app11:
   # Tiêu đề phần 1
   st.header("Phần 1: MNIST Dataset")
   
@@ -38,3 +38,5 @@ def run_app10:
       axes[i].axis('off')
       axes[i].set_title(f"Label: {train_labels[i]}")
   st.pyplot(fig)
+if __name__ == "__main__":
+    run_app11()
