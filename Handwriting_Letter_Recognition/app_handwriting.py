@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import mnist
 
 
-def run_app11:
+def run_app11():
   # Tiêu đề phần 1
   st.header("Phần 1: MNIST Dataset")
   
