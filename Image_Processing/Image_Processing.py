@@ -93,3 +93,5 @@ def run_app12():
       if st.button("Dịch ảnh"):
           translated_image = translate_image(image, dx, dy)
           st.image(translated_image, caption=f"Ảnh đã dịch ({dx}, {dy})", use_column_width=True)
+if __name__ == "__main__":
+    run_app12()
