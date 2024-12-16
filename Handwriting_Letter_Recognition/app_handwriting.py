@@ -52,7 +52,7 @@ def run_app11():
    
   st.write("""
   Mô hình CNN (Convolutional Neural Network) được sử dụng để trích xuất đặc trưng và phân loại chữ số.
-  """
+  """)
   result_image = Image.open('Handwriting_Letter_Recognition/2dd5b8be-d455-4d5c-b2b0-9e706d9d893b.png')
   st.image(result_image, caption="Detection Result", use_column_width=True)      
   st.write("""         
