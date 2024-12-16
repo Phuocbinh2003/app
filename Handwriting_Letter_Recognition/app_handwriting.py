@@ -31,7 +31,7 @@ def run_app11():
   (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
   
   # Hiển thị một lưới 10x9 ảnh từ bộ dữ liệu, xếp theo hàng từ 0 đến 9
-  st.subheader("Lưới 9x10 hình ảnh từ MNIST Dataset")
+  st.subheader("Một số hình ảnh từ MNIST Dataset")
   fig, axes = plt.subplots(10, 9, figsize=(10, 11))
   
   for row in range(10):
