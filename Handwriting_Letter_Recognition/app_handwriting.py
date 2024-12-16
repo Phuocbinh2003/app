@@ -48,5 +48,7 @@ def run_app11():
   
   plt.tight_layout()
   st.pyplot(fig)
+  st.header("Phần 2: Phương pháp")
+  st.header("Phần 3: Kết quả")
 if __name__ == "__main__":
     run_app11()
