@@ -63,30 +63,18 @@ def run_app11():
   - **Dense Layer**: Học và phân loại đặc trưng.
   """)
   st.write("""
-  ### Kiến trúc chi tiết của mạng CNN:
-  - **Input**: 28x28x1 (ảnh đầu vào dạng grayscale).
-  - **Conv1**: 16 kernel kích thước 3x3, stride = 1.
-    - **Chức năng**: Phát hiện các đặc trưng cơ bản như đường viền, cạnh.
-    - **Lý do chọn**: Sử dụng kernel nhỏ (3x3) giúp giữ được chi tiết của ảnh.
-  - **MaxPool1**: Kernel kích thước 2x2, stride = 2.
-    - **Chức năng**: Giảm kích thước dữ liệu, tăng tốc độ tính toán.
-    - **Lý do chọn**: Tăng tính bất biến đối với phép dịch chuyển và nhiễu.
-  - **Conv2**: 32 kernel kích thước 3x3, stride = 1.
-    - **Chức năng**: Trích xuất các đặc trưng phức tạp hơn từ các tầng trước.
-    - **Lý do chọn**: Tăng số lượng kernel để học thêm nhiều đặc trưng chi tiết.
-  - **MaxPool2**: Kernel kích thước 2x2, stride = 2.
-    - **Chức năng**: Tiếp tục giảm kích thước dữ liệu, giữ lại các đặc trưng quan trọng.
-    - **Lý do chọn**: Giảm độ phức tạp và tránh overfitting.
-  - **Flatten**: Biến đổi tensor thành vector 1 chiều.
-    - **Chức năng**: Chuẩn bị dữ liệu đầu vào cho tầng Fully Connected.
-    - **Lý do chọn**: Đơn giản hóa việc xử lý dữ liệu.
-  - **Dense**: 64 neuron với hàm kích hoạt ReLU.
-    - **Chức năng**: Học các đặc trưng phi tuyến từ vector đầu vào.
-    - **Lý do chọn**: Hàm ReLU giúp mạng hội tụ nhanh hơn và tránh vanishing gradient.
-  - **Output**: 10 lớp tương ứng với các chữ số từ 0 đến 9.
-    - **Chức năng**: Phân loại chữ số đầu ra.
-    - **Lý do chọn**: Sử dụng softmax để đảm bảo tổng xác suất bằng 1, phù hợp với bài toán phân loại.
+  Mô hình CNN (Convolutional Neural Network) được sử dụng để trích xuất đặc trưng và phân loại chữ số.
+  ### Kiến trúc mạng CNN:
+  1. **Input**: 28x28x1 (ảnh grayscale).
+  2. **Conv1**: 16 kernel 3x3, stride 1 - Phát hiện đặc trưng cơ bản như cạnh và góc.
+  3. **MaxPool1**: Kernel 2x2, stride 2 - Giảm kích thước, giữ đặc trưng quan trọng.
+  4. **Conv2**: 32 kernel 3x3, stride 1 - Học đặc trưng phức tạp hơn.
+  5. **MaxPool2**: Kernel 2x2, stride 2 - Tiếp tục giảm kích thước dữ liệu.
+  6. **Flatten**: Chuyển tensor thành vector 1 chiều.
+  7. **Dense**: 64 neuron với ReLU - Học đặc trưng phi tuyến.
+  8. **Output**: 10 lớp với softmax - Phân loại chữ số từ 0 đến 9.
   """)
+
   st.header("Phần 3: Kết quả")
   # Dữ liệu mô phỏng accuracy và loss
   epochs = list(range(1, 21))
