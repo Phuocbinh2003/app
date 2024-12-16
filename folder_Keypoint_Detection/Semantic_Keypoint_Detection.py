@@ -43,55 +43,45 @@ def run_app6():
 
     # Data setup for shapes with SIFT and ORB methods
     data = {
-        "Shape": ["stripes", "lines", "polygon", "ellipses", "cube", 
-                  "gaussian_noise", "checkerboard", "star", "multiple_polygons"],
-        "SIFT_Precision": [0.2004, 0.4995, 0.1429, 0.0000, 0.2513, 0.0000, 0.1498, 0.4431, 0.2646],
-        "SIFT_Recall": [0.2519, 0.7348, 0.1393, 0.0000, 0.4274, 0.0000, 0.1760, 0.7603, 0.3411],
-        "ORB_Precision": [0.0934, 0.4135, 0.4172, 0.0000, 0.3446, 0.0000, 0.2075, 0.3706, 0.3307],
-        "ORB_Recall": [0.0640, 0.2559, 0.5417, 0.0000, 0.5120, 0.0000, 0.3949, 0.6244, 0.3202]
+    "Shape": ["stripes", "lines", "polygon", "ellipses", "cube", 
+              "gaussian_noise", "checkerboard", "star", "multiple_polygons"],
+    "SIFT_Precision": [0.2004, 0.4995, 0.1429, 0.0000, 0.2513, 0.0000, 0.1498, 0.4431, 0.2646],
+    "SIFT_Recall": [0.2519, 0.7348, 0.1393, 0.0000, 0.4274, 0.0000, 0.1760, 0.7603, 0.3411],
+    "ORB_Precision": [0.0934, 0.4135, 0.4172, 0.0000, 0.3446, 0.0000, 0.2075, 0.3706, 0.3307],
+    "ORB_Recall": [0.0640, 0.2559, 0.5417, 0.0000, 0.5120, 0.0000, 0.3949, 0.6244, 0.3202]
     }
     
+    # Chuyển dữ liệu thành DataFrame
     df = pd.DataFrame(data)
-    x = np.arange(len(df["Shape"]))  # X-axis locations for shapes
-    width = 0.35  # Width of the bars
-
-    # Create the grouped bar chart for Precision
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
-    # Precision grouped bars
-    ax1.bar(x - width/2, df["SIFT_Precision"], width, label="SIFT", color='orange')
-    ax1.bar(x + width/2, df["ORB_Precision"], width, label="ORB", color='blue')
-    ax1.set_xticks(x)
-    ax1.set_xticklabels(df["Shape"], rotation=45, ha="right")
-    ax1.set_title("4.1 Đánh giá dựa trên độ đo Precision")
-    ax1.set_xlabel("")
-    ax1.set_ylabel("Precision Score")
-    ax1.legend()
-
-    # Recall grouped bars
-    ax2.bar(x - width/2, df["SIFT_Recall"], width, label="SIFT", color='orange')
-    ax2.bar(x + width/2, df["ORB_Recall"], width, label="ORB", color='blue')
-    ax2.set_xticks(x)
-    ax2.set_xticklabels(df["Shape"], rotation=45, ha="right")
-    ax2.set_title("4.2 Đánh giá dựa trên độ đo Recall")
-    ax2.set_xlabel("")
-    ax2.set_ylabel("Recall Score")
-    ax2.legend()
-
-    # Display the plots in Streamlit
-    st.pyplot(fig)
-    st.header("5. Nhận xét")
-    st.markdown(
-    """
+    # Hiển thị bảng dữ liệu
+    st.write("### Bảng kết quả Precision và Recall")
+    st.dataframe(df)
+    
+    # Vẽ biểu đồ bằng Altair
+    st.write("### Biểu đồ Precision và Recall")
+    chart = alt.Chart(df).transform_fold(
+        fold=["SIFT_Precision", "SIFT_Recall", "ORB_Precision", "ORB_Recall"],
+        as_=["Metric", "Value"]
+    ).mark_line(point=True).encode(
+        x="Shape",
+        y="Value:Q",
+        color="Metric:N",
+        tooltip=["Shape", "Metric", "Value"]
+    ).properties(width=700, height=400)
+    
+    st.altair_chart(chart)
+    
+    # Nhận xét về SIFT
+    st.markdown("""
     ### Nhận Xét về SIFT
-    - **Hiệu suất tốt trên một số hình dạng**: SIFT đạt kết quả Precision và Recall cao đối với các hình như `lines`, `star`, và `draw_cube`, nhưng lại cho hiệu suất kém với `draw_ellipses` và `gaussian_noise` (cả Precision và Recall bằng 0).
-    
+    - **Hiệu suất tốt trên một số hình dạng**: SIFT đạt kết quả Precision và Recall cao đối với các hình như `lines`, `star`, nhưng lại cho hiệu suất kém với `ellipses` và `gaussian_noise` (cả Precision và Recall bằng 0).
+    - **Phù hợp với dữ liệu phức tạp**: SIFT tỏ ra ổn định hơn khi xử lý các hình dạng có độ phức tạp cao như `multiple_polygons`.
     
     ### Nhận Xét về ORB
-   
-    """
+    - **Nhanh hơn nhưng kém chính xác hơn**: ORB có Precision và Recall trung bình thấp hơn SIFT nhưng hoạt động tốt hơn trên các hình như `polygon` và `checkerboard`.
+    - **Hiệu quả với hình đơn giản**: ORB hoạt động hiệu quả hơn trên các hình đơn giản và ít nhiễu.
+    """)
 
-          
-      )
 if __name__ == "__main__":
     run_app6()
