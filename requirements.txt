@@ -3,7 +3,7 @@ numpy
 opencv-python-headless
 Pillow
 streamlit-drawable-canvas==0.8.0
-
+tensorflow
 scikit-learn
 firebase-admin
 python-dotenv
