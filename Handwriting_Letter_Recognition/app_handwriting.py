@@ -49,6 +49,39 @@ def run_app11():
   plt.tight_layout()
   st.pyplot(fig)
   st.header("Phần 2: Phương pháp")
+  st.write("""
+  Mô hình CNN (Convolutional Neural Network) được sử dụng để trích xuất đặc trưng và phân loại chữ số.
+  Kiến trúc mạng bao gồm:
+  - **Convolution Layer**: Trích xuất đặc trưng từ ảnh đầu vào.
+  - **MaxPooling Layer**: Giảm kích thước dữ liệu, giữ lại các đặc trưng quan trọng.
+  - **Flatten Layer**: Chuyển đổi tensor nhiều chiều thành vector.
+  - **Dense Layer**: Học và phân loại đặc trưng.
+  """)
+  st.write("""
+  ### Kiến trúc chi tiết của mạng CNN:
+  - **Input**: 28x28x1 (ảnh đầu vào dạng grayscale).
+  - **Conv1**: 16 kernel kích thước 3x3, stride = 1.
+    - **Chức năng**: Phát hiện các đặc trưng cơ bản như đường viền, cạnh.
+    - **Lý do chọn**: Sử dụng kernel nhỏ (3x3) giúp giữ được chi tiết của ảnh.
+  - **MaxPool1**: Kernel kích thước 2x2, stride = 2.
+    - **Chức năng**: Giảm kích thước dữ liệu, tăng tốc độ tính toán.
+    - **Lý do chọn**: Tăng tính bất biến đối với phép dịch chuyển và nhiễu.
+  - **Conv2**: 32 kernel kích thước 3x3, stride = 1.
+    - **Chức năng**: Trích xuất các đặc trưng phức tạp hơn từ các tầng trước.
+    - **Lý do chọn**: Tăng số lượng kernel để học thêm nhiều đặc trưng chi tiết.
+  - **MaxPool2**: Kernel kích thước 2x2, stride = 2.
+    - **Chức năng**: Tiếp tục giảm kích thước dữ liệu, giữ lại các đặc trưng quan trọng.
+    - **Lý do chọn**: Giảm độ phức tạp và tránh overfitting.
+  - **Flatten**: Biến đổi tensor thành vector 1 chiều.
+    - **Chức năng**: Chuẩn bị dữ liệu đầu vào cho tầng Fully Connected.
+    - **Lý do chọn**: Đơn giản hóa việc xử lý dữ liệu.
+  - **Dense**: 64 neuron với hàm kích hoạt ReLU.
+    - **Chức năng**: Học các đặc trưng phi tuyến từ vector đầu vào.
+    - **Lý do chọn**: Hàm ReLU giúp mạng hội tụ nhanh hơn và tránh vanishing gradient.
+  - **Output**: 10 lớp tương ứng với các chữ số từ 0 đến 9.
+    - **Chức năng**: Phân loại chữ số đầu ra.
+    - **Lý do chọn**: Sử dụng softmax để đảm bảo tổng xác suất bằng 1, phù hợp với bài toán phân loại.
+  """)
   st.header("Phần 3: Kết quả")
   # Dữ liệu mô phỏng accuracy và loss
   epochs = list(range(1, 21))
@@ -71,6 +104,7 @@ def run_app11():
   ax.grid(True)
   
   st.pyplot(fig)
-
+  st.write("Test 1000 ảnh với mỗi ký tự với accuracy=0.9815 ")
+  
 if __name__ == "__main__":
     run_app11()
