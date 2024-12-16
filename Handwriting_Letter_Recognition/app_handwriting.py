@@ -105,7 +105,7 @@ def run_app11():
   
   st.pyplot(fig)
   st.write("Test 1000 ảnh với mỗi ký tự với accuracy=0.9815 ")
-  
+  st.write("Ma trận nhầm lẫn là: ")
   result_image = Image.open('Handwriting_Letter_Recognition/download.png')
   st.image(result_image, caption="Detection Result", use_column_width=True)
 
