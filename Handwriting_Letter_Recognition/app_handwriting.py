@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import mnist
-
+from PIL import Image
 
 def run_app11():
 
