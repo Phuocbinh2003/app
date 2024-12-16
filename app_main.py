@@ -10,11 +10,12 @@ from truy_van.Instance_Search import run_app8
 from foder_Object_racking.Object_Tracking_app import run_app9
 from mot_sort.mot_sort import run_app10
 from Handwriting_Letter_Recognition.app_handwriting import run_app11
+from Image_Processing.Image_Processing import run_app12
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
     ('GrabCut', 'Watershed_Segmentation','Face_detection','Face_Verification','Semantic_Keypoint_Detection','Instance_Search','Thuật toán SORT'
-    ,'OpenCV_Object_Tracking','Handwriting_Letter_Recognition')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
+    ,'OpenCV_Object_Tracking','Handwriting_Letter_Recognition','Image_Processing')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
 # Hiển thị ứng dụng tương ứng
@@ -41,5 +42,7 @@ elif option == 'Thuật toán SORT':
     run_app10()  # Gọi hàm chạy ứng dụng    
 elif option == 'Handwriting_Letter_Recognition':
     run_app11()  # Gọi hàm chạy ứng dụng   
+elif option == 'Image_Processing':
+    run_app12()  # Gọi hàm chạy ứng dụng   
 else:
     st.write("Vui lòng chọn một ứng dụng từ thanh điều hướng.")
