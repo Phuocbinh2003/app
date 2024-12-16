@@ -7,7 +7,7 @@ from tensorflow.keras.datasets import mnist
 def run_app11():
   # Tiêu đề phần 1
   st.header("Phần 1: MNIST Dataset")
-  
+
   # Mô tả về bộ dữ liệu
   st.write(
       """
@@ -28,15 +28,18 @@ def run_app11():
   # Tải dữ liệu MNIST
   (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
   
-  # Hiển thị một vài ảnh từ bộ dữ liệu
-  st.subheader("Một số hình ảnh từ MNIST Dataset")
-  num_images_to_show = 6
+  # Hiển thị một lưới 9x9 ảnh từ bộ dữ liệu
+  st.subheader("Lưới 9x9 hình ảnh từ MNIST Dataset")
+  fig, axes = plt.subplots(9, 9, figsize=(10, 10))
+  indices = np.random.choice(len(train_images), size=81, replace=False)
   
-  fig, axes = plt.subplots(1, num_images_to_show, figsize=(15, 4))
-  for i in range(num_images_to_show):
-      axes[i].imshow(train_images[i], cmap='gray')
-      axes[i].axis('off')
-      axes[i].set_title(f"Label: {train_labels[i]}")
+  for i, ax in enumerate(axes.flatten()):
+      ax.imshow(train_images[indices[i]], cmap='gray')
+      ax.axis('off')
+      ax.set_title(str(train_labels[indices[i]]), fontsize=8)
+  
+  plt.tight_layout()
   st.pyplot(fig)
+
 if __name__ == "__main__":
     run_app11()
