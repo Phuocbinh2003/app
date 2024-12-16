@@ -28,7 +28,7 @@ def crop_image(image, rect):
 
 def run_app12():
   
-  st.title("Ứng dụng xử lý ảnh")
+    st.title("Ứng dụng xử lý ảnh")
     # Upload ảnh
     uploaded_file = st.file_uploader("Tải ảnh lên", type=["jpg", "png", "jpeg"])
     if uploaded_file:
