@@ -50,9 +50,6 @@ def run_app11():
   st.pyplot(fig)
   st.header("Phần 2: Phương pháp")
   st.header("Phần 3: Kết quả")
-  # Phần 3: Biểu đồ accuracy và loss
-  st.header("Phần 3: Biểu đồ Accuracy và Loss")
-  
   # Dữ liệu mô phỏng accuracy và loss
   epochs = list(range(1, 21))
   accuracy = [0.8581, 0.9815, 0.9870, 0.9900, 0.9917, 0.9933, 0.9943, 0.9945, 0.9962, 0.9969, 0.9972, 0.9976, 0.9982, 0.9989, 0.9982, 0.9967, 0.9986, 0.9989, 0.9987, 0.9985]
