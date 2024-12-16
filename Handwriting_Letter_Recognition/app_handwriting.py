@@ -28,10 +28,10 @@ def run_app11():
   (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
   
   # Hiển thị một lưới 9x9 ảnh từ bộ dữ liệu, xếp theo hàng từ 0 đến 9
-  st.subheader("Lưới 9x9 hình ảnh từ MNIST Dataset")
+  st.subheader("Hình ảnh từ MNIST Dataset")
   fig, axes = plt.subplots(9, 9, figsize=(10, 10))
   
-  for row in range(9):
+  for row in range(10):
       count = 0
       for i in range(len(train_images)):
           if train_labels[i] == row:
@@ -40,7 +40,7 @@ def run_app11():
               ax.axis('off')
               ax.set_title(str(train_labels[i]), fontsize=8)
               count += 1
-              if count == 9:
+              if count == 10:
                   break
   
   plt.tight_layout()
