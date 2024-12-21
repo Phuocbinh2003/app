@@ -32,8 +32,8 @@ elif option == 'Face_Verification':
     run_app5()  # Gọi hàm chạy ứng dụng 5
 elif option == 'Semantic_Keypoint_Detection':
     run_app6()  # Gọi hàm chạy ứng dụng 6
-# elif option == 'SuperPoint_Rotation':
-#     run_app7()  # Gọi hàm chạy ứng dụng 
+elif option == 'SuperPoint_Rotation':
+    run_app7()  # Gọi hàm chạy ứng dụng 
 elif option == 'Instance_Search':
     run_app8()  # Gọi hàm chạy ứng dụng 
 elif option == 'OpenCV_Object_Tracking':
