@@ -22,7 +22,7 @@ def run_app7():
     
     superpoint_image_path1 = 'folder_SuperPoint_Rotation/XOAY3.png'
    
-     st.header("2. Đánh giá Matching Keypoint")
+    st.header("2. Đánh giá Matching Keypoint")
 
     st.write("""
     **Đánh giá Matching Keypoints với SIFT, ORB, và SuperPoint theo tiêu chí Rotation**
