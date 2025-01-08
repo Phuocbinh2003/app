@@ -41,60 +41,62 @@ def display_introduction():
 
 # Function to display the method section
 def display_method():
-    
+
+    # Header Section
     st.header("2. Phương pháp hoạt động")
     img = Image.open('mot_sort/buoc_sort.png')
-    st.image(img, caption=f"", use_column_width=True)
+    st.image(img, caption="Sơ đồ thuật toán SORT", use_column_width=True)
+
+    # Introduction
     st.write(
         """
         SORT thuộc nhóm thuật toán **tracking-by-detection**, nghĩa là nó dựa vào các bounding box do mô hình phát hiện 
         cung cấp để theo dõi đối tượng qua các khung hình. Các bước hoạt động chính của SORT gồm:
         """
     )
-    st.markdown(
+
+    # Step 1: Object Detection
+    st.subheader("Bước 1: Phát hiện đối tượng (Detection)")
+    st.write(
         """
-        1. **Phát hiện đối tượng (Detection)**:
-           - Sử dụng các mô hình như YOLO, Faster R-CNN để phát hiện bounding box của các đối tượng trong từng khung hình.
-        2. **Dự đoán vị trí tiếp theo (Prediction)**:
-           - Áp dụng **Kalman Filter** để dự đoán vị trí tiếp theo của đối tượng dựa trên trạng thái hiện tại.
-        3. **Ghép nối đối tượng (Assignment)**:
-           - Sử dụng **Hungarian Algorithm** để ghép nối các bounding box dự đoán và phát hiện dựa trên độ tương đồng (IoU).
-        4. **Cập nhật trạng thái (Update)**:
-           - Cập nhật trạng thái đối tượng (vị trí, vận tốc,...) hoặc gán ID mới cho các đối tượng mới xuất hiện.
+        - Sử dụng các mô hình như YOLO, Faster R-CNN để phát hiện bounding box của các đối tượng trong từng khung hình.
+        - Đầu ra là các bounding box với tọa độ $(x, y, w, h)$ tương ứng.
         """
     )
 
-    st.subheader("2.1. Kalman Filter")
+    # Step 2: Prediction
+    st.subheader("Bước 2: Dự đoán vị trí tiếp theo (Prediction)")
     st.write(
-    """
-    Kalman Filter là một thuật toán ước tính trạng thái của một hệ thống động lực tuyến tính. Trong SORT, trạng thái của đối tượng được biểu diễn dưới dạng:
-    """
+        """
+        - Áp dụng **Kalman Filter** để dự đoán vị trí tiếp theo của đối tượng dựa trên trạng thái hiện tại.
+        - Trạng thái của đối tượng được biểu diễn dưới dạng:
+        """
     )
     st.latex(r"""
     x = [u, v, s, r, \dot{u}, \dot{v}, \dot{s}]^T
-    """)
+    """
+    )
     st.write(
         """
         - $(u, v)$: Tọa độ trung tâm bounding box.  
         - $s$: Diện tích bounding box.  
         - $r$: Tỷ lệ khung hình (width/height).  
-        - $(\dot{u}, \dot{v}, \dot{s})$: Tốc độ thay đổi tương ứng.
-    
-        Kalman Filter dự đoán vị trí tiếp theo dựa trên trạng thái hiện tại và cập nhật khi có dữ liệu mới.
+        - $(\dot{u}, \dot{v}, \dot{s})$: Tốc độ thay đổi tương ứng.  
         """
     )
 
-
-    st.subheader("2.2. Hungarian Algorithm")
+    # Step 3: Data Association
+    st.subheader("Bước 3: Ghép nối đối tượng (Assignment)")
     st.write(
         """
-        Hungarian Algorithm là một thuật toán tối ưu để giải bài toán ghép nối. Trong SORT, nó được sử dụng để ghép nối 
-        các bounding box dự đoán và bounding box phát hiện dựa trên ma trận chi phí $C$, với:
+        - Sử dụng **Hungarian Algorithm** để ghép nối bounding box dự đoán và phát hiện dựa trên độ tương đồng (IoU).
+        - Ma trận chi phí $C$ được tính như sau:
         """
     )
     st.latex(r"""
     C_{ij} = 1 - \text{IoU}(B_i, B_j)
-    """)
+    """
+    )
     st.write(
         """
         - $C_{ij}$: Chi phí giữa bounding box $B_i$ (dự đoán) và $B_j$ (phát hiện).  
@@ -102,17 +104,16 @@ def display_method():
         """
     )
 
-
-    st.subheader("2.3. Cập nhật trạng thái")
+    # Step 4: State Update
+    st.subheader("Bước 4: Cập nhật trạng thái")
     st.write(
         """
-        - Đối tượng được ghép nối sẽ cập nhật trạng thái dựa trên kết quả mới.  
-        - Đối tượng không ghép nối trong một số khung hình (mặc định $T_{Lost} = 1$) sẽ bị xóa.  
+        - Đối tượng được ghép nối sẽ cập nhật trạng thái dựa trên kết quả mới từ Kalman Filter.
+        - Đối tượng không ghép nối trong một số khung hình (mặc định $T_{Lost} = 1$) sẽ bị xóa.
         - Đối tượng mới xuất hiện sẽ được gán ID mới.
         """
     )
 
-# Function to display the visualization section
 def display_visualization():
     st.header("3. Minh họa thuật toán SORT")
     st.write(
