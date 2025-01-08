@@ -191,7 +191,7 @@ def find_similar_faces(uploaded_image, folder_path):
             if image2 is None:
                 continue
 
-            image2_resized = resize_image(image2)
+            image2_resized = image2
             face_detector.setInputSize([image2_resized.shape[1], image2_resized.shape[0]])
             faces2 = face_detector.infer(image2_resized)
 
