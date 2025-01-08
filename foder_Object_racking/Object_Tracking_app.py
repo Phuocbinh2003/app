@@ -18,7 +18,7 @@ def run_app9():
     KCF hoạt động qua ba bước chính:
     """)
     
-    # Step 1: Update Filter
+    # Step 1: Update Filte
     st.subheader("Bước 1: Cập nhật bộ lọc (Filter Update)")
     st.markdown("""
     KCF sử dụng một bộ lọc để dự đoán vị trí của đối tượng. Bộ lọc được tối ưu hóa bằng cách giải bài toán tối thiểu hóa:
