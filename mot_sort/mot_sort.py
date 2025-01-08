@@ -42,6 +42,7 @@ def display_introduction():
 # Function to display the method section
 def display_method():
 
+
     # Header Section
     st.header("2. Phương pháp hoạt động")
     img = Image.open('mot_sort/buoc_sort.png')
@@ -51,7 +52,7 @@ def display_method():
     st.write(
         """
         SORT thuộc nhóm thuật toán **tracking-by-detection**, nghĩa là nó dựa vào các bounding box do mô hình phát hiện 
-        cung cấp để theo dõi đối tượng qua các khung hình. Các bước hoạt động chính của SORT gồm:
+        cung cấp để theo dõi đối tượng qua các khung hình. Thuật toán gồm các bước chính sau đây:
         """
     )
 
@@ -59,8 +60,9 @@ def display_method():
     st.subheader("Bước 1: Phát hiện đối tượng (Detection)")
     st.write(
         """
-        - Sử dụng các mô hình như YOLO, Faster R-CNN để phát hiện bounding box của các đối tượng trong từng khung hình.
-        - Đầu ra là các bounding box với tọa độ $(x, y, w, h)$ tương ứng.
+        - Sử dụng các mô hình như YOLO, Faster R-CNN, SSD hoặc RetinaNet để phát hiện bounding box của các đối tượng trong từng khung hình.
+        - Đầu ra là tập hợp các bounding box với tọa độ $(x, y, w, h)$ tương ứng, cùng với lớp đối tượng.
+        - Ví dụ: Một khung hình chứa các đối tượng như người đi bộ, xe hơi hoặc xe đạp.
         """
     )
 
@@ -69,7 +71,7 @@ def display_method():
     st.write(
         """
         - Áp dụng **Kalman Filter** để dự đoán vị trí tiếp theo của đối tượng dựa trên trạng thái hiện tại.
-        - Trạng thái của đối tượng được biểu diễn dưới dạng:
+        - Trạng thái của đối tượng được biểu diễn dưới dạng vector:
         """
     )
     st.latex(r"""
@@ -78,19 +80,24 @@ def display_method():
     )
     st.write(
         """
-        - $(u, v)$: Tọa độ trung tâm bounding box.  
-        - $s$: Diện tích bounding box.  
+        Trong đó:
+        - $(u, v)$: Tọa độ trung tâm của bounding box.  
+        - $s$: Diện tích của bounding box.  
         - $r$: Tỷ lệ khung hình (width/height).  
-        - $(\dot{u}, \dot{v}, \dot{s})$: Tốc độ thay đổi tương ứng.  
+        - $(\dot{u}, \dot{v}, \dot{s})$: Tốc độ thay đổi của các tham số tương ứng.  
+        - Dựa trên trạng thái này, Kalman Filter dự đoán vị trí tiếp theo trước khi nhận dữ liệu từ khung hình mới.
+        - Kalman Filter gồm hai bước chính:
+            1. **Dự đoán (Prediction):** Dự đoán trạng thái mới dựa trên trạng thái trước đó.
+            2. **Cập nhật (Update):** Điều chỉnh dự đoán bằng dữ liệu quan sát thực tế.
         """
     )
 
     # Step 3: Data Association
-    st.subheader("Bước 3: Ghép nối đối tượng (Assignment)")
+    st.subheader("Bước 3: Ghép nối đối tượng (Data Association)")
     st.write(
         """
-        - Sử dụng **Hungarian Algorithm** để ghép nối bounding box dự đoán và phát hiện dựa trên độ tương đồng (IoU).
-        - Ma trận chi phí $C$ được tính như sau:
+        - Sử dụng **Hungarian Algorithm** để ghép nối bounding box dự đoán và phát hiện dựa trên ma trận chi phí $C$.
+        - Ma trận chi phí $C$ được tính dựa trên độ tương đồng IoU (Intersection over Union):
         """
     )
     st.latex(r"""
@@ -99,20 +106,41 @@ def display_method():
     )
     st.write(
         """
-        - $C_{ij}$: Chi phí giữa bounding box $B_i$ (dự đoán) và $B_j$ (phát hiện).  
-        - $\text{IoU}$: Intersection over Union giữa hai bounding box.
+        Trong đó:
+        - $C_{ij}$: Chi phí giữa bounding box $B_i$ (dự đoán) và $B_j$ (phát hiện).
+        - $\text{IoU}$: Tỉ lệ giao nhau trên hợp giữa hai bounding box.
+        - **Hungarian Algorithm:** Giải bài toán tối ưu ghép nối sao cho tổng chi phí là nhỏ nhất. Kết quả ghép nối xác định bounding box nào thuộc về đối tượng nào qua các khung hình.
+        - Các bounding box không được ghép nối có thể được gán ID mới hoặc bị loại bỏ.
         """
     )
 
     # Step 4: State Update
-    st.subheader("Bước 4: Cập nhật trạng thái")
+    st.subheader("Bước 4: Cập nhật trạng thái (State Update)")
     st.write(
         """
         - Đối tượng được ghép nối sẽ cập nhật trạng thái dựa trên kết quả mới từ Kalman Filter.
-        - Đối tượng không ghép nối trong một số khung hình (mặc định $T_{Lost} = 1$) sẽ bị xóa.
-        - Đối tượng mới xuất hiện sẽ được gán ID mới.
+        - Đối tượng không ghép nối trong một số khung hình (thường là $T_{Lost} = 1$) sẽ bị xóa khỏi danh sách theo dõi.
+        - Đối tượng mới xuất hiện trong khung hình sẽ được khởi tạo với ID mới.
+        - Kết quả cuối cùng là tập hợp các bounding box và ID tương ứng với mỗi đối tượng.
         """
     )
+
+    # Summary
+    st.subheader("Tóm tắt quy trình")
+    st.write(
+        """
+        1. Phát hiện đối tượng trong khung hình hiện tại bằng mô hình phát hiện như YOLO hoặc Faster R-CNN.
+        2. Sử dụng Kalman Filter để dự đoán trạng thái của các đối tượng đã theo dõi.
+        3. Ghép nối các dự đoán với kết quả phát hiện qua Hungarian Algorithm.
+        4. Cập nhật trạng thái hoặc khởi tạo đối tượng mới.
+        5. Trả về danh sách các bounding box và ID đối tượng.
+        
+        **Ví dụ ứng dụng:**
+        - Theo dõi xe cộ trên đường trong video giám sát giao thông.
+        - Theo dõi người trong hệ thống camera an ninh.
+        """
+    )
+
 
 def display_visualization():
     st.header("3. Minh họa thuật toán SORT")
