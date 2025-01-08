@@ -329,7 +329,11 @@ def run_app5():
     """Phần 1: Tìm khuôn mặt giống nhất trong thư mục."""
     
     st.title("Tìm thông tin khuôn mặt trong lớp")
-
+    st.markdown("""
+    1. **Chọn ảnh cần so sánh**: Tải lên **ảnh chân dung** của bạn. Hệ thống sẽ tìm khuôn mặt trong ảnh và so sánh với ảnh học sinh trong thư mục.
+    2. **Kết quả tìm kiếm**: Ứng dụng sẽ hiển thị thông tin học sinh có khuôn mặt giống với ảnh của bạn, bao gồm tên, mã sinh viên, lớp học...
+    3. **Không tìm thấy kết quả**: Nếu không có khuôn mặt giống, hệ thống sẽ cảnh báo không tìm thấy khuôn mặt phù hợp.
+    """)
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
         folder_path = "Face_Verification/image"  # Đường dẫn thư mục
@@ -354,6 +358,13 @@ def run_app5():
 
     """Phần 2: So sánh ảnh chân dung và ảnh thẻ."""
     st.header("So sánh ảnh chân dung và ảnh thẻ")
+    st.markdown("""
+    
+    1. **Tải ảnh chân dung và ảnh thẻ**: Tải lên **hai ảnh** của bạn. Một là ảnh chân dung và một là ảnh thẻ.
+    2. **So sánh khuôn mặt**: Ứng dụng sẽ so sánh khuôn mặt trong hai ảnh và hiển thị kết quả.
+    3. **Kết quả so sánh**: Nếu khuôn mặt giống nhau, bạn sẽ thấy kết quả so sánh và ảnh đã được xử lý.
+    4. **Không giống nhau**: Nếu khuôn mặt trong hai ảnh khác nhau, hệ thống sẽ cảnh báo.
+    """)
     uploaded_image1 = st.file_uploader("Upload Portrait Image...", type=["jpg", "jpeg", "png"], key="portrait")
     uploaded_image2 = st.file_uploader("Upload ID Image...", type=["jpg", "jpeg", "png"], key="id")
 
@@ -372,17 +383,7 @@ def run_app5():
             st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), caption="Kết quả so sánh khuôn mặt", use_column_width=True)
 
                   
-        # face_img1 = extract_face(image1)
-        # if face_img1 is not None:
-        #     st.image(cv2.cvtColor(face_img1, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
-        # else:
-        #     st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
-            
-        # face_img2 = extract_face_the_sv(image2)
-        # if face_img2 is not None:
-        #     st.image(cv2.cvtColor(face_img2, cv2.COLOR_BGR2RGB), caption="Ảnh khuôn mặt")
-        # else:
-        #     st.warning("Không tìm thấy khuôn mặt trong ảnh thẻ. Vui lòng thử lại với một ảnh khác.")
+  
         
        
         
