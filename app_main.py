@@ -14,7 +14,7 @@ from Image_Processing.Image_Processing import run_app12
 # Tạo thanh điều hướn
 option = st.sidebar.selectbox(
     'Chọn ứng dụng:',
-    ('GrabCut', 'Watershed_Segmentation','Face_detection','Face_Verification','Semantic_Keypoint_Detection','Instance_Search','Thuật toán SORT'
+    ('GrabCut', 'Watershed_Segmentation','Face_detection','Face_Verification','Semantic_Keypoint_Detection','SuperPoint_Rotation','Instance_Search','Thuật toán SORT'
     ,'OpenCV_Object_Tracking','Handwriting_Letter_Recognition','Image_Processing')  # Đã loại bỏ Ứng dụng 2 nếu không sử dụng
 )
 
