@@ -5,39 +5,96 @@ import os
 def run_app9():
     # Tiêu đề của ứng dụn
     st.title("1. Object Tracking Using KCF")
-    
+
+    # Introduction
     st.markdown("""
-    **KCF (Kernelized Correlation Filters)** là một thuật toán mạnh mẽ trong việc theo dõi đối tượng. 
-    KCF sử dụng kỹ thuật kernel để cải thiện hiệu suất và độ chính xác, đặc biệt trong các tình huống có sự thay đổi trong đối tượng và nền.
+    **KCF (Kernelized Correlation Filters)** là một thuật toán mạnh mẽ dùng để theo dõi đối tượng qua các khung hình video. 
+    Thuật toán này tận dụng kỹ thuật **kernel trick** để hoạt động trong không gian đặc trưng cao, cho phép phát hiện chính xác vị trí của đối tượng.
     
-    Thuật toán này sử dụng **kernel trick** để làm việc với không gian hình ảnh phức tạp mà không cần thay đổi dữ liệu ban đầu. 
-    Mục tiêu là phát hiện đối tượng trong mỗi frame của video và theo dõi sự thay đổi vị trí của nó theo thời gian.
-
-    ### Công thức của KCF:
-
-    1. **Cập nhật bộ lọc (Filter Update):**
-    Bộ lọc được tối ưu hóa bằng cách sử dụng công thức sau:
+    **Cách hoạt động:**
+    - **Đầu vào:** Một video hoặc chuỗi khung hình, với một khung hình ban đầu chứa đối tượng được chọn thủ công hoặc tự động.
+    - **Theo dõi:** KCF sẽ tính toán các vùng ảnh xung quanh vị trí đối tượng hiện tại, sau đó tìm kiếm vùng có sự tương đồng cao nhất để xác định vị trí mới của đối tượng.
+    
+    KCF hoạt động qua ba bước chính:
+    """)
+    
+    # Step 1: Update Filter
+    st.subheader("Bước 1: Cập nhật bộ lọc (Filter Update)")
+    st.markdown("""
+    KCF sử dụng một bộ lọc để dự đoán vị trí của đối tượng. Bộ lọc được tối ưu hóa bằng cách giải bài toán tối thiểu hóa:
     """)
     st.latex(r"""
-        \hat{f} = \arg\min_f \sum_i \left\| \mathcal{K}(x_i, f) - y_i \right\|^2 + \lambda \|f\|^2
-        """)
+    \hat{f} = \arg\min_f \sum_i \left\| \mathcal{K}(x_i, f) - y_i \right\|^2 + \lambda \|f\|^2
+    """)
     st.markdown("""
-    - $ \mathcal{K}(x_i, f) $ là sự tương quan giữa vị trí $ x_i $ trong hình ảnh và bộ lọc $ f $.
-    - $ \mathcal{I}_i $ là các đặc trưng được trích xuất từ hình ảnh tại vị trí $ i $.
-    - $ \lambda $ là tham số điều chỉnh độ phức tạp của bộ lọc và tránh overfitting.
+    - **Ý nghĩa các tham số:**
+      - $ \mathcal{K}(x_i, f) $: Giá trị tương quan giữa điểm ảnh $x_i$ và bộ lọc $f$.
+      - $y_i$: Giá trị đầu ra mong muốn (thường là vị trí đối tượng trong không gian ảnh).
+      - $\lambda$: Tham số điều chỉnh để tránh hiện tượng quá khớp (overfitting).
+      - $f$: Bộ lọc tối ưu cần tìm.
+    - Công thức trên tìm kiếm bộ lọc $f$ sao cho sai số giữa giá trị dự đoán và thực tế là nhỏ nhất.
+    """)
     
-    2. **Sử dụng kernel để tính toán đặc trưng (Kernel Computation):**
-    Để tính toán đặc trưng giữa các điểm $ x $ và $ y $ trong không gian hình ảnh, ta sử dụng công thức:
-    $$
+    # Step 2: Kernel Computation
+    st.subheader("Bước 2: Tính toán Kernel (Kernel Computation)")
+    st.markdown("""
+    KCF sử dụng **kernel trick** để chuyển các điểm từ không gian gốc sang không gian đặc trưng cao hơn, giúp tăng độ chính xác khi theo dõi. 
+    Công thức tính kernel:
+    """)
+    st.latex(r"""
     \mathcal{K}(x, y) = \phi(x)^\top \phi(y)
-    $$
-    Trong đó:
-    - $ \phi(x) $ và $ \phi(y) $ là các hàm ánh xạ đặc trưng của điểm $ x $ và $ y $, giúp đưa các điểm trong không gian hình ảnh về một không gian đặc trưng có chiều cao hơn.
+    """)
+    st.markdown("""
+    - **Ý nghĩa các tham số:**
+      - $\phi(x)$ và $\phi(y)$: Hàm ánh xạ đặc trưng của hai điểm $x$ và $y$.
+      - $\mathcal{K}(x, y)$: Độ tương đồng giữa hai điểm trong không gian đặc trưng.
+    - Một số kernel thường dùng:
+      - **Kernel tuyến tính:** $\mathcal{K}(x, y) = x^\top y$
+      - **Kernel Gaussian:** $\mathcal{K}(x, y) = \exp(-\|x - y\|^2 / \sigma^2)$
+    """)
     
-    3. **Tính toán vị trí đối tượng trong các frame kế tiếp:**
-    Sau khi huấn luyện bộ lọc từ các frame trước, thuật toán sẽ tính toán vị trí của đối tượng trong frame tiếp theo bằng cách tìm điểm có giá trị cao nhất trong ma trận kết quả của phép tương quan giữa bộ lọc và các vùng trong hình ảnh.
-
-    Thuật toán này mang lại hiệu suất tốt trong nhiều tình huống với các đối tượng di chuyển chậm hoặc thay đổi hình dạng không quá lớn.
+    # Step 3: Target Localization
+    st.subheader("Bước 3: Xác định vị trí đối tượng (Target Localization)")
+    st.markdown("""
+    Sau khi huấn luyện bộ lọc, KCF sử dụng bộ lọc này để tìm vị trí của đối tượng trong khung hình tiếp theo. Quá trình này thực hiện bằng cách:
+    1. Tính giá trị tương quan giữa bộ lọc và các vùng trong khung hình.
+    2. Xác định vị trí có giá trị tương quan cao nhất, đây là vị trí của đối tượng.
+    
+    Công thức tính:
+    """)
+    st.latex(r"""
+    \text{Response Map} = \mathcal{K}(x, f)
+    """)
+    st.markdown("""
+    - **Ý nghĩa:**
+      - $\mathcal{K}(x, f)$: Giá trị tương quan giữa mỗi vùng $x$ trong khung hình và bộ lọc $f$.
+      - Vị trí có giá trị cao nhất trong bản đồ đáp ứng (Response Map) là vị trí của đối tượng.
+    """)
+    
+    # Example: How KCF Works
+    st.subheader("Ví dụ minh họa hoạt động của KCF")
+    st.markdown("""
+    1. **Đầu vào:** Một video, ví dụ như cảnh theo dõi bóng trong trận đấu.
+       - Người dùng chọn một khung hình đầu tiên và đánh dấu vị trí của quả bóng.
+    2. **Quá trình theo dõi:**
+       - Ở mỗi khung hình, KCF tính toán giá trị tương quan giữa bộ lọc đã được cập nhật và các vùng ảnh xung quanh vị trí dự đoán.
+       - Vùng có giá trị tương quan cao nhất được chọn làm vị trí mới của quả bóng.
+    3. **Kết quả:** Một đường dẫn liên tục được tạo ra, biểu diễn vị trí quả bóng trong suốt chuỗi video.
+    """)
+    
+    # Summary
+    st.subheader("Tóm tắt")
+    st.markdown("""
+    KCF là thuật toán theo dõi đối tượng hiệu quả nhờ sử dụng kernel trick và tối ưu hóa bộ lọc. 
+    Các bước chính:
+    1. Huấn luyện bộ lọc để nhận diện đối tượng.
+    2. Sử dụng kernel để xác định tương quan giữa đối tượng và các vùng ảnh.
+    3. Xác định vị trí đối tượng trong các khung hình kế tiếp dựa trên giá trị tương quan.
+    
+    **Ứng dụng:**
+    - Theo dõi khuôn mặt trong camera.
+    - Theo dõi xe cộ trong giám sát giao thông.
+    - Theo dõi bóng trong các trận đấu thể thao.
     """)
     
     # Ví dụ minh họa
