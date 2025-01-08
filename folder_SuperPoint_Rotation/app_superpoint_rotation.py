@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image
 
 def run_app7():
-    # Giao diện Streamlit
+    # Giao diện Streamli
     st.title("So sánh các mô hình phát hiện đặc trưng: SIFT, ORB, và SuperPoint")
 
     st.header("1. Giới thiệu dữ liệu")
