@@ -51,7 +51,7 @@ def run_app7():
     st.image(sift_image1, caption="Ảnh với đặc trưng SIFT", use_column_width=True)
     
     st.write("**Nhận xét:** Mô hình SIFT phát hiện các đặc trưng mạnh mẽ, đặc biệt hiệu quả với các góc cạnh và chi tiết phức tạp. Nhưng độ chính xác rất thấp với các điểm đúng nên xoay sẽ ảnh hưởng lớn đến độ chính xác")
-    sift_imagebd = Image.open(sift_image_pathbd)
+   
   
 
     # Phần ORB
