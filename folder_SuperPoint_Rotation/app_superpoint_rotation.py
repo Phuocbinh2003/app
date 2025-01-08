@@ -47,7 +47,7 @@ def run_app7():
     # Phần SIFT
     st.header("3. Hiển thị kết quả mô hình")
     st.subheader("2.1. Mô hình SIFT")
-    sift_image1 = Image.open(sift_image_path1)
+    sift_image1 = Image.open('folder_SuperPoint_Rotation/xoay1.png')
     st.image(sift_image1, caption="Ảnh với đặc trưng SIFT", use_column_width=True)
     
     st.write("**Nhận xét:** Mô hình SIFT phát hiện các đặc trưng mạnh mẽ, đặc biệt hiệu quả với các góc cạnh và chi tiết phức tạp. Nhưng độ chính xác rất thấp với các điểm đúng nên xoay sẽ ảnh hưởng lớn đến độ chính xác")
@@ -56,7 +56,7 @@ def run_app7():
 
     # Phần ORB
     st.subheader("2.2. Mô hình ORB")
-    orb_image1 = Image.open(orb_image_path1)
+    orb_image1 = Image.open('folder_SuperPoint_Rotation/xoay2.png')
     st.image(orb_image1, caption="Ảnh với đặc trưng ORB", use_column_width=True)
     
     st.write("**Nhận xét:** Mô hình ORB nhanh và hiệu quả, đặc biệt thích hợp cho các ứng dụng thời gian thực, nhưng bỏ qua một số đặc trưng chi tiết so với SIFT.")
@@ -64,7 +64,7 @@ def run_app7():
 
     # Phần SuperPoint
     st.subheader("2.3. Mô hình SuperPoint")
-    superpoint_image1 = Image.open(superpoint_image_path1)
+    superpoint_image1 = Image.open('folder_SuperPoint_Rotation/XOAY3.png')
     st.image(superpoint_image1, caption="Ảnh với đặc trưng SuperPoint", use_column_width=True)
    
     st.write("Với SuperPoint, số lượng đặc trưng phát hiện và số đặc trưng tương đồng duy trì ổn định qua các biến đổi xoay.")
