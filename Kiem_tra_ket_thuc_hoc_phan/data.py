@@ -157,7 +157,7 @@ def app_ket_thuc():
   
   # Khởi tạo tham số w
   w_start = 6
-  learning_rate = st.slider("Điều chỉnh Learning Rate (α)", 0.01, 0.5, 0.1, step=0.01)
+  learning_rate = st.slider("Điều chỉnh Learning Rate (α)", 0.01, 1.5, 0.1, step=0.01)
   
   # Quá trình cập nhật Gradient Descent
   w_current = w_start
@@ -194,7 +194,8 @@ def app_ket_thuc():
   
   # Kết luận
   st.write("""
-  Qua trực quan hóa, bạn có thể thấy Gradient Descent giảm giá trị của hàm mất mát qua từng vòng lặp, giúp tối ưu hóa tham số \(w\).
+  Qua trực quan hóa, bạn có thể thấy Gradient Descent giảm giá trị của hàm mất mát qua từng vòng lặp, giúp tối ưu hóa tham số \(w\) 
+  tốc độ học càng cao thì hướng về hội tụ càng nhanh nhưng dễ dẫn đến đi lệch quỷ đạo.
   """)
 
 
