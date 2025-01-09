@@ -239,14 +239,14 @@ def app_ket_thuc():
   st.write("Nhấn nút **Tiến hành một vòng lặp** để quan sát thay đổi ranh giới quyết định qua mỗi lần cập nhật.")
   
   # Điều chỉnh tham số dữ liệu
-  n_samples = st.sidebar.slider("Số lượng mẫu dữ liệu", 50, 500, 100, step=10)
-  centers = st.sidebar.slider("Số lượng tâm cụm", 2, 5, 2)
+  
+  
   cluster_std = st.sidebar.slider("Độ lệch cụm", 0.5, 2.0, 1.0, step=0.1)
   learning_rate = st.sidebar.slider("Learning Rate (α)", 0.01, 1.0, 0.1, step=0.01)
   random_state = st.sidebar.number_input("Random Seed", 0, 100, 42)
   
   # Tạo dữ liệu
-  X, y = generate_data(n_samples, centers, cluster_std, random_state)
+  X, y = generate_data(n_samples, n_classes, random_state)
   
   # Thêm cột bias
   X_bias = np.c_[np.ones((X.shape[0], 1)), X]
