@@ -37,15 +37,6 @@ def app_ket_thuc():
   ax.set_ylabel("Feature 2")
   ax.set_title("Tập dữ liệu")
   st.pyplot(fig)
-  
-  # Trả về dữ liệu để sử dụng trong các phần sau
-  st.write("Dữ liệu X:")
-  st.write(X)
-  st.write("Nhãn y:")
-  st.write(y)
-  
-  # Lưu lại dữ liệu để dùng tiếp
-  st.session_state['X'] = X
-  st.session_state['y'] = y
+
 if __name__ == "__main__":
     app_ket_thuc()
