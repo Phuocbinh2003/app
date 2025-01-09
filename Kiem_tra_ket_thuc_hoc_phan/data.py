@@ -37,6 +37,9 @@ def app_ket_thuc():
   ax.set_ylabel("Feature 2")
   ax.set_title("Tập dữ liệu")
   st.pyplot(fig)
+  st.title("Logistic Regression")
+  
+
 
 if __name__ == "__main__":
     app_ket_thuc()
