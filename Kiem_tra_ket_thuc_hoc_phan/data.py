@@ -206,13 +206,7 @@ def app_ket_thuc():
 
 
   # Tạo dữ liệu từ phần 1
-  def generate_data(n_samples, centers, cluster_std, random_state):
-      from sklearn.datasets import make_blobs
-      X, y = make_blobs(
-          n_samples=n_samples, centers=centers, cluster_std=cluster_std, random_state=random_state
-      )
-      y = y.reshape(-1, 1)  # Chuyển thành dạng cột
-      return X, y
+
   
   # Hàm sigmoid
   def sigmoid(z):
@@ -266,18 +260,20 @@ def app_ket_thuc():
   ax.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap="coolwarm", edgecolor="k")
   
   # Vẽ ranh giới quyết định
+ # Vẽ ranh giới quyết định
   if st.session_state.iterations > 0:
       w, b = st.session_state.w, st.session_state.b
       x_vals = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
       slope = -w[1][0] / w[2][0]
       intercept = -w[0][0] / w[2][0]
       y_vals = slope * x_vals + intercept
-      ax.plot(x_vals, y_vals, color="red", label=f"Decision Boundary (Iter {st.session_state.iterations})")
-  else:
-      st.write("Ranh giới ban đầu là ngẫu nhiên vì các tham số chưa được cập nhật.")
-  
-  ax.legend()
+      
+      # Vẽ ranh giới quyết định
+      ax.plot(x_vals, y_vals, color='black', label="Decision Boundary")
+      
+  # Hiển thị giao diện
   st.pyplot(fig)
+
   
   # Nút tiến hành một vòng lặp Gradient Descent
   if st.button("Tiến hành một vòng lặp"):
