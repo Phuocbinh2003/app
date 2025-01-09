@@ -230,7 +230,7 @@ def app_ket_thuc():
       return w, b, loss
   
   # Khởi tạo giao diện Streamlit
-  st.title("Trực quan hóa Gradient Descent trong Logistic Regression")
+  st.title("Thực nghiệm")
   st.write("Nhấn nút **Tiến hành một vòng lặp** để quan sát thay đổi ranh giới quyết định qua mỗi lần cập nhật.")
   
   # Điều chỉnh tham số dữ liệu
