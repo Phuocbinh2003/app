@@ -195,7 +195,7 @@ def app_ket_thuc():
   # Kết luận
   st.write("""
   Qua trực quan hóa, bạn có thể thấy Gradient Descent giảm giá trị của hàm mất mát qua từng vòng lặp, giúp tối ưu hóa tham số \(w\) 
-  tốc độ học càng cao thì hướng về hội tụ càng nhanh nhưng dễ dẫn đến đi lệch quỷ đạo.
+  tốc độ học càng cao thì hướng về hội tụ càng nhanh nhưng dễ dẫn đến đi lệch quỷ đạo không thể hội tụ.
   """)
 
 
