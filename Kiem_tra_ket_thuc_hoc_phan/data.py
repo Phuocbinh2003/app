@@ -47,3 +47,5 @@ def app_ket_thuc():
   # Lưu lại dữ liệu để dùng tiếp
   st.session_state['X'] = X
   st.session_state['y'] = y
+if __name__ == "__main__":
+    app_ket_thuc()
