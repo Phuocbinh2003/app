@@ -261,7 +261,7 @@ def app_ket_thuc():
   
   # Vẽ ranh giới quyết định
 
-    st.pyplot(fig)
+  st.pyplot(fig)
   
   # Tiến hành một vòng lặp Gradient Descent
   if st.button("Tiến hành một vòng lặp"):
