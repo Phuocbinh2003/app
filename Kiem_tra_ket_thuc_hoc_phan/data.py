@@ -9,8 +9,7 @@ def app_ket_thuc():
   def generate_data(n_samples, n_classes, random_state):
       X, y = make_classification(
           n_samples=n_samples, 
-          
-          n_informative=n_features, 
+  
           n_redundant=0, 
           n_classes=n_classes, 
           random_state=random_state
