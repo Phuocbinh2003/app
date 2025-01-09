@@ -10,7 +10,7 @@ def app_ket_thuc():
       X, y = make_classification(
           n_samples=n_samples, 
           n_features=2,
-          n_informative=2
+          n_informative=2,
           n_redundant=0, 
           n_classes=n_classes, 
           random_state=random_state
