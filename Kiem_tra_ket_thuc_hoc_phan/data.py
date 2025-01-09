@@ -37,13 +37,7 @@ def app_ket_thuc():
   ax.set_ylabel("Feature 2")
   ax.set_title("Tập dữ liệu")
   st.pyplot(fig)
-  st.title("Giới thiệu Logistic Regression")
 
-
-
-
-    
-  st.title("Giới thiệu Logistic Regression")
 
   # Mở bài
   st.header("Bài toán phân loại")
