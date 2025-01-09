@@ -18,7 +18,7 @@ def app_ket_thuc():
       return X, y
   
   # Tạo giao diện Streamlit
-  st.title("Tạo dữ liệu 2D cho Logistic Regression")
+  st.title("Tạo dữ liệu 2D ")
   
   # Các tham số điều chỉnh
   n_samples = st.slider("Số lượng mẫu (n_samples)", min_value=50, max_value=1000, value=200, step=50)
