@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def app_ket_thuc():
   # Hàm tạo dữ liệu
-  def generate_data(n_samples, n_features, n_classes, random_state):
+  def generate_data(n_samples, n_classes, random_state):
       X, y = make_classification(
           n_samples=n_samples, 
           n_features=2, 
@@ -27,7 +27,7 @@ def app_ket_thuc():
   random_state = st.slider("Seed ngẫu nhiên (random_state)", min_value=0, max_value=100, value=42)
   
   # Sinh dữ liệu
-  X, y = generate_data(n_samples, n_features, n_classes, random_state)
+  X, y = generate_data(n_samples, n_classes, random_state)
   
   # Hiển thị dữ liệu đã tạo
   st.subheader("Dữ liệu được tạo")
