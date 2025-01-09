@@ -1,32 +1,52 @@
 import streamlit as st
-from sklearn.datasets import make_classification
+from sklearn.datasets import make_classification, make_blobs
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Hàm tạo dữ liệu
+def generate_data(n_samples, n_features, n_classes, random_state):
+    X, y = make_classification(
+        n_samples=n_samples, 
+        n_features=n_features, 
+        n_informative=n_features, 
+        n_redundant=0, 
+        n_classes=n_classes, 
+        random_state=random_state
+    )
+    return X, y
+
+# Hàm sigmoid
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+# Hàm mất mát (Binary Cross Entropy)
+def loss_function(y_true, y_pred):
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+# Gradient Descent cập nhật tham số
+def gradient_descent(X, y, w, b, learning_rate):
+    m = X.shape[0]
+    z = np.dot(X, w) + b
+    y_pred = sigmoid(z)
+    dw = np.dot(X.T, (y_pred - y)) / m
+    db = np.sum(y_pred - y) / m
+    w -= learning_rate * dw
+    b -= learning_rate * db
+    loss = loss_function(y, y_pred)
+    return w, b, loss
 
 def app_ket_thuc():
-    # Hàm tạo dữ liệu
-    def generate_data(n_samples, n_classes, random_state):
-        X, y = make_classification(
-            n_samples=n_samples, 
-            n_features=2,
-            n_informative=2,
-            n_redundant=0, 
-            n_classes=n_classes, 
-            random_state=random_state
-        )
-        return X, y
-    
     # Tạo giao diện Streamlit
     st.title("Tạo dữ liệu 2D cho Logistic Regression")
     
     # Các tham số điều chỉnh
     n_samples = st.slider("Số lượng mẫu (n_samples)", min_value=50, max_value=1000, value=200, step=50)
+    n_features = st.slider("Số lượng đặc trưng (n_features)", min_value=2, max_value=10, value=2)
     n_classes = st.slider("Số lớp (n_classes)", min_value=2, max_value=4, value=2)
     random_state = st.slider("Seed ngẫu nhiên (random_state)", min_value=0, max_value=100, value=42)
     
     # Sinh dữ liệu
-    X, y = generate_data(n_samples, n_classes, random_state)
+    X, y = generate_data(n_samples, n_features, n_classes, random_state)
     
     # Hiển thị dữ liệu đã tạo
     st.subheader("Dữ liệu được tạo")
@@ -37,12 +57,13 @@ def app_ket_thuc():
     ax.set_title("Tập dữ liệu")
     st.pyplot(fig)
     
+    # Giới thiệu Logistic Regression
     st.title("Giới thiệu Logistic Regression")
     
     # Mở bài
     st.header("Bài toán phân loại")
     st.write("""
-    Phân loại là một bài toán cơ bản trong học máy, nơi chúng ta dự đoán nhãn của một dữ liệu dựa trên các đặc trưng của nó. 
+    Phân loại là một bài toán cơ bản trong học máy, nơi chúng ta dự đoán nhãn của một dữ liệu dựa trên các đặc trưng của nó.
     Ví dụ, dự đoán liệu một email là spam hay không, hoặc dự đoán một bệnh nhân có mắc bệnh không dựa trên các chỉ số y tế.
     """)
     
@@ -109,11 +130,11 @@ def app_ket_thuc():
     
     Hàm mất mát này được sử dụng để tối ưu hóa mô hình qua Gradient Descent.
     """)
-
-    # Gradient Descent: Phương pháp tối ưu hóa trong Logistic Regression
+    
+    # Giới thiệu về Gradient Descent
     st.header("Gradient Descent: Phương pháp tối ưu hóa trong Logistic Regression")
     st.write("""
-    Gradient Descent là một trong những thuật toán phổ biến nhất để tối ưu hóa mô hình học máy. 
+    Gradient Descent là một trong những thuật toán phổ biến nhất để tối ưu hóa mô hình học máy.
     Nó giúp tìm giá trị tối ưu của tham số \(w\) và \(b\) bằng cách giảm thiểu hàm mất mát (loss function) qua nhiều vòng lặp.
     """)
     
@@ -152,40 +173,30 @@ def app_ket_thuc():
     
     # Khởi tạo tham số w
     w_start = 6
-    learning_rate = st.slider("Điều chỉnh Learning Rate (α)", 0.01, 0.5, 0.1, step=0.01)
+    learning_rate = st.slider("Điều chỉnh Learning Rate (α)", 0.01, 0.5, 0.1)
     
-    # Quá trình cập nhật Gradient Descent
+    # Tối ưu hóa Gradient Descent
     w_current = w_start
-    steps = []
-    losses = []
-    
-    for _ in range(20):  # 20 vòng lặp
-        loss = loss_function(w_current)
-        steps.append(w_current)
-        losses.append(loss)
-        grad = gradient(w_current)
-        w_current = w_current - learning_rate * grad
+    iterations = 10
+    path = [w_current]
+    for _ in range(iterations):
+        w_current = w_current - learning_rate * gradient(w_current)
+        path.append(w_current)
     
     # Vẽ đồ thị
-    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
-    
-    # Đồ thị hàm mất mát
-    ax[0].plot(w_values, loss_values, label="Hàm mất mát")
-    ax[0].scatter(steps, losses, color="red", label="Quá trình tối ưu", zorder=5)
-    ax[0].set_title("Hàm mất mát và Gradient Descent")
-    ax[0].set_xlabel("Tham số w")
-    ax[0].set_ylabel("Loss")
-    ax[0].legend()
-    
-    # Đồ thị Gradient Descent
-    ax[1].plot(range(20), losses, label="Loss")
-    ax[1].set_title("Mất mát theo số vòng lặp")
-    ax[1].set_xlabel("Số vòng lặp")
-    ax[1].set_ylabel("Loss")
-    ax[1].legend()
-    
+    fig, ax = plt.subplots()
+    ax.plot(w_values, loss_values, label="Hàm Mất mát", color="blue")
+    ax.scatter(path, loss_function(np.array(path)), color="red", label="Gradient Descent Path")
+    ax.set_xlabel("w")
+    ax.set_ylabel("Loss")
+    ax.set_title("Gradient Descent")
+    ax.legend()
     st.pyplot(fig)
     
-    # Cập nhật kết quả cho người dùng
-    st.write(f"Tham số cuối cùng: w = {w_current:.2f}")
-    st.write(f"Loss cuối cùng: {losses[-1]:.2f}")
+    # Kết quả
+    st.write(f"Tham số tối ưu sau {iterations} vòng lặp Gradient Descent: {w_current:.2f}")
+    st.write(f"Giá trị mất mát tại tham số tối ưu: {loss_function(w_current):.2f}")
+
+if __name__ == "__main__":
+    app_ket_thuc()
+
