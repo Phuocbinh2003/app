@@ -260,33 +260,34 @@ def app_ket_thuc():
   ax.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap="coolwarm", edgecolor="k")
   
   # Vẽ ranh giới quyết định
- # Vẽ ranh giới quyết định
-  if st.session_state.iterations > 0:
-      w, b = st.session_state.w, st.session_state.b
+
+    st.pyplot(fig)
+  
+  # Tiến hành một vòng lặp Gradient Descent
+  if st.button("Tiến hành một vòng lặp"):
+      # Cập nhật tham số w, b bằng Gradient Descent
+      w, b, loss = gradient_descent(X_bias, y, st.session_state.w, st.session_state.b, learning_rate)
+      
+      # Lưu kết quả vào session state
+      st.session_state.w = w
+      st.session_state.b = b
+      st.session_state.losses.append(loss)
+      st.session_state.iterations += 1
+      
+      # Vẽ lại ranh giới quyết định
+      fig, ax = plt.subplots()
+      ax.scatter(X[:, 0], X[:, 1], c=y.flatten(), cmap="coolwarm", edgecolor="k")
+      
+      # Vẽ ranh giới quyết định
       x_vals = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
       slope = -w[1][0] / w[2][0]
       intercept = -w[0][0] / w[2][0]
       y_vals = slope * x_vals + intercept
-      
-      # Vẽ ranh giới quyết định
       ax.plot(x_vals, y_vals, color='black', label="Decision Boundary")
       
-  # Hiển thị giao diện
-  st.pyplot(fig)
-
-  
-  # Nút tiến hành một vòng lặp Gradient Descent
-  if st.button("Tiến hành một vòng lặp"):
-      st.session_state.w, st.session_state.b, loss = gradient_descent(
-          X_bias, y, st.session_state.w, st.session_state.b, learning_rate
-      )
-      st.session_state.losses.append(loss)
-      st.session_state.iterations += 1
-  
-  # Hiển thị số lần lặp và đồ thị hàm mất mát
-  st.write(f"Số lần lặp: {st.session_state.iterations}")
-  st.line_chart(st.session_state.losses)
-  st.write("Đồ thị hàm mất mát giảm qua từng vòng lặp.")
+      # Hiển thị kết quả
+      st.pyplot(fig)
+      st.write(f"Vòng lặp thứ {st.session_state.iterations}: Loss = {loss}")
 
 
 
