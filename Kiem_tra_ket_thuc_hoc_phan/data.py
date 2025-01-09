@@ -64,7 +64,7 @@ def app_ket_thuc():
   st.markdown("- Không thể trực tiếp thiết lập một ranh giới quyết định rõ ràng giữa các lớp.")
   
   # Chuyển sang Logistic Regression
-  st.header("Giới thiệu Logistic Regression")
+  st.header("Logistic Regression")
   st.write("""
   Để khắc phục nhược điểm của Linear Regression trong bài toán phân loại, Logistic Regression sử dụng một hàm kích hoạt, cụ thể là hàm sigmoid, để giới hạn giá trị đầu ra trong khoảng [0, 1].
   Công thức Logistic Regression:
@@ -114,7 +114,7 @@ def app_ket_thuc():
 
 
 
-  st.header("Gradient Descent: Phương pháp tối ưu hóa trong Logistic Regression")
+  st.header("Gradient Descent")
   
   # Giới thiệu cơ bản
   st.write("""
