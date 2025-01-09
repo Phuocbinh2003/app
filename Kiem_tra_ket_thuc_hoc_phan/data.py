@@ -42,6 +42,9 @@ def app_ket_thuc():
 
 
 
+    
+  # Tiêu đề chính
+  st.title("Giới thiệu Logistic Regression")
   
   # Mở bài
   st.header("Bài toán phân loại")
